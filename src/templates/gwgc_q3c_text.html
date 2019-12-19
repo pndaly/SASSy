@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--suppress ALL -->
+<!-- global container -->
+<div class="container">
+
+  <!-- introduction -->
+  <div class="row">
+    <div class="col-md-12">
+      <h2><font color="purple">G</font>ravitational <font color="purple">W</font>ave <font color="purple">G</font>alaxy
+        <font color="purple">C</font>atalog (<a href="http://cdsarc.u-strasbg.fr/ftp/VII/267/gwgc.dat.gz">gwgc.dat.gz</a>) Description</h2>
+    </div>
+  </div>
+  <!-- end of introduction -->
+
+  <pre>
+    {{ text }}
+  </pre>
+</div>
+{% endblock %}

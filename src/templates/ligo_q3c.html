@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+<!-- description -->
+{% block content %}
+
+<!--suppress ALL -->
+<!-- introduction -->
+<div class="container">
+ <div class="row">
+   <div class="col-md-12">
+     <h2>
+      <font color="purple">L</font>aser <font color="purple">I</font>nterferometer <font color="purple">G</font>ravitational-Wave
+      <font color="purple">O</font>bservatory (<a href="{{ url_for('ligo_q3c_text') }}">LIGO</a> [Q3C])</h2>
+     </h2>
+     This page provides a default interface to the LIGO alerts with Q3C indexing. The table lists LIGO records in descending
+     order by database <i>id</i>. Use the filters on the right to narrow down the results to areas of interest.
+     When the results look good, add <code>?format=json</code> to the URL. You can then access the URL to
+     retrieve the full data and use it in your scripts. <p></p>
+   </div>
+ </div>
+ <!-- end of introduction -->
+</div>
+
+<br>
+
+<div class="container">
+
+ <!-- sort section -->
+ <!--suppress HtmlUnknownAttribute -->
+ <div class="row">
+  <div class="col-md-2">
+   <form method="GET" action="/sassy/ligo_q3c">
+    <div align="center">
+     <button type="submit" class="btn btn-success">Select</button>
+     <a href="/sassy/ligo_q3c" class="btn btn-warning">Reset</a>
+    </div>
+
+    <br>
+
+    <!-- Sort By ... group -->
+    <div class="form-group">
+     <label><b>Sort By ...</b></label>
+     <!-- SORT_VALUE = ['id', 'name', 'name_prefix', 'name_suffix', 'ra', 'dec', 'transient_type', 'discovery_date', 'discovery_mag', 'filter_name', 'source_group', 'probability', 'sigma', 'gw_aka', 'gw_date', 'gw_event', 'before'] -->
+     <div class="form-row">
+      <select id="sort_field" name="sort_field" class="form-control form-control-sm" value="{{ request.args.sort_field }}">
+       <option value="id"             {% if request.args.sort_field=='id' %}             selected {% endif %}>Database ID</option>
+       <option value="name"           {% if request.args.sort_field=='name' %}           selected {% endif %}>Name</option>
+       <option value="name_prefix"    {% if request.args.sort_field=='name_prefix' %}    selected {% endif %}>Name Prefix</option>
+       <option value="name_suffix"    {% if request.args.sort_field=='name_suffix' %}    selected {% endif %}>Name Suffix</option>
+       <option value="ra"             {% if request.args.sort_field=='ra' %}             selected {% endif %}>RA (J2k&deg;)</option>
+       <option value="dec"            {% if request.args.sort_field=='dec' %}            selected {% endif %}>Dec (J2k&deg;)</option>
+       <option value="transient_type" {% if request.args.sort_field=='transient_type' %} selected {% endif %}>Transient Type</option>
+       <option value="discovery_date" {% if request.args.sort_field=='discovery_date' %} selected {% endif %}>Discovery Date</option>
+       <option value="discovery_mag"  {% if request.args.sort_field=='discovery_mag' %}  selected {% endif %}>Discovery Magnitude</option>
+       <option value="filter_name"    {% if request.args.sort_field=='filter_name' %}    selected {% endif %}>Filter</option>
+       <option value="source_group"   {% if request.args.sort_field=='source_group' %}   selected {% endif %}>Source Group</option>
+       <option value="probability"    {% if request.args.sort_field=='probability' %}    selected {% endif %}>Probability</option>
+       <option value="sigma"          {% if request.args.sort_field=='sigma' %}          selected {% endif %}>Sigma</option>
+       <option value="gw_aka"         {% if request.args.sort_field=='gw_aka' %}         selected {% endif %}>GW (Alternate) Name</option>
+       <option value="gw_date"        {% if request.args.sort_field=='gw_date' %}        selected {% endif %}>GW (Discovery) Date</option>
+       <option value="gw_event"       {% if request.args.sort_field=='gw_event' %}       selected {% endif %}>GW (Event) Name</option>
+       <option value="before"         {% if request.args.sort_field=='before' %}         selected {% endif %}>Before</option>
+      </select>
+     </div>
+
+     <div class="form-row">
+      <select id="sort_order" name="sort_order" class="form-control form-control-sm" value="{{ request.args.sort_order }}">
+       <option value="descending"     {% if request.args.sort_order=='descending' %}     selected {% endif %}>Descending</option>
+       <option value="ascending"      {% if request.args.sort_order=='ascending' %}      selected {% endif %}>Ascending</option>
+      </select>
+     </div>
+    </div>
+
+    <br>
+
+    <!-- Using Filters ... group -->
+    <div class="form-group">
+     <label><b>Using Filters ...</b></label>
+
+     <div class="form-row">
+      <input type="text" class="form-control form-control-sm" id="name" name="name"
+          value="{{ request.args.name }}" placeholder="G334993-2019gwt">
+     </div>
+
+     <div class="form-row">
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="ra__gte" name="ra__gte" value="{{ request.args.ra__gte }}" placeholder="0">
+      </div>
+      <label for="ra__gte"><font color="grey">&le;</font> <small>RA</small> <font color="grey">&le;</font></label>
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="ra__lte" name="ra__lte" value="{{ request.args.ra__lte }}" placeholder="360">
+      </div>
+     </div>
+
+     <div class="form-row">
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="dec__gte" name="dec__gte" value="{{ request.args.dec__gte }}" placeholder="-90">
+      </div>
+      <label for="dec__gte"><font color="grey">&le;</font> <small>Dec</small> <font color="grey">&le;</font></label>
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="dec__lte" name="dec__lte" value="{{ request.args.dec__lte }}" placeholder="90">
+      </div>
+     </div>
+
+     <div class="form-row">
+      <input type="text" class="form-control form-control-sm" id="filter_name" name="filter_name"
+          value="{{ request.args.filter_name }}" placeholder="Filter Name">
+     </div>
+
+     <div class="form-row">
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="discovery_mag__gte" name="discovery_mag__gte" value="{{ request.args.discovery_mag__gte }}" placeholder="-10">
+      </div>
+      <label for="discovery_mag__gte"><font color="grey">&le;</font> <small>mag</small> <font color="grey">&le;</font></label>
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="discovery_mag__lte" name="discovery_mag__lte" value="{{ request.args.discovery_mag__lte }}" placeholder="25">
+      </div>
+     </div>
+
+     <div class="form-row">
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="probability__gte" name="probability__gte" value="{{ request.args.probability__gte }}" placeholder="0">
+      </div>
+      <label for="probability__gte"><font color="grey">&le;</font> <small>P(Event)</small> <font color="grey">&le;</font></label>
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="probability__lte" name="probability__lte" value="{{ request.args.probability__lte }}" placeholder="1">
+      </div>
+     </div>
+
+     <div class="form-row">
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="sigma__gte" name="sigma__gte" value="{{ request.args.sigma__gte }}" placeholder="1">
+      </div>
+      <label for="sigma__gte"><font color="grey">&le;</font> <small>&sigma;</small> <font color="grey">&le;</font></label>
+      <div class="col">
+       <input type="number" step="0.01" class="form-control form-control-sm" id="sigma__lte" name="sigma__lte" value="{{ request.args.sigma__lte }}" placeholder="3">
+      </div>
+     </div>
+
+     <label for="gw_date"><small>GW Date</small></label>
+     <div class="form-row">
+      <div class="col">
+       <input type="date" class="form-control form-control-sm" id="gw_date"
+           name="gw_date" value="{{ request.args.gw_date}}" placeholder="2019-01-01">
+      </div>
+     </div>
+
+     <label for="discovery_date"><small>Transient Date</small></label>
+     <div class="form-row">
+      <div class="col">
+       <input type="date" class="form-control form-control-sm" id="discovery_date"
+           name="discovery_date" value="{{ request.args.discovery_date}}" placeholder="2019-01-01">
+      </div>
+     </div>
+
+     <div class="form-row">
+      <input type="text" class="form-control form-control-sm" id="gw_aka" name="gw_aka"
+          value="{{ request.args.gw_aka }}" placeholder="GW Alternate Name">
+     </div>
+
+     <div class="form-row">
+      <input type="text" class="form-control form-control-sm" id="gw_event" name="gw_event"
+          value="{{ request.args.gw_event }}" placeholder="GW Event Name">
+     </div>
+
+     <div class="form-row">
+      <input type="text" class="form-control form-control-sm" id="transient_type" name="transient_type"
+          value="{{ request.args.transient_type }}" placeholder="Type SN Ia">
+     </div>
+
+     <div class="form-row">
+      <input type="text" class="form-control form-control-sm" id="source_group" name="source_group"
+          value="{{ request.args.source_group }}" placeholder="Source Group">
+     </div>
+
+     <div class="form-row">
+      <input type="checkbox" id="before" name="before" value="0" placeholder="0" onclick="toggle_check(this)"> &nbsp; <small>Discovered Before?</small>
+     </div>
+
+     <label for="astrocone"><small>AstroCone Search</small></label>
+     <div class="form-row">
+      <div class="col">
+       <input type="text" class="form-control form-control-sm" id="astrocone"
+           name="astrocone" value="" placeholder="M51,5.0">
+      </div>
+     </div>
+
+     <label for="cone"><small>Cone Search</small></label>
+     <div class="form-row">
+      <div class="col">
+       <input type="text" class="form-control form-control-sm" id="cone"
+           name="cone" value="" placeholder="202.0,47.0,5.0">
+      </div>
+     </div>
+
+     <br>
+
+     <div align="center">
+       <button type="submit" class="btn btn-success">Select</button>
+       <a href="/sassy/ligo_q3c" class="btn btn-warning">Reset</a>
+     </div>
+    </div>
+   </form>
+  </div>
+  <!-- End of Using Filters ... group -->
+
+  <br>
+
+  <!-- Table -->
+  <div class="col-md-10">
+   <div class="table-responsive">
+    <div class="row">
+     <div class="col">
+      <div align="left">
+       {% if context.has_prev %}
+        <a href="/sassy/ligo_q3c?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+       {% else %}
+        <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+       {% endif %}
+      </div>
+     </div>
+     <div class="col-md-8">
+      <div align="center">
+       {{ context.total }} record(s) found, showing page {{ page }} / {{ context.pages }}.
+      </div>
+     </div>
+     <div class="col">
+      <div align="right">
+       {% if context.has_next %}
+        <a href="/sassy/ligo_q3c?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+       {% else %}
+        <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+       {% endif %}
+      </div>
+     </div>
+    </div>
+
+    <br>
+
+    <table class="table table-striped table-sm">
+     <thead>
+      <tr>
+       <th><font color="blue">ID</font></th>
+       <th><font color="blue">TNS Name</font></th>
+       <th><font color="blue">GW Name</font></th>
+       <th><font color="blue">GW Date</font></th>
+       <th><font color="blue">RA</font></th>
+       <th><font color="blue">Dec</font></th>
+       <th><font color="blue">Filter</font></th>
+       <th><font color="blue">Magnitude</font></th>
+       <th><font color="blue">Probability</font></th>
+       <th><font color="blue">Sigma</font></th>
+       <th><font color="blue">Type</font></th>
+       <th><font color="blue">Discovered</font></th>
+       <th><font color="blue">Group</font></th>
+       <th><font color="blue">GW Aka</font></th>
+       <th><font color="blue">Before?</font></th>
+      </tr>
+      <tr>
+       <th><font color="grey"></font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey">J2k &deg;</font></th>
+       <th><font color="grey">J2k &deg;</font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey">0 &lt;&gt; 1</font></th>
+       <th><font color="grey">1 &lt;&gt; 3</font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey">(date)</font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey"></font></th>
+       <th><font color="grey"></font></th>
+      </tr>
+     </thead>
+     <tbody>
+      {% for record in context.results %}
+       <tr>
+        <td><a href="/sassy/ligo_q3c/{{ record.id }}/" title="{{ record.id }}">{{ record.id }}</a></td>
+	{% if '-' in record.name %}
+	 {% set tns_name = record.name.split('-') %}
+	 <td><a href="https://wis-tns.weizmann.ac.il/object/{{ tns_name[1] }}/" title="{{ tns_name[1]}}">{{ record.name_prefix }}{{ tns_name[1] }}</a></td>
+	{% else %}
+         <td><a href="https://wis-tns.weizmann.ac.il/object/{{ record.name }}/" title="{{ record.name }}">{{ record.name }}</a></td>
+	{% endif %}
+	<td><a href="https://wis-tns.weizmann.ac.il/ligo/event/LIGO_-_{{ record.gw_aka }}/" title="{{ record.gw_event }}">{{ record.gw_event }}</a></td>
+        <td>{{ record.gw_date }}</td>
+        {% if record.ra|float("NaN") == "NaN" %}
+         <td>{{ record.ra }}</td>
+        {% else %}
+         <td>{{ "%.3f"|format(record.ra) }}</td>
+        {% endif %}
+        {% if record.dec|float("NaN") == "NaN" %}
+         <td>{{ record.dec }}</td>
+        {% else %}
+         <td>{{ "%.3f"|format(record.dec) }}</td>
+        {% endif %}
+        <td>{{ record.filter_name }}</td>
+        {% if record.discovery_mag|float("NaN") == "NaN" %}
+         <td>{{ record.discovery_mag }}</td>
+        {% else %}
+         <td>{{ "%.3f"|format(record.discovery_mag) }}</td>
+        {% endif %}
+        {% if record.probability|float("NaN") == "NaN" %}
+         <td>{{ record.probability }}</td>
+        {% else %}
+         <td>{{ "%.3f"|format(record.probability) }}</td>
+        {% endif %}
+        {% if record.sigma|float("NaN") == "NaN" %}
+         <td>{{ record.sigma }}</td>
+        {% else %}
+         <td>{{ "%.3f"|format(record.sigma) }}</td>
+        {% endif %}
+        <td>{{ record.transient_type }}</td>
+        <td>{{ record.discovery_date }}</td>
+        <td>{{ record.source_group }}</td>
+        <td>{{ record.gw_aka }}</td>
+        {% if record.before %}
+         <td><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></td>
+        {% else %}
+         <td><i class="fa fa-thumbs-o-down" aria-hidden="true"></i></td>
+        {% endif %}
+       </tr>
+      {% endfor %}
+     </tbody>
+    </table>
+
+    <div class="row">
+     <div class="col">
+      <div align="left">
+       {% if context.has_prev %}
+        <a href="/sassy/ligo_q3c?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+       {% else %}
+        <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+       {% endif %}
+      </div>
+     </div>
+     <div class="col-md-8">
+      <div align="center">
+       {{ context.total }} record(s) found. Showing page {{ page }} / {{ context.pages }}.
+      </div>
+     </div>
+     <div class="col">
+      <div align="right">
+       {% if context.has_next %}
+        <a href="/sassy/ligo_q3c?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+       {% else %}
+        <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+       {% endif %}
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <!-- end of table section -->
+ </div>
+{% endblock %}
+
+{% block js %}
+<!-- toggle script -->
+<script type="text/javascript">
+function toggle_check(check) {
+  if (check.value == "1") {
+    check.value = "0";
+    console.log('check.value: True -> False');
+  } else {
+    check.value = "1";
+    console.log('check.value: False -> True');
+  }
+}
+</script>
+{% endblock %}

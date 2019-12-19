@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+
+<!-- suppress ALL -->
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+
+    <!-- Acknowledgement(s) -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Acknowledgement">Acknowledgement of Use</button>
+      </div>
+    </div>
+    <div id="Acknowledgement" class="collapse">
+      <br>
+      <p>
+        Any scientific publication which results from the use of this resource should include an acknowledgment of
+        SASSy as well as the LCOGT organization.
+        Note that the <i>Las Cumbres Observatory Global Telescope</i> advocates the use of their acronym, LCOGT, in
+        scientific publications to avoid confusion
+        with <i>Las Campanas Observatory</i>. If appropriate you may also consider citing their <a
+        href="https://arxiv.org/abs/1011.6394">paper</a> which defines
+        the goals, capabilities and research interests of LCO.
+      </p>
+    </div>
+    <br>
+
+    <!-- Styling -->
+    <div class="row">
+     <div class="col-md-12">
+      <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#SASSyWebsiteStyling">SASSy Website Styling</button>
+     </div>
+    </div>
+    <div class="row">
+     <div class="col-md-12 imgdiv">
+      <div id="SASSyWebsiteStyling" class="collapse">
+       <p>Each (non-landing) page consists of the following sections:</p>
+       <h4><i class="far fa-arrow-alt-circle-right"></i> Navigation Bar</h4>
+       <img title="SASSy NavBar" src="{{ url_for('static', filename='img/SASSy_NavBar.png') }}" class="myimg img-responsive thumbnail">
+       <p>The <i>navigation bar</i> is fixed to the top of the page and controls access to various sub-pages.
+       Iconography used through the application is explained elsewhere.</p>
+       <br>
+       <h4><i class="far fa-arrow-alt-circle-right"></i> Citation Header</h4>
+       <img title="SASSy Citation" src="{{ url_for('static', filename='img/SASSy_Citation.png') }}" class="myimg img-responsive thumbnail">
+       <p>The <i>citation header</i> reminds users of the purpose of SASSy and references the founding document(s) and code-base.</p>
+       <br>
+       <h4><i class="far fa-arrow-alt-circle-right"></i> Page Specifics</h4>
+       <img title="SASSy Specifics" src="{{ url_for('static', filename='img/SASSy_Specifics.png') }}" class="myimg img-responsive thumbnail">
+       <p>The <i>page specifics</i> section is dynamically created by various RESTful routes. In the above example we see the
+         <a href="{{ url['url'] }}/ligo">LIGO</a> route (which was under construction at the time). Many other routes are complete.</p>
+       <br>
+       <h4><i class="far fa-arrow-alt-circle-right"></i> Footer</h4>
+       <img title="SASSy Footer" src="{{ url_for('static', filename='img/SASSy_Footer.png') }}" class="myimg img-responsive thumbnail">
+       <p>The <i>footer</i> shows the organizations that have contributed in significant ways to SASSy.</p>
+      </div>
+     </div>
+    </div>
+    <br>
+
+    <!-- Iconography -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Iconography">Iconography</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 imgdiv">
+        <div id="Iconography" class="collapse">
+          <br>
+          <table class="table table-striped table-bordered table-hover table-lg">
+            <thead>
+              <tr>
+                <th><font color="blue">Icon</font></th>
+                <th><font color="blue">Description</font></th>
+               </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><i class="fa fa-2x fa-home" aria-hidden="true"></i></td>
+                <td>Navigate to the landing page</td>
+              </tr>
+              <tr>
+                <td><i class="fa fa-2x fa-envelope"></i></td>
+                <td>Contact the SASSy webmaster via email</td>
+              </tr>
+              <tr>
+                <td><i class="fa fa-2x fa-phone"></i></td>
+                <td>Contact the SASSy webmaster via 'phone (mobile application only)</td>
+              </tr>
+              <tr>
+                <td><i class="fa fa-2x fa-info" aria-hidden="true"></i></td>
+                <td>Navigate to the help page</td>
+              </tr>
+              <tr>
+                <td><i class="fa fa-2x fa-book" aria-hidden="true"></i></td>
+                <td>Navigate to the API page</td>
+              </tr>
+              <tr>
+                <td><i class="far fa-2x fa-arrow-alt-circle-right" aria-hidden="true"></i></td>
+                <td>Section identifier</td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-2x fa-tools" aria-hidden="true"></i></td>
+                <td>Page under construction</td>
+              </tr>
+             <tr>
+                <td><i class="far fa-2x fa-thumbs-up" aria-hidden="true"></i></td>
+                <td>Activity is enabled / running</td>
+              </tr>
+             <tr>
+                <td><i class="far fa-2x fa-thumbs-down" aria-hidden="true"></i></td>
+                <td>Activity is disabled / stopped</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <!-- GLADE Interface -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Using_The_SASSy_GLADE_Web_Interface">GLADE Interface</button>
+      </div>
+    </div>
+    <div id="Using_The_SASSy_GLADE_Web_Interface" class="collapse">
+      <br>
+      <p>
+         (<font color="purple">GLADE</font>) is the <i><strong><font color="purple">G</font></strong>alaxy <strong><font color="purple">L</font></strong>ist 
+         for the <strong><font color="purple">A</font></strong>dvanced <strong><font color="purple">D</font></strong>etector</i> <strong><font color="purple">E</font></strong>ra</i>.
+	 The SASSy database is sourced from <a href="http://glade.elte.hu/GLADEi_2.3.txt">Glade v2.3</a>.
+	 Column headings can be viewed using the <a href="{{ url['url'] }}/glade/text">text</a> route.
+	 The database schema is:
+         <blockquote>
+           <font color="green"><small>
+	     CREATE TABLE glade (<br>
+	     &nbsp; id serial PRIMARY KEY,<br>
+	     &nbsp; pgc integer,<br>
+	     &nbsp; gwgc VARCHAR(128),<br>
+	     &nbsp; hyperleda VARCHAR(128),<br>
+	     &nbsp; twomass VARCHAR(128),<br>
+	     &nbsp; sdss VARCHAR(128),<br>
+	     &nbsp; flag1 VARCHAR(1),<br>
+	     &nbsp; ra double precision,<br>
+	     &nbsp; dec double precision,<br>
+	     &nbsp; dist double precision,<br>
+	     &nbsp; disterr double precision,<br>
+	     &nbsp; z double precision,<br>
+	     &nbsp; b double precision,<br>
+	     &nbsp; b_err double precision,<br>
+	     &nbsp; b_abs double precision,<br>
+	     &nbsp; j double precision,<br>
+	     &nbsp; j_err double precision,<br>
+	     &nbsp; h double precision,<br>
+	     &nbsp; h_err double precision,<br>
+	     &nbsp; k double precision,<br>
+	     &nbsp; k_err double precision,<br>
+	     &nbsp; flag2 integer,<br>
+	     &nbsp; flag3 integer<br>
+	     );<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The <a href="https://github.com/segasai/q3c/tree/master/sql">Q3C</a> variant database has the same table schema but a table name of <i>glade_q3c</i> and was created with:
+         <blockquote>
+           <font color="green"><small>
+             CREATE EXTENSION q3c;<br>
+             CREATE INDEX ON glade_q3c (q3c_ang2ipix(ra, dec));<br>
+             CLUSTER glade_q3c_q3c_ang2ipix_idx ON glade_q3c;<br>
+             ANALYZE VERBOSE glade_q3c;<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The GLADE page of the SASSy interface consists of a list of selection criteria and a table of records. By default the
+         table lists records in ascending order by database identifier. Earlier or later records can be viewed by using the 
+	 <font color="blue">Prev</font> and <font color="blue">Next</font> links. 
+         To narrow down the results shown use the modifiers on the left.
+	 To apply modifiers simply enter the desired value into each corresponding entry widgets and click <i><font color="blue">Select</font></i>.
+         Greyed-out values within entry widgets are placeholders which give some idea of the data required and format.
+	 Only the Q3C database features a cone/astrocone search.
+      </p>
+    </div>
+    <br>
+
+    <!-- GWGC Interface -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Using_The_SASSy_GWGC_Web_Interface">GWGC Interface</button>
+      </div>
+    </div>
+    <div id="Using_The_SASSy_GWGC_Web_Interface" class="collapse">
+      <br>
+      <p>
+         (<font color="purple">GWGC</font>) is the <i><strong><font color="purple">G</font></strong>ravitational <strong><font color="purple">W</font></strong>ave 
+         <strong><font color="purple">G</font></strong>alaxy <strong><font color="purple">C</font></strong>atalog</i>.
+	 The SASSy database is sourced from <a href="http://cdsarc.u-strasbg.fr/ftp/VII/267/gwgc.dat.gz">Gwgc VII/267</a>.
+	 Column headings can be viewed using the <a href="{{ url['url'] }}/gwgc/text">text</a> route.
+	 The database schema is:
+         <blockquote>
+           <font color="green"><small>
+	     CREATE TABLE gwgc (<br>
+	       &nbsp; id serial PRIMARY KEY,<br>
+	       &nbsp; pgc integer,<br>
+	       &nbsp; name VARCHAR(128) NOT NULL,<br>
+	       &nbsp; ra double precision,<br>
+	       &nbsp; dec double precision,<br>
+	       &nbsp; tt double precision,<br>
+	       &nbsp; b_app double precision,<br>
+	       &nbsp; a double precision,<br>
+	       &nbsp; e_a double precision,<br>
+	       &nbsp; b double precision,<br>
+	       &nbsp; e_b double precision,<br>
+	       &nbsp; b_div_a double precision,<br>
+	       &nbsp; e_b_div_a double precision,<br>
+	       &nbsp; pa double precision,<br>
+	       &nbsp; b_abs double precision,<br>
+	       &nbsp; dist double precision,<br>
+	       &nbsp; e_dist double precision,<br>
+	       &nbsp; e_b_app double precision,<br>
+	       &nbsp; e_b_abs double precision<br>
+	     );<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The <a href="https://github.com/segasai/q3c/tree/master/sql">Q3C</a> variant database has the same table schema but a table name of <i>gwgc_q3c</i> and was created with:
+         <blockquote>
+           <font color="green"><small>
+             CREATE EXTENSION q3c;<br>
+             CREATE INDEX ON gwgc_q3c (q3c_ang2ipix(ra, dec));<br>
+             CLUSTER gwgc_q3c_q3c_ang2ipix_idx ON gwgc_q3c;<br>
+             ANALYZE VERBOSE gwgc_q3c;<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The GWGC page of the SASSy interface consists of a list of selection criteria and a table of records. By default the
+         table lists records in ascending order by database identifier. Earlier or later records can be viewed by using the 
+	 <font color="blue">Prev</font> and <font color="blue">Next</font> links. 
+         To narrow down the results shown use the modifiers on the left.
+	 To apply modifiers simply enter the desired value into each corresponding entry widgets and click <i><font color="blue">Select</font></i>.
+         Greyed-out values within entry widgets are placeholders which give some idea of the data required and format.
+	 Only the Q3C database features a cone/astrocone search.
+      </p>
+    </div>
+    <br>
+
+    <!-- LIGO Interface -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Using_The_SASSy_LIGO_Web_Interface">LIGO Interface</button>
+      </div>
+    </div>
+    <div id="Using_The_SASSy_LIGO_Web_Interface" class="collapse">
+      <br>
+      <p>
+         (<font color="purple">LIGO</font>) is the <i><strong><font color="purple">L</font></strong>aser <strong><font color="purple">I</font></strong>nterferometer 
+         <strong><font color="purple">G</font></strong>ravitational-Wave <strong><font color="purple">O</font></strong>bservatory</i>.
+	 The SASSy database is sourced from <a href="http://wis-tns.weizmann.ac.il/ligo/events">LIGO GW</a>.
+	 Column headings can be viewed using the <a href="{{ url['url'] }}/ligo/text">text</a> route.
+	 The database schema is:
+         <blockquote>
+           <font color="green"><small>
+	     CREATE TABLE ligo (<br>
+	       &nbsp; id serial PRIMARY KEY,<br>
+	       &nbsp; name VARCHAR(32) NOT NULL UNIQUE,<br>
+	       &nbsp; name_prefix VARCHAR(16),<br>
+	       &nbsp; name_suffix VARCHAR(16),<br>
+	       &nbsp; ra double precision,<br>
+	       &nbsp; dec double precision,<br>
+	       &nbsp; transient_type VARCHAR(64),<br>
+	       &nbsp; discovery_date TIMESTAMP,<br>
+	       &nbsp; discovery_mag double precision,<br>
+	       &nbsp; filter_name VARCHAR(32),<br>
+	       &nbsp; source_group VARCHAR(64),<br>
+	       &nbsp; probability double precision,<br>
+	       &nbsp; sigma double precision,<br>
+	       &nbsp; gw_aka VARCHAR(64),<br>
+	       &nbsp; gw_date TIMESTAMP,<br>
+	       &nbsp; gw_event VARCHAR(32),<br>
+	       &nbsp; before BOOLEAN NOT NULL DEFAULT False<br>
+	     );<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The <a href="https://github.com/segasai/q3c/tree/master/sql">Q3C</a> variant database has the same table schema but a table name of <i>ligo_q3c</i> and was created with:
+         <blockquote>
+           <font color="green"><small>
+             CREATE EXTENSION q3c;<br>
+             CREATE INDEX ON ligo_q3c (q3c_ang2ipix(ra, dec));<br>
+             CLUSTER ligo_q3c_q3c_ang2ipix_idx ON ligo_q3c;<br>
+             ANALYZE VERBOSE ligo_q3c;<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The LIGO page of the SASSy interface consists of a list of selection criteria and a table of records. By default the
+         table lists records in ascending order by database identifier. Earlier or later records can be viewed by using the 
+	 <font color="blue">Prev</font> and <font color="blue">Next</font> links. 
+         To narrow down the results shown use the modifiers on the left.
+	 To apply modifiers simply enter the desired value into each corresponding entry widgets and click <i><font color="blue">Select</font></i>.
+         Greyed-out values within entry widgets are placeholders which give some idea of the data required and format.
+	 Only the Q3C database features a cone/astrocone search.
+      </p>
+    </div>
+    <br>
+
+    <!-- TNS Interface -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Using_The_SASSy_TNS_Web_Interface">TNS Interface</button>
+      </div>
+    </div>
+    <div id="Using_The_SASSy_TNS_Web_Interface" class="collapse">
+      <br>
+      <p>
+         (<font color="purple">TNS</font>) is the <i><strong><font color="purple">T</font></strong>ransient <strong><font color="purple">N</font></strong>ame 
+         <strong><font color="purple">S</font></strong>erver.
+	 The SASSy database is sourced from <a href="http://wis-tns.weizmann.ac.il">Tns</a>.
+	 Column headings can be viewed using the <a href="{{ url['url'] }}/tns/text">text</a> route.
+	 The database schema is:
+         <blockquote>
+           <font color="green"><small>
+	     CREATE TABLE tns (<br>
+	       &nbsp; id serial PRIMARY KEY,<br>
+               &nbsp; tns_id INTEGER,<br>
+               &nbsp; tns_name VARCHAR(64) NOT NULL UNIQUE,<br>
+               &nbsp; tns_link VARCHAR(128),<br>
+               &nbsp; ra double precision,<br>
+               &nbsp; dec double precision,<br>
+               &nbsp; redshift double precision,<br>
+               &nbsp; discovery_date TIMESTAMP,<br>
+               &nbsp; discovery_mag double precision,<br>
+               &nbsp; discovery_instrument VARCHAR(64),<br>
+               &nbsp; filter_name VARCHAR(32),<br>
+               &nbsp; tns_class VARCHAR(64),<br>
+               &nbsp; host VARCHAR(64),<br>
+               &nbsp; host_z double precision,<br>
+               &nbsp; source_group VARCHAR(64),<br>
+               &nbsp; alias VARCHAR(64),<br>
+               &nbsp; certificate VARCHAR(128)<br>
+	     );<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The <a href="https://github.com/segasai/q3c/tree/master/sql">Q3C</a> variant database has the same table schema but a table name of <i>tns_q3c</i> and was created with:
+         <blockquote>
+           <font color="green"><small>
+             CREATE EXTENSION q3c;<br>
+             CREATE INDEX ON tns_q3c (q3c_ang2ipix(ra, dec));<br>
+             CLUSTER tns_q3c_q3c_ang2ipix_idx ON tns_q3c;<br>
+             ANALYZE VERBOSE tns_q3c;<br>
+           </small></font>
+         </blockquote>
+      </p>
+      <p>The TNS page of the SASSy interface consists of a list of selection criteria and a table of records. By default the
+         table lists records in ascending order by database identifier. Earlier or later records can be viewed by using the 
+	 <font color="blue">Prev</font> and <font color="blue">Next</font> links. 
+         To narrow down the results shown use the modifiers on the left.
+	 To apply modifiers simply enter the desired value into each corresponding entry widgets and click <i><font color="blue">Select</font></i>.
+         Greyed-out values within entry widgets are placeholders which give some idea of the data required and format.
+	 Only the Q3C database features a cone/astrocone search.
+      </p>
+    </div>
+    <br>
+
+    <!-- ZTF Interface -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Using_The_SASSy_ZTF_Web_Interface">ZTF Interface</button>
+      </div>
+    </div>
+    <div id="Using_The_SASSy_ZTF_Web_Interface" class="collapse">
+      <br>
+      <p>The ZTF page of the SASSy interface consists of a list of selection criteria and a table of alerts. By default the
+        table lists the 50 most recent public alerts from ZTF with no modifiers applied. Earlier results can be viewed by
+        using the prev/next links. To narrow down the results shown, for example by date, use the modifiers on the left.
+        To apply modifiers simply enter the desired value into each corresponding field on the modifier list and click
+        "select". Some fields are range selections, some upper or lower bounds, and some are simple matches. For example,
+        to show alerts with a Real/Bogus score greater or equal to 0.8, you would place "0.8" in the field marked "rb &gt;="
+        and click "select".
+        Greyed-out values within entry widgets are placeholders which give some idea of the data required and format.
+	    Column headings can be viewed using the <a href="{{ url['url'] }}/ztf/text">text</a> route (which contains a
+        link to the gzip sources).</p>
+
+      <h4><i>Viewing Details Of A Single Alert</i></h4>
+      <p>Clicking on the <i>id</i> of an alert in the main table will bring you to that alert’s detail page. Here you can download
+        the original AVRO file, view the detection triplet, lightcurve, and the data provided within the AVRO.
+        The three cutouts are taken from the AVRO file and display the 1x1 arcmin area surrounding the alert.
+        They are displayed using JS9, which is a web based version of DS9. You can access the menu of JS9
+        functions (such as scaling and analysis) by clicking "toggle JS9 menus".</p>
+
+      <h4><i>Using The JSON API</i></h4>
+      <p>JSON (Javascript Object Notation) is a widely used data serialization format. Most programming languages provide
+        functions for reading and writing it, which makes it ideal for use in web services. Both the table and detail view
+        can be viewed in JSON form by adding the URL modifier <code><i>?format=json</i></code>. For example, to
+        view the JSON list of alerts with a Real/Bogus score &gt;= 0.8, you would use the following url:</p>
+
+      <p><a href="{{ url['url'] }}/ztf?rb__gte=0.8&format=json">{{ url['url'] }}/ztf?rb__gte=0.8&format=json</a></p>
+
+      <p>Alerts will be located within the <code>results</code> key. The other parameters, <code>has_next</code>,
+        <code>has_prev</code>, <code>pages</code> and <code>total</code> are informative keys that should help you
+        paginate through results should your query return greater than 75 alerts.
+        Similarly, a single alert can also be viewed in JSON form:</p>
+
+      <p><a href="{{ url['url'] }}/ztf/4157148?format=json">{{ url['url'] }}/ztf/4157148?format=json</a></p>
+
+      <p>The <i>identifier</i> part of the URL comes from the <i>sid</i> key contained in the alert JSON.</p>
+
+      <h4><i>Bulk Queryies Using The JSON API</i></h4>
+      <p>With a POST query, you can submit multiple queries simultaneously, rather than leveraging the GET
+        endpoint multiple times. To do so, simply use the base SASSy URL: <a href="{{ url['url'] }}/ztf">{{ url['url'] }}/ztf</a>
+        and include a list of queries in the JSON in the POST body:</p>
+
+      <div>
+        <code>
+          {
+            "queries": [
+              {
+                "sid": 1,
+                "cone": "242.3456,-5.3456,0.0007"
+              },
+              {
+                "sid": 2,
+                "ra_gt": 242.34,
+                "ra_lt": 242.35
+              }
+            ]
+          }
+        </code>
+      </div>
+      <br>
+
+      <p>The API will return the original query information in the response to differentiate queries. It will also ignore
+        any unsupported parameters, so you can use this to your advantage by including fields such as unique IDs (as shown
+        above) or names of queries, which you can parse later in the response.  The POST endpoint supports the same modifiers 
+ 	    as are available on the basic GET endpoint.</p>
+    </div>
+    <br>
+
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Working_With_AVRO_Files">Working With AVRO Files</button>
+      </div>
+    </div>
+
+    <div id="Working_With_AVRO_Files" class="collapse">
+      <br>
+      <p>ZTF uses the <a href="https://avro.apache.org/">Apache AVRO</a> data serialization format to distribute alerts.
+        You can access the raw AVRO files from SASSy by using the web interface or following the <code>avro</code>
+        link in the JSON views. ZTF provides a <a href="https://github.com/ZwickyTransientFacility/ztf-avro-alert">repository</a>
+        containing example scripts and iPython/Jupyter notebooks for working with these files.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- toggle script -->
+<script type="text/javascript">
+var _hidediv = null;
+function ToggleContent(id) {
+    if (_hidediv)
+        _hidediv();
+    var div = document.getElementById(id);
+    div.style.display = 'block';
+    _hidediv = function () { div.style.display = 'none'; };
+}
+</script>
+{% endblock %}

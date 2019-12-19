@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% block css %}
+<link type="text/css" rel="stylesheet" href="https://cdn.lco.global/js9/js9support.css">
+<link type="text/css" rel="stylesheet" href="https://cdn.lco.global/js9/js9.css">
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <h2>Alert {{ alert.id }}</h2>
+    <p>
+      This page lists all data available for this alert. You can add
+      <a href="/{{ alert.id }}?format=json" title="json view"><code>?format=json</code></a> to the url to view it in
+      raw json.
+    </p>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <strong>Other alerts at this location:</strong>
+        <div class="table-responsive">
+          <table class="table table-striped table-sm">
+            <thead><tr><th>lco_id</th><th>date</th><th>filter</th></tr></thead>
+            <tbody>
+              {% for prv_alert in alert.prv_candidate %}
+              <tr>
+                <td><a href="/{{ prv_alert.id }}">{{ prv_alert.id }}</td>
+                <td>{{ prv_alert.wall_time }}</td>
+                <td>{{ prv_alert.filter }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      <table class="table table-sm table-reponsive">
+        <tbody>
+          <tr><th>lco_id</th><td>{{ alert.id }}</td></tr>
+          <tr><th>objectId</th><td>{{ alert.objectId }}</td></tr>
+          <tr><th>publisher</th><td>{{ alert.publisher }}</td></tr>
+          <tr><th>candid</th><td>{{ alert.candid }}</td></tr>
+          <tr><th></th><td><strong>Candidate</strong></td></tr>
+          {% for k, v in alert.serialized().candidate.items() %}
+          <tr>
+            <th>{{ k }}</th>
+            <td>{{ v }}</th>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <p>Download original .avro file: <a href="{{ alert.avro }}" class="btn btn-primary">Download</a></p>
+      <p><a href="#" onclick="toggleMenus()">Toggle JS9 Menus</a></p>
+      <div class="row">
+        <div class="col-md-4">
+          <strong>Science</strong><br/>
+          <a href="/{{ alert.id }}/cutout/Science/">Download</a>
+          <div class="JS9Menubar d-none" id="JS9SciMenubar" data-displays="JS9Sci" data-width="180px"></div>
+          <div class="JS9" id="JS9Sci" data-width="180px" data-height="180px"></div>
+          <div style="margin-top: 2px;">
+            <div class="JS9Colorbar" id="JS9SciColorbar" data-displays="JS9Sci" data-width="180px"></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <strong>Template</strong><br/>
+          <a href="/{{ alert.id }}/cutout/Template/">Download</a>
+          <div class="JS9Menubar d-none" id="JS9TmpMenubar" data-displays="JS9Tmp" data-width="180px"></div>
+          <div class="JS9" id="JS9Tmp" data-width="180px" data-height="180px"></div>
+          <div style="margin-top: 2px;">
+            <div class="JS9Colorbar" id="JS9TmpColorbar" data-displays="JS9Tmp" data-width="180px"></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <strong>Difference</strong><br/>
+          <a href="/{{ alert.id }}/cutout/Difference/">Download</a>
+          <div class="JS9Menubar d-none" id="JS9DifMenubar" data-displays="JS9Dif" data-width="180px"></div>
+          <div class="JS9" id="JS9Dif" data-width="180px" data-height="180px"></div>
+          <div style="margin-top: 2px;">
+            <div class="JS9Colorbar" id="JS9DifColorbar" data-displays="JS9Dif" data-width="180px"></div>
+          </div>
+        </div>
+      </div>
+      <div id="lightcurve"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="https://cdn.lco.global/js9/js9prefs.js"></script>
+<script type="text/javascript" src="https://cdn.lco.global/js9/js9support.min.js"></script>
+<script type="text/javascript" src="https://cdn.lco.global/js9/js9.min.js"></script>
+<script type="text/javascript" src="https://cdn.lco.global/js9/js9plugins.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script type="text/javascript">
+  var filters = ['g', 'r', 'i'];
+  var filter_colorscale = [[0, 'rgb(0, 255, 0)'],[0.5, 'rgb(255, 0, 0)'],[1, 'rgb(0, 0, 255)']]
+  var unix_epoch_julian_day = 2440587;
+  var day = 86400000;
+  document.addEventListener('DOMContentLoaded', function() {
+    JS9.Preload('/{{ alert.id }}/cutout/Science/', {scale: 'log', onload: setZoom},  {display: 'JS9Sci'});
+    JS9.Preload('/{{ alert.id }}/cutout/Template/', {scale: 'log', onload: setZoom}, {display: 'JS9Tmp'});
+    JS9.Preload('/{{ alert.id }}/cutout/Difference/', {scale: 'log', onload: setZoom}, {display: 'JS9Dif'});
+    plotLightCurve();
+  });
+  function toggleMenus(){
+    menus = document.getElementsByClassName('JS9Menubar');
+    for(var i=0; i < menus.length; i++){
+      menus[i].classList.toggle('d-none');
+    }
+  }
+  function setZoom(display){
+    JS9.SetZoom('ToFit', {display: display});
+  }
+  function jdToDate(jd){
+    return new Date((Number(jd) - unix_epoch_julian_day) * day);
+  }
+  function buildSeries(data, fid){
+    // Finds all previous candidates of this object with the same filter that are not non-detections
+    var matches = data.prv_candidate.filter(function(match){
+      return match.candidate.fid === fid && "magpsf" in match.candidate;
+    });
+    // Gets the magpsf value of all matching previous candidates
+    var mags = matches.map(function(match){
+      return match.candidate.magpsf.toFixed(2);
+    });
+    // Gets the error of the magpsf value of all matching previous candidates
+    var mag_err = matches.map(function(match){
+      return match.candidate.sigmapsf.toFixed(2);
+    });
+    // Gets the timestamp of all matching previous candidates
+    var jds = matches.map(function(match){
+      return match.candidate.jd;
+    });
+    // Builds an array of the correct symbol for each matching previous candidate
+    // An isDiffPos value of t or 1 indicates a positive subtraction, represented by a full circle
+    // An isDiffPos value of f or 0 indicates a negative subtraction, represented by an empty circle
+    var symbols = matches.map(function(match){
+      if (['t', '1'].includes(match.candidate.isDiffPos)) {
+        return 'circle';
+      } else {
+        return 'circle-open';
+      }
+    });
+    // Adds the current candidate data for that filter to the previously constructed arrays
+    if(data.candidate.fid === fid){
+      mags.push(data.candidate.magpsf.toFixed(2));
+      mag_err.push(data.candidate.sigmapsf.toFixed(2));
+      jds.push(data.candidate.jd);
+    }
+    return {
+      y: mags,
+      x: jds.map(function(jd){return jdToDate(jd)}),
+      text: jds.map(function(jd){return 'jd: ' + jd}),
+      error_y:{
+        type: 'data',
+        array: mag_err,
+        visible: true,
+        color: filter_colorscale[fid - 1][1]
+      },
+      mode: 'markers',
+      type: 'scatter',
+      name: filters[fid - 1],
+      marker:{
+        symbol: symbols,
+        color: filter_colorscale[fid - 1][1],
+        size: 9
+      }
+    }
+  }
+  function buildPlot(data){
+    var fids = data.prv_candidate.map(function(prv_candidate){
+      return prv_candidate.candidate.fid;
+    })
+    fids.push(data.candidate.fid)
+    fids = fids.filter(function(fid, index){
+      return fids.indexOf(fid) === index;
+    });
+    var plot_data  = [];
+    for(var i=0; i<fids.length; i++){
+      plot_data.push(buildSeries(data, fids[i]));
+    }
+    non_detections = data.prv_candidate.filter(function(match){
+      return !("candid" in match.candidate);
+    });
+    plot_data.push({
+      x: non_detections.map(function(nd){return jdToDate(nd.candidate.jd);}),
+      y: non_detections.map(function(nd){return nd.candidate.diffmaglim;}),
+      mode: 'markers',
+      type: 'scatter',
+      name: 'non-detections',
+      marker: {
+        symbol: 'triangle-down',
+        color: non_detections.map(function(nd){return (nd.candidate.fid - 1)/2}),
+        colorscale: filter_colorscale,
+        cmin: -0.5,
+        cmax: 2.5
+      }
+    });
+    var layout = {
+      title: 'Light Curve',
+      yaxis:{
+        title: 'magnitude',
+        autorange: 'reversed'
+      },
+      xaxis:{
+        title: 'date',
+      }
+    }
+    Plotly.newPlot('lightcurve', plot_data, layout);
+  }
+  function plotLightCurve(){
+    var request = new XMLHttpRequest();
+    request.open('GET', '/{{ alert.id }}/?format=json', true);
+    request.onload = function(){
+      if(request.status >= 200 && request.status < 400){
+        var data = JSON.parse(request.responseText);
+        buildPlot(data);
+      }else{
+        alert('Could not load lightcurve');
+      }
+    }
+    request.send();
+  }
+</script>
+{% endblock %}

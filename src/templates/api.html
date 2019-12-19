@@ -1,0 +1,2645 @@
+{% extends 'base.html' %}
+
+<!-- suppress ALL -->
+{% block content %}
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse" data-target="#Routes">RESTful Routes API</button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="Routes" class="collapse">
+     <table class="table table-striped table-bordered table-hover table-lg">
+      <thead>
+       <tr>
+        <th><font color="blue">Route(s)</font></th>
+        <th><font color="blue">Description</font></th>
+        <th><font color="blue">Example(s)</font></th>
+       </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td class="orange">/sassy</td>
+          <td> SASSy home page</td>
+          <td><a href="{{ url['url'] }}">{{ url['url'] }}</a></td>
+        </tr>
+	<!--
+        <tr>
+          <td class="orange">/sassy/custom</td>
+          <td> Custom home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/custom">{{ url['url'] }}/custom</a></td>
+        </tr>
+	-->
+	<!--
+        <tr>
+          <td class="red">/sassy/glade</td>
+          <td> GLADE home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/glade">{{ url['url'] }}/glade</a></td>
+        </tr>
+        <tr>
+          <td class="red">/sassy/glade/<i>dbid</i></td>
+          <td> GLADE data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/glade/777">{{ url['url'] }}/glade/777</a></td>
+        </tr>
+       <tr>
+          <td class="red">/sassy/glade/text</td>
+          <td> GLADE description</td>
+          <td><a href="{{ url['url'] }}/glade/text">{{ url['url'] }}/glade/text</a></td>
+        </tr>
+	-->
+        <tr>
+          <td class="red">/sassy/glade_q3c</td>
+          <td> GLADE (Q3C) home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/glade_q3c">{{ url['url'] }}/glade_q3c</a></td>
+        </tr>
+        <tr>
+          <td class="red">/sassy/glade_q3c/<i>dbid</i></td>
+          <td> GLADE (Q3C) data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/glade_q3c/777">{{ url['url'] }}/glade_q3c/777</a></td>
+        </tr>
+       <tr>
+          <td class="red">/sassy/glade_q3c/text</td>
+          <td> GLADE (Q3C) description</td>
+          <td><a href="{{ url['url'] }}/glade_q3c/text">{{ url['url'] }}/glade_q3c/text</a></td>
+        </tr>
+	<!--
+        <tr>
+          <td class="blue">/sassy/gwgc</td>
+          <td> GWGC home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/gwgc">{{ url['url'] }}/gwgc</a></td>
+        </tr>
+        <tr>
+          <td class="blue">/sassy/gwgc/<i>dbid</i></td>
+          <td> GWGC data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/gwgc/777">{{ url['url'] }}/gwgc/777</a></td>
+        </tr>
+        <tr>
+          <td class="blue">/sassy/gwgc/text</td>
+          <td> GWGC description</td>
+          <td><a href="{{ url['url'] }}/gwgc/text">{{ url['url'] }}/gwgc/text</a></td>
+        </tr>
+	-->
+        <tr>
+          <td class="blue">/sassy/gwgc_q3c</td>
+          <td> GWGC (Q3C) home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/gwgc_q3c">{{ url['url'] }}/gwgc_q3c</a></td>
+        </tr>
+        <tr>
+          <td class="blue">/sassy/gwgc_q3c/<i>dbid</i></td>
+          <td> GWGC (Q3C) data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/gwgc_q3c/777">{{ url['url'] }}/gwgc_q3c/777</a></td>
+        </tr>
+        <tr>
+          <td class="blue">/sassy/gwgc_q3c/text</td>
+          <td> GWGC (Q3C) description</td>
+          <td><a href="{{ url['url'] }}/gwgc_q3c/text">{{ url['url'] }}/gwgc_q3c/text</a></td>
+        </tr>
+	<!--
+        <tr>
+          <td class="magenta">/sassy/ligo</td>
+          <td> LIGO home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/ligo">{{ url['url'] }}/ligo</a></td>
+        </tr>
+        <tr>
+          <td class="magenta">/sassy/ligo/<i>dbid</i></td>
+          <td> LIGO data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/ligo/777">{{ url['url'] }}/ligo/777</a></td>
+        </tr>
+        <tr>
+          <td class="magenta">/sassy/ligo/text</td>
+          <td> LIGO description</td>
+          <td><a href="{{ url['url'] }}/ligo/text">{{ url['url'] }}/ligo/text</a></td>
+        </tr>
+	-->
+        <tr>
+          <td class="magenta">/sassy/ligo_q3c</td>
+          <td> LIGO (Q3C) home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/ligo_q3c">{{ url['url'] }}/ligo_q3c</a></td>
+        </tr>
+        <tr>
+          <td class="magenta">/sassy/ligo_q3c/<i>dbid</i></td>
+          <td> LIGO (Q3C) data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/ligo_q3c/777">{{ url['url'] }}/ligo_q3c/777</a></td>
+        </tr>
+        <tr>
+          <td class="magenta">/sassy/ligo_q3c/text</td>
+          <td> LIGO (Q3C) description</td>
+          <td><a href="{{ url['url'] }}/ligo_q3c/text">{{ url['url'] }}/ligo_q3c/text</a></td>
+        </tr>
+	<!--
+        <tr>
+          <td class="grey">/sassy/tns</td>
+          <td> TNS home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/tns">{{ url['url'] }}/tns</a></td>
+        </tr>
+        <tr>
+          <td class="grey">/sassy/tns/<i>dbid</i></td>
+          <td> TNS data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/tns/777">{{ url['url'] }}/tns/777</a></td>
+        </tr>
+        <tr>
+          <td class="grey">/sassy/tns/text</td>
+          <td> TNS description</td>
+          <td><a href="{{ url['url'] }}/tns/text">{{ url['url'] }}/tns/text</a></td>
+        </tr>
+	-->
+        <tr>
+          <td class="grey">/sassy/tns_q3c</td>
+          <td> TNS (Q3C) home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/tns_q3c">{{ url['url'] }}/tns_q3c</a></td>
+        </tr>
+        <tr>
+          <td class="grey">/sassy/tns_q3c/<i>dbid</i></td>
+          <td> TNS (Q3C) data for given database <i>dbid</i></td>
+          <td><a href="{{ url['url'] }}/tns_q3c/777">{{ url['url'] }}/tns_q3c/777</a></td>
+        </tr>
+        <tr>
+          <td class="grey">/sassy/tns_q3c/text</td>
+          <td> TNS (Q3C) description</td>
+          <td><a href="{{ url['url'] }}/tns_q3c/text">{{ url['url'] }}/tns_q3c/text</a></td>
+        </tr>
+	<!--
+        <tr>
+          <td class="green">/sassy/ztf_q3c</td>
+          <td> ZTF home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/ztf_q3c">{{ url['url'] }}/ztf_q3c</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/avros/<i>date</i></td>
+          <td> ZTF JSON list of all AVRO files for given <i>date</i></td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/avros/20180601">{{ url['url'] }}/ztf_q3c/avros/20180601</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/files/<i>filepath</i></td>
+          <td> ZTF download file from given <i>filepath</i></td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/files/2018/06/01/516169962215010004.avro">{{ url['url'] }}/ztf_q3c/files/2018/06/01/516169962215010004.avro</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/<i>id</i></td>
+          <td> ZTF data for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/777">{{ url['url'] }}/ztf_q3c/777</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/<i>id</i>/cutout/Science</td>
+          <td> ZTF download science image cutout for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/777/cutout/Science">{{ url['url'] }}/ztf_q3c/777/cutout/Science</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/<i>id</i>/cutout/Difference</td>
+          <td> ZTF download difference image cutout for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/777/cutout/Difference">{{ url['url'] }}/ztf_q3c/777/cutout/Difference</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/<i>id</i>/cutout/Template</td>
+          <td> ZTF download template image cutout for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/777/cutout/Template">{{ url['url'] }}/ztf_q3c/777/cutout/Template</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf_q3c/text/</td>
+          <td> ZTF description</td>
+          <td><a href="{{ url['url'] }}/ztf_q3c/text">{{ url['url'] }}/ztf_q3c/text</a></td>
+        </tr>
+	-->
+        <tr>
+          <td class="green">/sassy/ztf</td>
+          <td> ZTF home page (GET, POST)</td>
+          <td><a href="{{ url['url'] }}/ztf">{{ url['url'] }}/ztf</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/avros/<i>date</i></td>
+          <td> ZTF JSON list of all AVRO files for given <i>date</i></td>
+          <td><a href="{{ url['url'] }}/ztf/avros/20180601">{{ url['url'] }}/ztf/avros/20180601</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/files/<i>filepath</i></td>
+          <td> ZTF download file from given <i>filepath</i></td>
+          <td><a href="{{ url['url'] }}/ztf/files/2018/06/01/516169962215010004.avro">{{ url['url'] }}/ztf/files/2018/06/01/516169962215010004.avro</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/<i>id</i></td>
+          <td> ZTF data for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf/777">{{ url['url'] }}/ztf/777</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/<i>id</i>/cutout/Science</td>
+          <td> ZTF download science image cutout for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf/777/cutout/Science">{{ url['url'] }}/ztf/777/cutout/Science</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/<i>id</i>/cutout/Difference</td>
+          <td> ZTF download difference image cutout for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf/777/cutout/Difference">{{ url['url'] }}/ztf/777/cutout/Difference</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/<i>id</i>/cutout/Template</td>
+          <td> ZTF download template image cutout for given database <i>id</i></td>
+          <td><a href="{{ url['url'] }}/ztf/777/cutout/Template">{{ url['url'] }}/ztf/777/cutout/Template</a></td>
+        </tr>
+        <tr>
+          <td class="green">/sassy/ztf/text/</td>
+          <td> ZTF description</td>
+          <td><a href="{{ url['url'] }}/ztf/text">{{ url['url'] }}/ztf/text</a></td>
+        </tr>
+      </tbody>
+     </table>
+    </div>
+   </div>
+  </div>
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse"
+      data-target="#GLADEModels">GLADE Database Model API
+    </button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="GLADEModels" class="collapse">
+     <div class="table-responsive">
+      <table class="table table-striped table-sm cart">
+       <thead>
+        <tr>
+         <th>API</th>
+         <th>Return ObsReq with ...</th>
+         <th>ArgName[Type]: Description</th>
+         <th>Example(s)</th>
+        </tr>
+       </thead>
+       <tbody>
+         <tr>
+            <td class="blue"> ?astrocone=<em><font type="lucinda" color="green">name,radius</font></em></td>
+            <td> cone search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/glade_q3c?astrocone=m51,5.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?astrocone=m51,5.0
+                <span>Object lookup via astropy.SkyCoord.from_name().</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_abs__gte=<em><font type="lucinda" color="green">bmag</font></em></td>
+            <td> |B| &ge; <em><font type="lucinda" color="green">bmag</font></em></td>
+            <td><em><font type="lucinda" color="green">bmag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?b_abs__gte=1.50" class="hasTooltip">{{ url['url'] }}/glade?b_abs__gte=1.50
+                <span></span>
+	      </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?b_abs__gte=1.50" class="hasTooltip">{{ url['url'] }}/glade_q3c?b_abs__gte=1.50
+                <span></span>
+	      </a><br>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_abs__lte=<em><font type="lucinda" color="green">bmag</font></em></td>
+            <td> |B| &le; <em><font type="lucinda" color="green">bmag</font></em></td>
+            <td><em><font type="lucinda" color="green">bmag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?b_abs__lte=1.50" class="hasTooltip">{{ url['url'] }}/glade?b_abs__lte=1.50
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glace_q3c?b_abs__lte=1.50" class="hasTooltip">{{ url['url'] }}/glace_q3c?b_abs__lte=1.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_err__gte=<em><font type="lucinda" color="green">berr</font></em></td>
+            <td> &plusmn;B (apparent) &ge; <em><font type="lucinda" color="green">berr</font></em></td>
+            <td><em><font type="lucinda" color="green">berr</font></em>[float]: &plusmn;magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?b_err__gte=0.50" class="hasTooltip">{{ url['url'] }}/glade?b_err__gte=0.50
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?b_err__gte=0.50" class="hasTooltip">{{ url['url'] }}/glade_q3c?b_err__gte=0.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_err__lte=<em><font type="lucinda" color="green">berr</font></em></td>
+            <td> &plusmn;B (apparent) &le; <em><font type="lucinda" color="green">berr</font></em></td>
+            <td><em><font type="lucinda" color="green">berr</font></em>[float]: &plusmn;magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?b_err__lte=0.50" class="hasTooltip">{{ url['url'] }}/glade?b_err__lte=0.50
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?b_err__lte=0.50" class="hasTooltip">{{ url['url'] }}/glade_q3c?b_err__lte=0.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_mag__gte=<em><font type="lucinda" color="green">bmag</font></em></td>
+            <td> B (apparent) &ge; <em><font type="lucinda" color="green">bmag</font></em></td>
+            <td><em><font type="lucinda" color="green">bmag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?b_mag__gte=10.0" class="hasTooltip">{{ url['url'] }}/glade?b_mag__gte=10.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?b_mag__gte=10.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?b_mag__gte=10.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_mag__lte=<em><font type="lucinda" color="green">bmag</font></em></td>
+            <td> B (apparent) &le; <em><font type="lucinda" color="green">bmag</font></em></td>
+            <td><em><font type="lucinda" color="green">bmag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?b_mag__lte=10.0" class="hasTooltip">{{ url['url'] }}/glade?b_mag__lte=10.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?b_mag__lte=10.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?b_mag__lte=10.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?cone=<em><font type="lucinda" color="green">ra,dec,radius</font></em></td>
+            <td> cone search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/glade_q3c?cone=202.2,47.2,5.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?cone=202.2,47.2,5.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dec__gte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &ge; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/glade?dec__gte=-90.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?dec__gte=-90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dec__lte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &le; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/glade?dec__lte=90.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?dec__lte=90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dist__gte=<em><font type="lucinda" color="green">dist</font></em></td>
+            <td> the distance to the nearest source &ge; <em><font type="lucinda" color="green">dist</font></em> </td>
+            <td><em><font type="lucinda" color="green">dist</font></em>[float]: Mpc</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?dist__gte=5.0" class="hasTooltip">{{ url['url'] }}/glade?dist__gte=5.0</a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?dist__gte=5.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?dist__gte=5.0</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dist__lte=<em><font type="lucinda" color="green">dist</font></em></td>
+            <td> the distance to the nearest source &le; <em><font type="lucinda" color="green">dist</font></em> </td>
+            <td><em><font type="lucinda" color="green">dist</font></em>[float]: Mpc</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?dist__lte=5.0" class="hasTooltip">{{ url['url'] }}/glade?dist__lte=5.0</a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?dist__lte=5.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?dist__lte=5.0</a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?ellipse=<em><font type="lucinda" color="green">ra,dec,majaxis,ratio,posang</font></em></td>
+            <td> ellipse search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">majaxis</font></em>[float]: &deg;,
+              <em><font type="lucinda" color="green">ratio</font></em>[float]: no units, 
+              <em><font type="lucinda" color="green">posang</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/glade_q3c?ellipse=202.2,47.2,5.0,0.5,25.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?ellipse=202.2,47.2,5.0,0.5,25.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?flag1=<em><font type="lucinda" color="green">code</font></em></td>
+            <td> given flag <em><font type="lucinda" color="green">code</font></em></td>
+            <td><em><font type="lucinda" color="green">code</font></em>[char]: {Q,C,G}</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?flag1=Q" class="hasTooltip">{{ url['url'] }}/glade?flag1=Q
+                <span>
+                  Q: source is from the SDSS-DR12 QSO catalog<br>
+                  C: source is a globular cluste<br>
+                  G: source is from another catalog and not identified as a globular cluster.
+                </span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?flag1=Q" class="hasTooltip">{{ url['url'] }}/glade_q3c?flag1=Q
+                <span>
+                  Q: source is from the SDSS-DR12 QSO catalog<br>
+                  C: source is a globular cluste<br>
+                  G: source is from another catalog and not identified as a globular cluster.
+                </span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?flag2__gte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> object flag2 &ge; <em><font type="lucinda" color="green">value</font></em> </td>
+            <td><em><font type="lucinda" color="green">value</font></em>[int]: {0,1,2,3}</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?flag2__gte=0" class="hasTooltip">{{ url['url'] }}/glade?flag2__gte=0
+                <span>
+                  0: galaxy had neither measured distance nor measured redshift value<br>
+                  1: galaxy had measured redshift value, from which we have calculated distance using the
+		             following cosmological parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  2: galaxy had measured distance value from which we have calculated redshift using the
+		             following cosmological parameters: H_0=70/km/s/Mp, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  3: measured photometric redshift of the galaxy has been changed to spectroscopic
+                  redshift, from which we have calculated distance using the following cosmological
+                     parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73.<br>
+                </span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?flag2__gte=0" class="hasTooltip">{{ url['url'] }}/glade_q3c?flag2__gte=0
+                <span>
+                  0: galaxy had neither measured distance nor measured redshift value<br>
+                  1: galaxy had measured redshift value, from which we have calculated distance using the
+		             following cosmological parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  2: galaxy had measured distance value from which we have calculated redshift using the
+		             following cosmological parameters: H_0=70/km/s/Mp, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  3: measured photometric redshift of the galaxy has been changed to spectroscopic
+                  redshift, from which we have calculated distance using the following cosmological
+                     parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73.<br>
+                </span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?flag2__lte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> object flag2 &le; <em><font type="lucinda" color="green">value</font></em> </td>
+            <td><em><font type="lucinda" color="green">value</font></em>[int]: {0,1,2,3}</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?flag2__lte=3" class="hasTooltip">{{ url['url'] }}/glade?flag2__lte=3
+                <span>
+                  0: galaxy had neither measured distance nor measured redshift value<br>
+                  1: galaxy had measured redshift value, from which we have calculated distance using the
+                     following cosmological parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  2: galaxy had measured distance value from which we have calculated redshift using the
+                     following cosmological parameters: H_0=70/km/s/Mp, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  3: measured photometric redshift of the galaxy has been changed to spectroscopic
+                  redshift, from which we have calculated distance using the following cosmological
+                     parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73.<br>
+                </span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?flag2__lte=3" class="hasTooltip">{{ url['url'] }}/glade_q3c?flag2__lte=3
+                <span>
+                  0: galaxy had neither measured distance nor measured redshift value<br>
+                  1: galaxy had measured redshift value, from which we have calculated distance using the
+                     following cosmological parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  2: galaxy had measured distance value from which we have calculated redshift using the
+                     following cosmological parameters: H_0=70/km/s/Mp, Omega_M=0.27 and Omega_Lambda=0.73<br>
+                  3: measured photometric redshift of the galaxy has been changed to spectroscopic
+                  redshift, from which we have calculated distance using the following cosmological
+                     parameters: H_0=70/km/s/Mpc, Omega_M=0.27 and Omega_Lambda=0.73.<br>
+                </span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?flag3__gte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> object flag3 &ge; <em><font type="lucinda" color="green">value</font></em> </td>
+            <td><em><font type="lucinda" color="green">value</font></em>[int]: {0,1}</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?flag3__gte=0" class="hasTooltip">{{ url['url'] }}/glade?flag3__gte=0
+                <span>
+                  0: velocity field correction has not been applied to the object<br>
+                  1: we have subtracted the radial velocity of the object.
+                </span>
+              </a>
+	      <br>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?flag3__lte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> object flag3 &le; <em><font type="lucinda" color="green">value</font></em> </td>
+            <td><em><font type="lucinda" color="green">value</font></em>[int]: {0,1}</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?flag3__lte=1" class="hasTooltip">{{ url['url'] }}/glade?flag3__lte=1
+                <span>
+                  0: velocity field correction has not been applied to the object<br>
+                  1: we have subtracted the radial velocity of the object.
+                </span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?flag3__lte=1" class="hasTooltip">{{ url['url'] }}/glade_q3c?flag3__lte=1
+                <span>
+                  0: velocity field correction has not been applied to the object<br>
+                  1: we have subtracted the radial velocity of the object.
+                </span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?gwgc_name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> search by GWGC name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: GWGC name</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?gwgc_name=NGC0253" class="hasTooltip">{{ url['url'] }}/glade?gwgc_name=NGC0253</a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?gwgc_name=NGC0253" class="hasTooltip">{{ url['url'] }}/glade_q3c?gwgc_name=NGC0253</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?h_err__gte=<em><font type="lucinda" color="green">herr</font></em></td>
+            <td> &plusmn;H magnitude &ge; <em><font type="lucinda" color="green">herr</font></em></td>
+            <td><em><font type="lucinda" color="green">herr</font></em>[float]: &plusmn;magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?h_err__gte=0.05" class="hasTooltip">{{ url['url'] }}/glade?h_err__gte=0.05
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?h_err__gte=0.05" class="hasTooltip">{{ url['url'] }}/glade_q3c?h_err__gte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?h_err__lte=<em><font type="lucinda" color="green">herr</font></em></td>
+            <td> &plusmn;H magnitude &le; <em><font type="lucinda" color="green">herr</font></em></td>
+            <td><em><font type="lucinda" color="green">herr</font></em>[float]: &plusmn;magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?h_err__lte=0.05" class="hasTooltip">{{ url['url'] }}/glade?h_err__lte=0.05
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?h_err__lte=0.05" class="hasTooltip">{{ url['url'] }}/glade_q3c?h_err__lte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?h_mag__gte=<em><font type="lucinda" color="green">hmag</font></em></td>
+            <td> H magnitude &ge; <em><font type="lucinda" color="green">hmag</font></em></td>
+            <td><em><font type="lucinda" color="green">hmag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?h_mag__gte=2.5" class="hasTooltip">{{ url['url'] }}/glade?h_mag__gte=2.5
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?h_mag__gte=2.5" class="hasTooltip">{{ url['url'] }}/glade_q3c?h_mag__gte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?h_mag__lte=<em><font type="lucinda" color="green">hmag</font></em></td>
+            <td> H magnitide &le; <em><font type="lucinda" color="green">hmag</font></em></td>
+            <td><em><font type="lucinda" color="green">hmag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?h_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/glade?h_mag__lte=2.5
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?h_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/glade_q3c?h_mag__lte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?hyperleda_name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> search by HyperLEDA name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: PGC name</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?hyperleda_name=NGC0253" class="hasTooltip">{{ url['url'] }}/glade?hyperleda_name=NGC0253</a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?hyperleda_name=NGC0253" class="hasTooltip">{{ url['url'] }}/glade_q3c?hyperleda_name=NGC0253</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?id=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id = <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?id=20" class="hasTooltip">{{ url['url'] }}/glade?id=20
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?id=20" class="hasTooltip">{{ url['url'] }}/glade_q3c?id=20
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?id__gte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id &ge; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?id__gte=20" class="hasTooltip">{{ url['url'] }}/glade?id__gte=20
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?id__gte=20" class="hasTooltip">{{ url['url'] }}/glade_q3c?id__gte=20
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?id__lte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id &le; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?id__lte=20" class="hasTooltip">{{ url['url'] }}/glade?id__lte=20
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?id__lte=20" class="hasTooltip">{{ url['url'] }}/glade_q3c?id__lte=20
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?j_err__gte=<em><font type="lucinda" color="green">jerr</font></em></td>
+            <td> &plusmn;J magnitude &ge; <em><font type="lucinda" color="green">jerr</font></em></td>
+            <td><em><font type="lucinda" color="green">jerr</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?j_err__gte=0.05" class="hasTooltip">{{ url['url'] }}/glade?j_err__gte=0.05
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?j_err__gte=0.05" class="hasTooltip">{{ url['url'] }}/glade_q3c?j_err__gte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?j_err__lte=<em><font type="lucinda" color="green">jerr</font></em></td>
+            <td> &plusmn;J magnitude &le; <em><font type="lucinda" color="green">jerr</font></em></td>
+            <td><em><font type="lucinda" color="green">jerr</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?j_err__lte=0.05" class="hasTooltip">{{ url['url'] }}/glade?j_err__lte=0.05
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?j_err__lte=0.05" class="hasTooltip">{{ url['url'] }}/glade_q3c?j_err__lte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?j_mag__gte=<em><font type="lucinda" color="green">jmag</font></em></td>
+            <td> J magnitude &ge; <em><font type="lucinda" color="green">jmag</font></em></td>
+            <td><em><font type="lucinda" color="green">jmag</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?j_mag__gte=2.5" class="hasTooltip">{{ url['url'] }}/glade?j_mag__gte=2.5
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?j_mag__gte=2.5" class="hasTooltip">{{ url['url'] }}/glade_q3c?j_mag__gte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?j_mag__lte=<em><font type="lucinda" color="green">jmag</font></em></td>
+            <td> J magnitide &le; <em><font type="lucinda" color="green">jmag</font></em></td>
+            <td><em><font type="lucinda" color="green">jmag</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?j_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/glade?j_mag__lte=2.5
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?j_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/glade_q3c?j_mag__lte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?k_err__gte=<em><font type="lucinda" color="green">kerr</font></em></td>
+            <td> &plusmn;K magnitude &ge; <em><font type="lucinda" color="green">kerr</font></em></td>
+            <td><em><font type="lucinda" color="green">kerr</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?k_err__gte=0.05" class="hasTooltip">{{ url['url'] }}/glade?k_err__gte=0.05
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?k_err__gte=0.05" class="hasTooltip">{{ url['url'] }}/glade_q3c?k_err__gte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?k_err__lte=<em><font type="lucinda" color="green">kerr</font></em></td>
+            <td> &plusmn;K magnitude &le; <em><font type="lucinda" color="green">kerr</font></em></td>
+            <td><em><font type="lucinda" color="green">kerr</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?k_err__lte=0.05" class="hasTooltip">{{ url['url'] }}/glade?k_err__lte=0.05
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?k_err__lte=0.05" class="hasTooltip">{{ url['url'] }}/glade_q3c?k_err__lte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?k_mag__gte=<em><font type="lucinda" color="green">kmag</font></em></td>
+            <td> K magnitude &ge; <em><font type="lucinda" color="green">kmag</font></em></td>
+            <td><em><font type="lucinda" color="green">kmag</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?k_mag__gte=2.5" class="hasTooltip">{{ url['url'] }}/glade?k_mag__gte=2.5
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?k_mag__gte=2.5" class="hasTooltip">{{ url['url'] }}/glade_q3c?k_mag__gte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?k_mag__lte=<em><font type="lucinda" color="green">kmag</font></em></td>
+            <td> K magnitide &le; <em><font type="lucinda" color="green">kmag</font></em></td>
+            <td><em><font type="lucinda" color="green">kmag</font></em>[float]: &#0176;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?k_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/glade?k_mag__lte=2.5
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?k_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/glade_q3c?k_mag__lte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?mass_name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> search by 2MASS name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: 2MASS name</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?mass_name=00473313-2517196" class="hasTooltip">{{ url['url'] }}/glade?mass_name=00473313-2517196</a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?mass_name=00473313-2517196" class="hasTooltip">{{ url['url'] }}/glade_q3c?mass_name=00473313-2517196</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?pgc=<em><font type="lucinda" color="green">pgc</font></em></td>
+            <td> PGC code = <em><font type="lucinda" color="green">pgc</font></em></td>
+            <td><em><font type="lucinda" color="green">pgc</font></em>[int]: PGC code</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?pgc=2789" class="hasTooltip">{{ url['url'] }}/glade?pgc=2789
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?pgc=2789" class="hasTooltip">{{ url['url'] }}/glade_q3c?pgc=2789
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?pgc__gte=<em><font type="lucinda" color="green">pgc</font></em></td>
+            <td> PGC code &ge; <em><font type="lucinda" color="green">pgc</font></em></td>
+            <td><em><font type="lucinda" color="green">pgc</font></em>[int]: PGC code</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?pgc__gte=2789" class="hasTooltip">{{ url['url'] }}/glade?pgc__gte=2789
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?pgc__gte=2789" class="hasTooltip">{{ url['url'] }}/glade_q3c?pgc__gte=2789
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?pgc__lte=<em><font type="lucinda" color="green">pgc</font></em></td>
+            <td> PGC code &le; <em><font type="lucinda" color="green">pgc</font></em></td>
+            <td><em><font type="lucinda" color="green">pgc</font></em>[int]: PGC code</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?pgc__lte=2789" class="hasTooltip">{{ url['url'] }}/glade?pgc__lte=2789
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?pgc__lte=2789" class="hasTooltip">{{ url['url'] }}/glade_q3c?pgc__lte=2789
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?ra__gte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &ge; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/glade?ra__gte=0.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?ra__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?ra__lte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &le; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/glade?ra__lte=360.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?ra__lte=360.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?sdss_name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> search by SDSS name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: SDSS name</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?sdss_name=235953.93" class="hasTooltip">{{ url['url'] }}/glade?sdss_name=235953.93</a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?sdss_name=235953.93" class="hasTooltip">{{ url['url'] }}/glade_q3c?sdss_name=235953.93</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?z__gte=<em><font type="lucinda" color="green">z</font></em></td>
+            <td> redshift &ge; <em><font type="lucinda" color="green">z</font></em></td>
+            <td><em><font type="lucinda" color="green">z</font></em>[float]: redshift</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?z__gte=0.0" class="hasTooltip">{{ url['url'] }}/glade?z__gte=0.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?z__gte=0.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?z__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?z__lte=<em><font type="lucinda" color="green">z</font></em></td>
+            <td> redshift &le; <em><font type="lucinda" color="green">z</font></em></td>
+            <td><em><font type="lucinda" color="green">z</font></em>[float]: redshift</td>
+            <td>
+              <a href="{{ url['url'] }}/glade?z__lte=1.0" class="hasTooltip">{{ url['url'] }}/glade?z__lte=1.0
+                <span></span>
+              </a>
+	      <br>
+              <a href="{{ url['url'] }}/glade_q3c?z__lte=1.0" class="hasTooltip">{{ url['url'] }}/glade_q3c?z__lte=1.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse"
+      data-target="#GWGCModels">GWGC Database Model API
+    </button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="GWGCModels" class="collapse">
+     <div class="table-responsive">
+      <table class="table table-striped table-sm cart">
+       <thead>
+        <tr>
+         <th>API</th>
+         <th>Return ObsReq with ...</th>
+         <th>ArgName[Type]: Description</th>
+         <th>Example(s)</th>
+        </tr>
+       </thead>
+       <tbody>
+         <tr>
+            <td class="blue"> ?astrocone=<em><font type="lucinda" color="green">name,radius</font></em></td>
+            <td> cone search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc_q3c?astrocone=m51,25.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?astrocone=m51,25.0
+                <span>Object lookup via astropy.SkyCoord.from_name().</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?a__gte=<em><font type="lucinda" color="green">a</font></em></td>
+            <td> Major &empty; &ge; <em><font type="lucinda" color="green">a</font></em></td>
+            <td><em><font type="lucinda" color="green">a</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?a__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc?a__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?a__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?a__gte=0.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?a__lte=<em><font type="lucinda" color="green">a</font></em></td>
+            <td> Major &empty; &le; <em><font type="lucinda" color="green">a</font></em></td>
+            <td><em><font type="lucinda" color="green">a</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?a__lte=2.5" class="hasTooltip">{{ url['url'] }}/gwgc?a__lte=2.5
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?a__lte=2.5" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?a__lte=2.5
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?abs_bmag__gte=<em><font type="lucinda" color="green">babs</font></em></td>
+            <td> |B| &ge; <em><font type="lucinda" color="green">babs</font></em></td>
+            <td><em><font type="lucinda" color="green">babs</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?abs_bmag__gte=-10.0" class="hasTooltip">{{ url['url'] }}/gwgc?abs_bmag__gte=-10.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?abs_bmag__gte=-10.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?abs_bmag__gte=-10.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?abs_bmag__lte=<em><font type="lucinda" color="green">babs</font></em></td>
+            <td> |B| &le; <em><font type="lucinda" color="green">babs</font></em></td>
+            <td><em><font type="lucinda" color="green">babs</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?abs_bmag__lte=2.5" class="hasTooltip">{{ url['url'] }}/gwgc?abs_bmag__lte=2.5
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?abs_bmag__lte=2.5" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?abs_bmag__lte=2.5
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?app_bmag__gte=<em><font type="lucinda" color="green">bapp</font></em></td>
+            <td> B (apparent) &ge; <em><font type="lucinda" color="green">bapp</font></em></td>
+            <td><em><font type="lucinda" color="green">bapp</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?app_bmag__gte=12.5" class="hasTooltip">{{ url['url'] }}/gwgc?app_bmag__gte=12.5
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?app_bmag__gte=12.5" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?app_bmag__gte=12.5
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?app_bmag__lte=<em><font type="lucinda" color="green">bapp</font></em></td>
+            <td> B (apparent) &le; <em><font type="lucinda" color="green">bapp</font></em></td>
+            <td><em><font type="lucinda" color="green">bapp</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?app_bmag__lte=12.5" class="hasTooltip">{{ url['url'] }}/gwgc?app_bmag__lte=12.5
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?app_bmag__lte=12.5" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?app_bmag__lte=12.5
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b__gte=<em><font type="lucinda" color="green">b</font></em></td>
+            <td> Minor &empty; &ge; <em><font type="lucinda" color="green">b</font></em></td>
+	        <td><em><font type="lucinda" color="green">b</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?b__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc?b__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?b__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?b__gte=0.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b__lte=<em><font type="lucinda" color="green">b</font></em></td>
+            <td> Minor &empty; &le; <em><font type="lucinda" color="green">b</font></em></td>
+            <td><em><font type="lucinda" color="green">b</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?b__lte=2.0" class="hasTooltip">{{ url['url'] }}/gwgc?b__lte=2.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?b__lte=2.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?b__lte=2.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_div_a__gte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> Axis ratio &ge; <em><font type="lucinda" color="green">value</font></em></td>
+            <td><em><font type="lucinda" color="green">value</font></em>[float]: 0.0&ndash;1.0</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?b_div_a__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc?b_div_a__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?b_div_a__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?b_div_a__gte=0.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?b_div_a__lte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> Axis ratio &le; <em><font type="lucinda" color="green">value</font></em></td>
+            <td><em><font type="lucinda" color="green">value</font></em>[float]: 0.0&ndash;1.0</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?b_div_a__lte=1.0" class="hasTooltip">{{ url['url'] }}/gwgc?b_div_a__lte=1.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?b_div_a__lte=1.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?b_div_a__lte=1.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?cone=<em><font type="lucinda" color="green">ra,dec,radius</font></em></td>
+            <td> cone search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc_q3c?cone=202.2,47.2,5.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?cone=202.2,47.2,5.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+	  <tr>
+            <td class="blue">?dec__gte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &ge; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/gwgc?dec__gte=-90.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?dec__gte=-90.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dec__lte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &le; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/gwgc?dec__lte=90.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?dec__lte=90.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dist__gte=<em><font type="lucinda" color="green">dist</font></em></td>
+            <td> the distance to the nearest source &ge; <em><font type="lucinda" color="green">dist</font></em> </td>
+            <td><em><font type="lucinda" color="green">dist</font></em>[float]: Mpc</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?dist__gte=5.0" class="hasTooltip">{{ url['url'] }}/gwgc?dist__gte=5.0</a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?dist__gte=5.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?dist__gte=5.0</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?dist__lte=<em><font type="lucinda" color="green">dist</font></em></td>
+            <td> the distance to the nearest source &le; <em><font type="lucinda" color="green">dist</font></em> </td>
+            <td><em><font type="lucinda" color="green">dist</font></em>[float]: Mpc</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?dist__lte=10.0" class="hasTooltip">{{ url['url'] }}/gwgc?dist__lte=10.0</a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?dist__lte=10.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?dist__lte=10.0</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_a__gte=<em><font type="lucinda" color="green">a</font></em></td>
+            <td> &plusmn;Major &empty; &ge; <em><font type="lucinda" color="green">a</font></em></td>
+            <td><em><font type="lucinda" color="green">a</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_a__gte=0.05" class="hasTooltip">{{ url['url'] }}/gwgc?e_a__gte=0.05
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_a__gte=0.05" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_a__gte=0.05
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_a__lte=<em><font type="lucinda" color="green">a</font></em></td>
+            <td> &plusmn;Major &empty; &le; <em><font type="lucinda" color="green">a</font></em></td>
+            <td><em><font type="lucinda" color="green">a</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_a__lte=0.05" class="hasTooltip">{{ url['url'] }}/gwgc?e_a__lte=0.05
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_a__lte=0.05" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_a__lte=0.05
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_abs_bmag__gte=<em><font type="lucinda" color="green">babs</font></em></td>
+            <td> &plusmn;|B| mag &ge; <em><font type="lucinda" color="green">babs</font></em></td>
+            <td><em><font type="lucinda" color="green">babs</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_abs_bmag__gte=0.050" class="hasTooltip">{{ url['url'] }}/gwgc?e_abs_bmag__gte=0.05
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_abs_bmag__gte=0.050" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_abs_bmag__gte=0.05
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_abs_bmag__lte=<em><font type="lucinda" color="green">babs</font></em></td>
+            <td> &plusmn;|B| mag &le; <em><font type="lucinda" color="green">babs</font></em></td>
+            <td><em><font type="lucinda" color="green">babs</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_abs_bmag__lte=0.25" class="hasTooltip">{{ url['url'] }}/gwgc?e_abs_bmag__lte=0.25
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_abs_bmag__lte=0.25" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_abs_bmag__lte=0.25
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_app_bmag__gte=<em><font type="lucinda" color="green">bapp</font></em></td>
+            <td> &plusmn;B (apparent) &ge; <em><font type="lucinda" color="green">bapp</font></em></td>
+            <td><em><font type="lucinda" color="green">bapp</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_app_bmag__gte=0.25" class="hasTooltip">{{ url['url'] }}/gwgc?e_app_bmag__gte=0.25
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_app_bmag__gte=0.25" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_app_bmag__gte=0.25
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_app_bmag__lte=<em><font type="lucinda" color="green">bapp</font></em></td>
+            <td> &plusmn;B (apparent) &le; <em><font type="lucinda" color="green">bapp</font></em></td>
+            <td><em><font type="lucinda" color="green">bapp</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_app_bmag__lte=20.50" class="hasTooltip">{{ url['url'] }}/gwgc?e_app_bmag__lte=20.50
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_app_bmag__lte=20.50" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_app_bmag__lte=20.50
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_b__gte=<em><font type="lucinda" color="green">b</font></em></td>
+            <td> &plusmn;Minor &empty; &ge; <em><font type="lucinda" color="green">b</font></em></td>
+            <td><em><font type="lucinda" color="green">b</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_b__gte=0.50" class="hasTooltip">{{ url['url'] }}/gwgc?e_b__gte=0.50
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_b__gte=0.50" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_b__gte=0.50
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_b__lte=<em><font type="lucinda" color="green">b</font></em></td>
+            <td> &plusmn;Minor &empty; &le; <em><font type="lucinda" color="green">b</font></em></td>
+            <td><em><font type="lucinda" color="green">b</font></em>[float]: &prime;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_b__lte=0.50" class="hasTooltip">{{ url['url'] }}/gwgc?e_b__lte=0.50
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_b__lte=0.50" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_b__lte=0.50
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_b_div_a__gte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> &plusmn;Axis ratio &ge; <em><font type="lucinda" color="green">value</font></em></td>
+            <td><em><font type="lucinda" color="green">value</font></em>[float]: 0.0&ndash;1.0</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_b_div_a__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc?e_b_div_a__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_b_div_a__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_b_div_a__gte=0.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?e_b_div_a__lte=<em><font type="lucinda" color="green">value</font></em></td>
+            <td> &plusmn;Axis ratio &le; <em><font type="lucinda" color="green">value</font></em></td>
+            <td><em><font type="lucinda" color="green">value</font></em>[float]: 0.0&ndash;1.0</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?e_b_div_a__lte=1.0" class="hasTooltip">{{ url['url'] }}/gwgc?e_b_div_a__lte=1.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?e_b_div_a__lte=1.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?e_b_div_a__lte=1.0
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?ellipse=<em><font type="lucinda" color="green">ra,dec,majaxis,ratio,posang</font></em></td>
+            <td> ellipse search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">majaxis</font></em>[float]: &deg;,
+              <em><font type="lucinda" color="green">ratio</font></em>[float]: no units, 
+              <em><font type="lucinda" color="green">posang</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc_q3c?ellipse=202.2,47.2,5.0,0.5,25.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?ellipse=202.2,47.2,5.0,0.5,25.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?id=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id = <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?id=20" class="hasTooltip">{{ url['url'] }}/gwgc?id=20
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?id=20" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?id=20
+                <span></span>
+	      </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: GWGC name</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?name=NGC0253" class="hasTooltip">{{ url['url'] }}/gwgc?name=NGC0253</a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?name=NGC0253" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?name=NGC0253</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?pa__gte=<em><font type="lucinda" color="green">angle</font></em></td>
+            <td> position angle &ge; <em><font type="lucinda" color="green">angle</font></em></td>
+            <td><em><font type="lucinda" color="green">angle</font></em>[int]: &deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?pa__gte=75.0" class="hasTooltip">{{ url['url'] }}/gwgc?pa__gte=75.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?pa__gte=75.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?pa__gte=75.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?pa__lte=<em><font type="lucinda" color="green">angle</font></em></td>
+            <td> position angle &le; <em><font type="lucinda" color="green">angle</font></em></td>
+            <td><em><font type="lucinda" color="green">angle</font></em>[int]: &deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?pa__lte=25.0" class="hasTooltip">{{ url['url'] }}/gwgc?pa__lte=25.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?pa__lte=25.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?pa__lte=25.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?pgc=<em><font type="lucinda" color="green">pgc</font></em></td>
+            <td> PGC code = <em><font type="lucinda" color="green">pgc</font></em></td>
+            <td><em><font type="lucinda" color="green">pgc</font></em>[int]: PGC code</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?pgc=4494" class="hasTooltip">{{ url['url'] }}/gwgc?pgc=4494
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?pgc=4494" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?pgc=4494
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?ra__gte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &ge; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc?ra__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?ra__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?ra__lte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &le; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/gwgc?ra__lte=360.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?ra__lte=360.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?tt__gte=<em><font type="lucinda" color="green">code</font></em></td>
+            <td> TT (morphology) code &ge; <em><font type="lucinda" color="green">code</font></em></td>
+            <td><em><font type="lucinda" color="green">code</font></em>[float]: code</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?z__gte=-10.0" class="hasTooltip">{{ url['url'] }}/gwgc?z__gte=-10.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?z__gte=-10.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?z__gte=-10.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue">?tt__lte=<em><font type="lucinda" color="green">code</font></em></td>
+            <td> TT (morphology) code &le; <em><font type="lucinda" color="green">code</font></em></td>
+            <td><em><font type="lucinda" color="green">code</font></em>[float]: code</td>
+            <td>
+              <a href="{{ url['url'] }}/gwgc?tt__lte=10.0" class="hasTooltip">{{ url['url'] }}/gwgc?tt__lte=10.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/gwgc_q3c?tt__lte=10.0" class="hasTooltip">{{ url['url'] }}/gwgc_q3c?tt__lte=10.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse"
+      data-target="#LIGOModels">LIGO Database Model API
+    </button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="LIGOModels" class="collapse">
+     <div class="table-responsive">
+      <table class="table table-striped table-sm cart">
+       <thead>
+        <tr>
+         <th>API</th>
+         <th>Return LigoRecord with ...</th>
+         <th>ArgName[Type]: Description</th>
+         <th>Example(s)</th>
+        </tr>
+       </thead>
+       <tbody>
+         <tr>
+            <td class="blue"> ?astrocone=<em><font type="lucinda" color="green">name,radius</font></em></td>
+            <td> cone search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/ligo_q3c?astrocone=m51,5.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?astrocone=m51,5.0
+                <span>Object lookup via astropy.SkyCoord.from_name().</span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-before" -->
+	  <tr>
+            <td class="blue">?before=<em><font type="lucinda" color="green">flag</font></em></td>
+            <td> Transient dicovered before? </td>
+            <td><em><font type="lucinda" color="green">flag</font></em>[boolean]: T|F</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?before=True" class="hasTooltip">{{ url['url'] }}/ligo?before=True
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?before=True" class="hasTooltip">{{ url['url'] }}/ligo_q3c?before=True
+                <span></span>
+              </a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?cone=<em><font type="lucinda" color="green">ra,dec,radius</font></em></td>
+            <td> cone search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/ligo_q3c?cone=202.2,47.2,5.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?cone=202.2,47.2,5.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-dec__gte" -->
+	  <tr>
+            <td class="blue">?dec__gte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &ge; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/ligo?dec__gte=-90.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?dec__gte=-90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-dec__lte" -->
+          <tr>
+            <td class="blue">?dec__lte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &le; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/ligo?dec__lte=90.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?dec__lte=90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_date" -->
+          <tr>
+            <td class="blue">?discovery_date=<em><font type="lucinda" color="green">date</font></em></td>
+	    <td> discovery date &ge; <em><font type="lucinda" color="green">date</font></em></td>
+            <td><em><font type="lucinda" color="green">date</font></em>[string]: discovery date</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?discovery_date=2019-06-02" class="hasTooltip">{{ url['url'] }}/ligo?discovery_date=2019-06-02</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?discovery_date=2019-06-02" class="hasTooltip">{{ url['url'] }}/ligo_q3c?discovery_date=2019-06-02</a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_mag__gte" -->
+          <tr>
+            <td class="blue">?discovery_mag__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> Magnitude &ge; <em><font type="lucinda" color="green">mag</font></em></td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?discovery_mag__gte=-10.0" class="hasTooltip">{{ url['url'] }}/ligo?discovery_mag__gte=-10.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?discovery_mag__gte=-10.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?discovery_mag__gte=-10.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_mag__lte" -->
+          <tr>
+            <td class="blue">?discovery_mag__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> Magnitude &le; <em><font type="lucinda" color="green">mag</font></em></td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?discovery_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/ligo?discovery_mag__lte=2.5
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?discovery_mag__lte=2.5" class="hasTooltip">{{ url['url'] }}/ligo_q3c?discovery_mag__lte=2.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?ellipse=<em><font type="lucinda" color="green">ra,dec,majaxis,ratio,posang</font></em></td>
+            <td> ellipse search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">majaxis</font></em>[float]: &deg;,
+              <em><font type="lucinda" color="green">ratio</font></em>[float]: no units, 
+              <em><font type="lucinda" color="green">posang</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/ligo_q3c?ellipse=202.2,47.2,5.0,0.5,25.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?ellipse=202.2,47.2,5.0,0.5,25.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-filter_name" -->
+          <tr>
+            <td class="blue">?filter_name=<em><font type="lucinda" color="green">filter</font></em></td>
+            <td> filter name like <em><font type="lucinda" color="green">filter</font></em></td>
+            <td><em><font type="lucinda" color="green">filter</font></em>[string]: filter name</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?filter_name=Gaia-G" class="hasTooltip">{{ url['url'] }}/ligo?filter_name=Gaia-G</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?filter_name=Gaia-G" class="hasTooltip">{{ url['url'] }}/ligo_q3c?filter_name=Gaia-G</a>
+            </td>
+          </tr>
+          <!-- "\-\-gw_aka" -->
+          <tr>
+            <td class="blue">?gw_aka=<em><font type="lucinda" color="green">aka</font></em></td>
+            <td> GW alternate name = <em><font type="lucinda" color="green">aka</font></em></td>
+            <td><em><font type="lucinda" color="green">aka</font></em>[string]: GW alternate name</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?gw_aka=GW20190602_175927" class="hasTooltip">{{ url['url'] }}/ligo?gw_aka=GW20190602_175927</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?gw_aka=GW20190602_175927" class="hasTooltip">{{ url['url'] }}/ligo_q3c?gw_aka=GW20190602_175927</a>
+            </td>
+          </tr>
+          <!-- "\-\-gw_date" -->
+          <tr>
+            <td class="blue">?gw_date=<em><font type="lucinda" color="green">date</font></em></td>
+            <td> GW date &ge; <em><font type="lucinda" color="green">date</font></em></td>
+            <td><em><font type="lucinda" color="green">date</font></em>[string]: GW date</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?gw_date=2019-06-02" class="hasTooltip">{{ url['url'] }}/ligo?gw_date=2019-06-02</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?gw_date=2019-06-02" class="hasTooltip">{{ url['url'] }}/ligo_q3c?gw_date=2019-06-02</a>
+            </td>
+          </tr>
+          <!-- "\-\-gw_event" -->
+          <tr>
+            <td class="blue">?gw_event=<em><font type="lucinda" color="green">event</font></em></td>
+            <td> GW event name like <em><font type="lucinda" color="green">event</font></em></td>
+            <td><em><font type="lucinda" color="green">event</font></em>[string]: GW event name</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?gw_event=G334993" class="hasTooltip">{{ url['url'] }}/ligo?gw_event=G334993</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?gw_event=G334993" class="hasTooltip">{{ url['url'] }}/ligo_q3c?gw_event=G334993</a>
+            </td>
+          </tr>
+          <!-- "\-\-id" -->
+          <tr>
+            <td class="blue">?id=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id = <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?id=20" class="hasTooltip">{{ url['url'] }}/ligo?id=20
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?id=20" class="hasTooltip">{{ url['url'] }}/ligo_q3c?id=20
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-id__gte" -->
+          <tr>
+            <td class="blue">?id__gte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id &ge; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: id</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?id__gte=777" class="hasTooltip">{{ url['url'] }}/ligo?id__gte=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?id__gte=777" class="hasTooltip">{{ url['url'] }}/ligo_q3c?id__gte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-id__lte" -->
+          <tr>
+            <td class="blue">?id__lte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id &le; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: id</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?id__lte=777" class="hasTooltip">{{ url['url'] }}/ligo?id__lte=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?id__lte=777" class="hasTooltip">{{ url['url'] }}/ligo_q3c?id__lte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-name" -->
+          <tr>
+            <td class="blue">?name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> name like <em><font type="lucinda" color="green">name</font></em></td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?name=G337426" class="hasTooltip">{{ url['url'] }}/ligo?name=G337426</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?name=G337426" class="hasTooltip">{{ url['url'] }}/ligo_q3c?name=G337426</a>
+            </td>
+          </tr>
+          <!-- "\-\-name_prefix" -->
+          <tr>
+            <td class="blue">?name_prefix=<em><font type="lucinda" color="green">prefix</font></em></td>
+            <td> name prefix like <em><font type="lucinda" color="green">prefix</font></em></td>
+            <td><em><font type="lucinda" color="green">prefix</font></em>[string]: TNS prefix (AT|SN)</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?name_prefix=AT" class="hasTooltip">{{ url['url'] }}/ligo?name_prefix=AT</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?name_prefix=AT" class="hasTooltip">{{ url['url'] }}/ligo_q3c?name_prefix=AT</a>
+            </td>
+          </tr>
+          <!-- "\-\-probability__gte" -->
+          <tr>
+            <td class="blue">?probability__gte=<em><font type="lucinda" color="green">p</font></em></td>
+            <td> P(event) &ge; <em><font type="lucinda" color="green">p</font></em></td>
+            <td><em><font type="lucinda" color="green">p</font></em>[float]: probability</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?probability__gte=0.0" class="hasTooltip">{{ url['url'] }}/ligo?probability__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?probability__gte=0.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?probability__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-probability__lte" -->
+          <tr>
+            <td class="blue">?probability__lte=<em><font type="lucinda" color="green">p</font></em></td>
+            <td> P(event) &le; <em><font type="lucinda" color="green">p</font></em></td>
+            <td><em><font type="lucinda" color="green">p</font></em>[float]: probability</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?probability__lte=1.0" class="hasTooltip">{{ url['url'] }}/ligo?probability__lte=1.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?probability__lte=1.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?probability__lte=1.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-ra__gte" -->
+          <tr>
+            <td class="blue">?ra__gte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &ge; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/ligo?ra__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?ra__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-ra__lte" -->
+          <tr>
+            <td class="blue">?ra__lte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &le; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/ligo?ra__lte=360.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/ligo_q3c?ra__lte=360.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-sigma__gte" -->
+          <tr>
+            <td class="blue">?sigma__gte=<em><font type="lucinda" color="green">sigma</font></em></td>
+            <td> &sigma; &ge; <em><font type="lucinda" color="green">sigma</font></em></td>
+            <td><em><font type="lucinda" color="green">sigma</font></em>[float]: sigma</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?sigma__gte=0.050" class="hasTooltip">{{ url['url'] }}/ligo?sigma__gte=0.05
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?sigma__gte=0.050" class="hasTooltip">{{ url['url'] }}/ligo_q3c?sigma__gte=0.05
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-sigma__lte" -->
+          <tr>
+            <td class="blue">?sigma__lte=<em><font type="lucinda" color="green">sigma</font></em></td>
+            <td> &sigma; &le; <em><font type="lucinda" color="green">sigma</font></em></td>
+            <td><em><font type="lucinda" color="green">sigma</font></em>[float]: sigma</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?sigma__lte=0.25" class="hasTooltip">{{ url['url'] }}/ligo?sigma__lte=0.25
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?sigma__lte=0.25" class="hasTooltip">{{ url['url'] }}/ligo_q3c?sigma__lte=0.25
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-source_group" -->
+          <tr>
+            <td class="blue">?source_group=<em><font type="lucinda" color="green">group</font></em></td>
+            <td> source group like <em><font type="lucinda" color="green">group</font></em></td>
+            <td><em><font type="lucinda" color="green">group</font></em>[string]: Source group</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?source_group=ZTF" class="hasTooltip">{{ url['url'] }}/ligo?source_group=ZTF</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?source_group=ZTF" class="hasTooltip">{{ url['url'] }}/ligo_q3c?source_group=ZTF</a>
+            </td>
+          </tr>
+          <!-- "\-\-transient_type" -->
+          <tr>
+            <td class="blue">?transient_type=<em><font type="lucinda" color="green">type</font></em></td>
+            <td> transient type like <em><font type="lucinda" color="green">type</font></em></td>
+            <td><em><font type="lucinda" color="green">type</font></em>[string]: Transient type</td>
+            <td>
+              <a href="{{ url['url'] }}/ligo?transient_type='SN Ia'" class="hasTooltip">{{ url['url'] }}/ligo?transient_type=SN Ia</a><br>
+              <a href="{{ url['url'] }}/ligo_q3c?transient_type='SN Ia'" class="hasTooltip">{{ url['url'] }}/ligo_q3c?transient_type=SN Ia</a>
+            </td>
+          </tr>
+	  <!-- END -->
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse"
+      data-target="#TNSModels">TNS Database Model API
+    </button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="TNSModels" class="collapse">
+     <div class="table-responsive">
+      <table class="table table-striped table-sm cart">
+       <thead>
+        <tr>
+         <th>API</th>
+         <th>Return TnsRecord with ...</th>
+         <th>ArgName[Type]: Description</th>
+         <th>Example(s)</th>
+        </tr>
+       </thead>
+       <tbody>
+         <tr>
+            <td class="blue"> ?astrocone=<em><font type="lucinda" color="green">name,radius</font></em></td>
+            <td> cone search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/tns_q3c?astrocone=m51,5.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?astrocone=m51,5.0
+                <span>Object lookup via astropy.SkyCoord.from_name().</span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-alias" -->
+	  <tr>
+            <td class="blue">?alias=<em><font type="lucinda" color="green">alias</font></em></td>
+            <td> Alternate Name </td>
+            <td><em><font type="lucinda" color="green">alias</font></em>[string]: name</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?alias=ATLAS19otu" class="hasTooltip">{{ url['url'] }}/tns?alias=ATLAS19otu
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?alias=ATLAS19otu" class="hasTooltip">{{ url['url'] }}/tns_q3c?alias=ATLAS19otu
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-cone" -->
+         <tr>
+            <td class="blue"> ?cone=<em><font type="lucinda" color="green">ra,dec,radius</font></em></td>
+            <td> cone search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/tns_q3c?cone=202.2,47.2,5.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?cone=202.2,47.2,5.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-dec__gte" -->
+	  <tr>
+            <td class="blue">?dec__gte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &ge; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/tns?dec__gte=-90.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?dec__gte=-90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-dec__lte" -->
+          <tr>
+            <td class="blue">?dec__lte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &le; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/tns?dec__lte=90.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?dec__lte=90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_date" -->
+          <tr>
+            <td class="blue">?discovery_date=<em><font type="lucinda" color="green">date</font></em></td>
+	    <td> discovery date &gt; <em><font type="lucinda" color="green">date</font></em></td>
+            <td><em><font type="lucinda" color="green">date</font></em>[string]: discovery date</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?discovery_date=2019-06-02" class="hasTooltip">{{ url['url'] }}/tns?discovery_date=2019-06-02</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?discovery_date=2019-06-02" class="hasTooltip">{{ url['url'] }}/tns_q3c?discovery_date=2019-06-02</a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_instrument" -->
+          <tr>
+            <td class="blue">?discovery_instrument=<em><font type="lucinda" color="green">ins</font></em></td>
+	    <td> discovery instrument like <em><font type="lucinda" color="green">ins</font></em></td>
+            <td><em><font type="lucinda" color="green">ins</font></em>[string]: discovery instrument</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?discovery_instrument=ATLAS" class="hasTooltip">{{ url['url'] }}/tns?discovery_instrument=ATLAS</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?discovery_instrument=ATLAS" class="hasTooltip">{{ url['url'] }}/tns_q3c?discovery_instrument=ATLAS</a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_mag__gte" -->
+          <tr>
+            <td class="blue">?discovery_mag__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> Magnitude &ge; <em><font type="lucinda" color="green">mag</font></em></td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?discovery_mag__gte=-10.0" class="hasTooltip">{{ url['url'] }}/tns?discovery_mag__gte=-10.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?discovery_mag__gte=-10.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?discovery_mag__gte=-10.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-discovery_mag__lte" -->
+          <tr>
+            <td class="blue">?discovery_mag__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> Magnitude &le; <em><font type="lucinda" color="green">mag</font></em></td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?discovery_mag__lte=22.5" class="hasTooltip">{{ url['url'] }}/tns?discovery_mag__lte=22.5
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?discovery_mag__lte=22.5" class="hasTooltip">{{ url['url'] }}/tns_q3c?discovery_mag__lte=22.5
+                <span></span>
+              </a>
+            </td>
+          </tr>
+         <tr>
+            <td class="blue"> ?ellipse=<em><font type="lucinda" color="green">ra,dec,majaxis,ratio,posang</font></em></td>
+            <td> ellipse search by co-ordinate</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">majaxis</font></em>[float]: &deg;,
+              <em><font type="lucinda" color="green">ratio</font></em>[float]: no units, 
+              <em><font type="lucinda" color="green">posang</font></em>[float]: &deg;
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/tns_q3c?ellipse=202.2,47.2,5.0,0.5,25.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?ellipse=202.2,47.2,5.0,0.5,25.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-filter_name" -->
+          <tr>
+            <td class="blue">?filter_name=<em><font type="lucinda" color="green">filter</font></em></td>
+            <td> filter name like <em><font type="lucinda" color="green">filter</font></em></td>
+            <td><em><font type="lucinda" color="green">filter</font></em>[string]: filter name</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?filter_name=G-Gaia" class="hasTooltip">{{ url['url'] }}/tns?filter_name=G-Gaia</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?filter_name=G-Gaia" class="hasTooltip">{{ url['url'] }}/tns_q3c?filter_name=G-Gaia</a>
+            </td>
+          </tr>
+          <!-- "\-\-host" -->
+          <tr>
+            <td class="blue">?host=<em><font type="lucinda" color="green">host</font></em></td>
+            <td> host object name like <em><font type="lucinda" color="green">host</font></em></td>
+            <td><em><font type="lucinda" color="green">host</font></em>[string]: host object name</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?host=Unknown" class="hasTooltip">{{ url['url'] }}/tns?host=Unknown</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?host=Unknown" class="hasTooltip">{{ url['url'] }}/tns_q3c?host=Unknown</a>
+            </td>
+          </tr>
+          <!-- "\-\-host_z__gte" -->
+          <tr>
+            <td class="blue">?host_z__gte=<em><font type="lucinda" color="green">z</font></em></td>
+            <td> P(event) &ge; <em><font type="lucinda" color="green">z</font></em></td>
+            <td><em><font type="lucinda" color="green">z</font></em>[float]: redshift</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?host_z__gte=0.0" class="hasTooltip">{{ url['url'] }}/tns?host_z__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?host_z__gte=0.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?host_z__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-hoist_z__lte" -->
+          <tr>
+            <td class="blue">?host_z__lte=<em><font type="lucinda" color="green">z</font></em></td>
+            <td> P(event) &le; <em><font type="lucinda" color="green">z</font></em></td>
+            <td><em><font type="lucinda" color="green">z</font></em>[float]: redshift</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?host_z__lte=1.0" class="hasTooltip">{{ url['url'] }}/tns?host_z__lte=1.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?host_z__lte=1.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?host_z__lte=1.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-id" -->
+          <tr>
+            <td class="blue">?id=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id = <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?id=20" class="hasTooltip">{{ url['url'] }}/tns?id=20
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?id=20" class="hasTooltip">{{ url['url'] }}/tns_q3c?id=20
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-id__gte" -->
+          <tr>
+            <td class="blue">?id__gte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id &ge; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?id__gte=777" class="hasTooltip">{{ url['url'] }}/tns?id__gte=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?id__gte=777" class="hasTooltip">{{ url['url'] }}/tns_q3c?id__gte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-id__lte" -->
+          <tr>
+            <td class="blue">?id__lte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> database id &le; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: record number</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?id__lte=777" class="hasTooltip">{{ url['url'] }}/tns?id__lte=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?id__lte=777" class="hasTooltip">{{ url['url'] }}/tns_q3c?id__lte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-redshift__gte" -->
+          <tr>
+            <td class="blue">?redshift__gte=<em><font type="lucinda" color="green">z</font></em></td>
+            <td> P(event) &ge; <em><font type="lucinda" color="green">z</font></em></td>
+            <td><em><font type="lucinda" color="green">z</font></em>[float]: redshift</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?redshift__gte=0.0" class="hasTooltip">{{ url['url'] }}/tns?redshift__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?redshift__gte=0.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?redshift__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-redshift__lte" -->
+          <tr>
+            <td class="blue">?redshift__lte=<em><font type="lucinda" color="green">z</font></em></td>
+            <td> P(event) &le; <em><font type="lucinda" color="green">z</font></em></td>
+            <td><em><font type="lucinda" color="green">z</font></em>[float]: redshift</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?redshift__lte=1.0" class="hasTooltip">{{ url['url'] }}/tns?redshift__lte=1.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?redshift__lte=1.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?redshift__lte=1.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-ra__gte" -->
+          <tr>
+            <td class="blue">?ra__gte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &ge; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/tns?ra__gte=0.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?ra__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-ra__lte" -->
+          <tr>
+            <td class="blue">?ra__lte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &le; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/tns?ra__lte=360.0
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/tns_q3c?ra__lte=360.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-source_group" -->
+          <tr>
+            <td class="blue">?source_group=<em><font type="lucinda" color="green">group</font></em></td>
+            <td> source group like <em><font type="lucinda" color="green">group</font></em></td>
+            <td><em><font type="lucinda" color="green">group</font></em>[string]: source group</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?source_group=ZTF" class="hasTooltip">{{ url['url'] }}/tns?source_group=ZTF</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?source_group=ZTF" class="hasTooltip">{{ url['url'] }}/tns_q3c?source_group=ZTF</a>
+            </td>
+          </tr>
+          <!-- "\-\-tns_class" -->
+          <tr>
+            <td class="blue">?tns_class=<em><font type="lucinda" color="green">type</font></em></td>
+            <td> TNS class like <em><font type="lucinda" color="green">type</font></em></td>
+            <td><em><font type="lucinda" color="green">type</font></em>[string]: transient type</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?tns_class='SN Ia'" class="hasTooltip">{{ url['url'] }}/tns?tns_class='SN Ia'</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?tns_class='SN Ia'" class="hasTooltip">{{ url['url'] }}/tns_q3c?tns_class='SN Ia'</a>
+            </td>
+          </tr>
+          <!-- "\-\-tns_id" -->
+          <tr>
+            <td class="blue">?tns_id=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> TNS tns_id = <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: id number</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?tns_id=777" class="hasTooltip">{{ url['url'] }}/tns?tns_id=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?tns_id=777" class="hasTooltip">{{ url['url'] }}/tns_q3c?tns_id=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-tns_id__gte" -->
+          <tr>
+            <td class="blue">?tns_id__gte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> TNS id &ge; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: id number</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?tns_id__gte=777" class="hasTooltip">{{ url['url'] }}/tns?tns_id__gte=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?tns_id__gte=777" class="hasTooltip">{{ url['url'] }}/tns_q3c?tns_id__gte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-tns_id__lte" -->
+          <tr>
+            <td class="blue">?tns_id__lte=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> TNS id &le; <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: id number</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?tns_id__lte=777" class="hasTooltip">{{ url['url'] }}/tns?tns_id__lte=777
+                <span></span>
+	      </a><br>
+              <a href="{{ url['url'] }}/tns_q3c?tns_id__lte=777" class="hasTooltip">{{ url['url'] }}/tns_q3c?tns_id__lte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <!-- "\-\-tns_name" -->
+          <tr>
+            <td class="blue">?tns_name=<em><font type="lucinda" color="green">name</font></em></td>
+            <td> TNS name like <em><font type="lucinda" color="green">name</font></em></td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name</td>
+            <td>
+              <a href="{{ url['url'] }}/tns?tns_name=2019kra" class="hasTooltip">{{ url['url'] }}/tns?tns_name=2019kra</a><br>
+              <a href="{{ url['url'] }}/tns_q3c?tns_name=2019kra" class="hasTooltip">{{ url['url'] }}/tns_q3c?tns_name=2019kra</a>
+            </td>
+          </tr>
+	  <!-- END -->
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse"
+      data-target="#ZTFModels">ZTF Database Model API
+    </button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="ZTFModels" class="collapse">
+     <div class="table-responsive">
+      <table class="table table-striped table-sm cart">
+       <thead>
+        <tr>
+         <th>API</th>
+         <th>Return ObsReq with ...</th>
+         <th>ArgName[Type]: Description</th>
+         <th>Example(s)</th>
+        </tr>
+       </thead>
+       <tbody>
+         <tr>
+            <td class="blue"> ?astrocone=<em><font type="lucinda" color="green">name,radius</font></em></td>
+            <td> cone search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: name,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: pixels
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?astrocone=m51,0.01" class="hasTooltip">{{ url['url'] }}/ztf?astrocone=m51,0.01
+                <span>Object lookup via astropy.SkyCoord.from_name().</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?b__gte=<em><font type="lucinda" color="green">b</font></em></td>
+            <td> galactic latitude (b) &ge; <em><font type="lucinda" color="green">b</font></em></td>
+            <td><em><font type="lucinda" color="green">b</font></em>[float]: &deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?b__gte=20.50" class="hasTooltip">{{ url['url'] }}/ztf?b__gte=20.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?b__lte=<em><font type="lucinda" color="green">b</font></em></td>
+            <td> galactic latitude (b) &le; <em><font type="lucinda" color="green">b</font></em></td>
+            <td><em><font type="lucinda" color="green">b</font></em>[float]: &deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?b__lte=20.50" class="hasTooltip">{{ url['url'] }}/ztf?b__lte=20.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?candid=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> given <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[long]: candidate identifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?candid=516168124115010000" class="hasTooltip">{{ url['url']
+                }}/ztf?candid=516168124115010000
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?clastar__gte=<em><font type="lucinda" color="green">cscore</font></em></td>
+            <td> star/galaxy score &ge; <em><font type="lucinda" color="green">cscore</font></em> </td>
+            <td><em><font type="lucinda" color="green">cscore</font></em>[float]: CLASS_STAR classifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?clastar__gte=0.4" class="hasTooltip">{{ url['url'] }}/ztf?clastar__gte=0.4
+                <span>Deprecated: value is SExtractor score measured from the difference image.<br/>CLASS_STAR has been replaced by SPREAD_MODEL (not implemented).</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?clastar__lte=<em><font type="lucinda" color="green">cscore</font></em></td>
+            <td> star/galaxy score &le; <em><font type="lucinda" color="green">cscore</font></em> </td>
+            <td><em><font type="lucinda" color="green">cscore</font></em>[float]: CLASS_STAR classifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?clastar__lte=0.4" class="hasTooltip">{{ url['url'] }}/ztf?clastar__gte=0.4
+                <span>Deprecated: value is SExtractor score measured from the difference image.<br/>CLASS_STAR has been replaced by SPREAD_MODEL (not implemented).</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?cone=<em><font type="lucinda" color="green">ra,dec,radius</font></em></td>
+            <td> cone search</td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: pixels
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?cone=202.47,47.20,0.01" class="hasTooltip">{{ url['url']
+                }}/ztf?cone=202.47,47.20,0.01
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?dec__gte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &ge; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?dec__gte=-90.0" class="hasTooltip">{{ url['url'] }}/ztf?dec__gte=-90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?dec__lte=<em><font type="lucinda" color="green">dec</font></em></td>
+            <td> declination (Dec) &le; <em><font type="lucinda" color="green">dec</font></em></td>
+            <td><em><font type="lucinda" color="green">dec</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?dec__lte=90.0" class="hasTooltip">{{ url['url'] }}/ztf?dec__lte=90.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?deltamaglatest__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> magnitude difference &ge; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: abs(magnitude)</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?deltamaglatest__gte=1.0" class="hasTooltip">{{ url['url']
+                }}/ztf?deltamaglatest__gte=1.0
+                <span>Derived magpsf[this alert] - magpsf[last alert] at this location from image of same filter.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?deltamaglatest__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> magnitude difference &le; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: abs(magnitude)</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?deltamaglatest__lte=1.0" class="hasTooltip">{{ url['url']
+                }}/ztf?deltamaglatest__lte=1.0
+                <span>Derived magpsf[this alert] - magpsf[last alert] at this location from image of same filter.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?deltamagref__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> magnitude difference in reference image &ge; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?deltamagref__gte=1.0" class="hasTooltip">{{ url['url']
+                }}/ztf?deltamagref__gte=1.0
+                <span>Derived if distnr&#8818;2 pixels, deltamagref = (magnr - magpsf).</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?deltamagref__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> magnitude difference in reference image &le; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?deltamagref__lte=1.0" class="hasTooltip">{{ url['url']
+                }}/ztf?deltamagref__lte=1.0
+                <span>Derived if distnr&#8818;2 pixels, deltamagref = (magnr - magpsf).</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?distnr__gte=<em><font type="lucinda" color="green">dist</font></em></td>
+            <td> the distance to the nearest source &ge; <em><font type="lucinda" color="green">dist</font></em> </td>
+            <td><em><font type="lucinda" color="green">dist</font></em>[float]: pixels</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?distnr__gte=1.0" class="hasTooltip">{{ url['url'] }}/ztf?distnr__gte=1.0
+                <span>Distance to nearest source in reference image PSF-catalog within 30 arcsec</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?distnr__lte=<em><font type="lucinda" color="green">dist</font></em></td>
+            <td> the distance to the nearest source &le; <em><font type="lucinda" color="green">dist</font></em> </td>
+            <td><em><font type="lucinda" color="green">dist</font></em>[float]: pixels</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?distnr__lte=1.0" class="hasTooltip">{{ url['url'] }}/ztf?distnr__lte=1.0
+                <span>Distance to nearest source in reference image PSF-catalog within 30 arcsec</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?filter=<em><font type="lucinda" color="green">fstr</font></em></td>
+            <td> given filter</td>
+            <td><em><font type="lucinda" color="green">fstr</font></em>[char]: g, r, i</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?filter=g" class="hasTooltip">{{ url['url'] }}/ztf?filter=g
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?fwhm__gte=<em><font type="lucinda" color="green">fwhm</font></em></td>
+            <td> FWHM &ge; <em><font type="lucinda" color="green">fwhm</font></em> </td>
+            <td><em><font type="lucinda" color="green">fwhm</font></em>[float]: pixels</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?fwhm__gte=1.123" class="hasTooltip">{{ url['url'] }}/ztf?fwhm__gte=1.123
+                <span>FWHM is measured from the difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?fwhm__lte=<em><font type="lucinda" color="green">fwhm</font></em></td>
+            <td> FWHM &le; <em><font type="lucinda" color="green">fwhm</font></em> </td>
+            <td><em><font type="lucinda" color="green">fwhm</font></em>[float]: pixels</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?fwhm__lte=1.123" class="hasTooltip">{{ url['url'] }}/ztf?fwhm__lte=1.123
+                <span>FWHM is measured from the difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?jd__gte=<em><font type="lucinda" color="green">jd</font></em></td>
+            <td> Julian day &ge; <em><font type="lucinda" color="green">jd</font></em></td>
+            <td><em><font type="lucinda" color="green">jd</font></em>[float]: valid JD</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?jd__gte=2458302.6906713" class="hasTooltip">{{ url['url']
+                }}/ztf?jd__gte=2458302.6906713
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?jd__lte=<em><font type="lucinda" color="green">jd</font></em></td>
+            <td> Julian day &le; <em><font type="lucinda" color="green">jd</font></em></td>
+            <td><em><font type="lucinda" color="green">jd</font></em>[float]: valid JD</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?jd__lte=2458302.6906713" class="hasTooltip">{{ url['url']
+                }}/ztf?jd__lte=2458302.6906713
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?l__gte=<em><font type="lucinda" color="green">l</font></em></td>
+            <td> galactic longitude (l) &ge; <em><font type="lucinda" color="green">l</font></em></td>
+            <td><em><font type="lucinda" color="green">l</font></em>[float]: &deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?l__gte=20.50" class="hasTooltip">{{ url['url'] }}/ztf?l__gte=20.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?l__lte=<em><font type="lucinda" color="green">l</font></em></td>
+            <td> galactic longitude (l) &le; <em><font type="lucinda" color="green">l</font></em></td>
+            <td><em><font type="lucinda" color="green">l</font></em>[float]: &deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?l__lte=20.50" class="hasTooltip">{{ url['url'] }}/ztf?l__lte=20.50
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?magap__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> aperture magnitude &ge; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?magap__gte=12.5" class="hasTooltip">{{ url['url'] }}/ztf?magap__gte=12.5
+                <span>Magnitude using 8 pixel diameter aperture measured from difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?magap__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> aperture magnitude &le; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?magap__lte=12.5" class="hasTooltip">{{ url['url'] }}/ztf?magap__lte=12.5
+                <span>Magnitude using 8 pixel diameter aperture measured from difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?magpsf__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> brightness &ge; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?magpsf__gte=20.0" class="hasTooltip">{{ url['url'] }}/ztf?magpsf__gte=20.0
+                <span>Magnitude from PSF-fit photometry measured from difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?magpsf__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> brightness &le; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?magpsf__lte=20.0" class="hasTooltip">{{ url['url'] }}/ztf?magpsf__lte=20.0
+                <span>Magnitude from PSF-fit photometry measured from difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?objectcone=<em><font type="lucinda" color="green">name,radius</font></em></td>
+            <td> cone search by name</td>
+            <td><em><font type="lucinda" color="green">name</font></em>[string]: catalogue name,
+              <em><font type="lucinda" color="green">radius</font></em>[float]: pixels
+            </td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?objectcone=m51,0.01" class="hasTooltip">{{ url['url']
+                }}/ztf?objectcone=m51,0.01
+                <span>Deprecated: Object lookup via https://simbad2k.lco.global.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?objectId=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> given objectId</td>
+            <td><em><font type="lucinda" color="green">id</font></em>[None]: unique object identifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?objectId=ZTF17aacnwnb" class="hasTooltip">{{ url['url']
+                }}/ztf?objectId=ZTF17aacnwnb
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?objectidps=<em><font type="lucinda" color="green">idps</font></em></td>
+            <td> given PS1 object identifier</td>
+            <td><em><font type="lucinda" color="green">idps</font></em>[None]: PS-1 catalog identifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?objectidps=123632692811945346" class="hasTooltip">{{ url['url'] }}/ztf?objectidps=123632692811945346
+                <span></span>
+              </a></td>
+          </tr>
+          <tr>
+            <td class="blue"> ?ra__gte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &ge; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?ra__gte=0.0" class="hasTooltip">{{ url['url'] }}/ztf?ra__gte=0.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?ra__lte=<em><font type="lucinda" color="green">ra</font></em></td>
+            <td> right ascension (RA) &le; <em><font type="lucinda" color="green">ra</font></em></td>
+            <td><em><font type="lucinda" color="green">ra</font></em>[float]: J2k&deg;</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?ra__lte=360.0" class="hasTooltip">{{ url['url'] }}/ztf?ra__lte=360.0
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?rb__gte=<em><font type="lucinda" color="green">rb</font></em></td>
+            <td> real/bogus score &ge; <em><font type="lucinda" color="green">rb</font></em> </td>
+            <td><em><font type="lucinda" color="green">rb</font></em>[float]: 0.0&ndash;1.0</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?rb__gte=0.3" class="hasTooltip">{{ url['url'] }}/ztf?rb__gte=0.3
+                <span>0.0 is the least reliable and 1.0 is the most reliable.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?rb__lte=<em><font type="lucinda" color="green">rb</font></em></td>
+            <td> real/bogus score &le; <em><font type="lucinda" color="green">rb</font></em> </td>
+            <td><em><font type="lucinda" color="green">rb</font></em>[float]: 0.0&ndash;1.0</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?rb__lte=0.3" class="hasTooltip">{{ url['url'] }}/ztf?rb__lte=0.3
+                <span>0.0 is the least reliable and 1.0 is the most reliable.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?sid=<em><font type="lucinda" color="green">id</font></em></td>
+            <td> SASSy id <em><font type="lucinda" color="green">id</font></em></td>
+            <td><em><font type="lucinda" color="green">id</font></em>[int]: SASSy identifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?sid=777" class="hasTooltip">{{ url['url'] }}/ztf?sid=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?sid__gte=<em><font type="lucinda" color="green">sid</font></em></td>
+            <td> SASSy id &ge; <em><font type="lucinda" color="green">sid</font></em></td>
+            <td><em><font type="lucinda" color="green">sid</font></em>[int]: SASSy identifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?sid__gte=777" class="hasTooltip">{{ url['url'] }}/ztf?sid__gte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?sid__lte=<em><font type="lucinda" color="green">sid</font></em></td>
+            <td> SASSy id &le; <em><font type="lucinda" color="green">sid</font></em></td>
+            <td><em><font type="lucinda" color="green">sid</font></em>[int]: SASSy identifier</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?sid__lte=777" class="hasTooltip">{{ url['url'] }}/ztf?sid__lte=777
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?sigmagpsf__gte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> brightness uncertainty &ge; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?sigmagpsf__gte=0.4" class="hasTooltip">{{ url['url'] }}/ztf?sigmagpsf__gte=0.4
+                <span>Magnitude uncertainty from PSF-fit photometry measured from difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?sigmagpsf__lte=<em><font type="lucinda" color="green">mag</font></em></td>
+            <td> brightness uncertainty &le; <em><font type="lucinda" color="green">mag</font></em> </td>
+            <td><em><font type="lucinda" color="green">mag</font></em>[float]: magnitude</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?sigmagpsf__lte=0.4" class="hasTooltip">{{ url['url'] }}/ztf?sigmagpsf__lte=0.4
+                <span>Magnitude uncertainty from PSF-fit photometry measured from difference image.</span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?time__gte=<em><font type="lucinda" color="green">time</font></em></td>
+            <td> calendar time &ge; <em><font type="lucinda" color="green">time</font></em></td>
+            <td><em><font type="lucinda" color="green">time</font></em>[string]: yyyy-mm-dd</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?time__gte=2018-07-17" class="hasTooltip">{{ url['url']
+                }}/ztf?time__gte=2017-07-17
+                <span></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="blue"> ?time__lte=<em><font type="lucinda" color="green">time</font></em></td>
+            <td> calendar time &le; <em><font type="lucinda" color="green">time</font></em></td>
+            <td><em><font type="lucinda" color="green">time</font></em>[string]: yyyy-mm-dd</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?time__lte=2018-07-17" class="hasTooltip">{{ url['url']
+                }}/ztf?time__lte=2017-07-17
+                <span></span>
+              </a>
+            </td>
+          </tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Section -->
+  <div class="row">
+   <div class="col-md-12">
+    <button class="btn btn-outline-info btn-block" data-toggle="collapse"
+      data-target="#Display">Display Modifiers
+    </button>
+   </div>
+  </div>
+  <br>
+  <div class="row">
+   <div class="col-md-12 imgdiv">
+    <div id="Display" class="collapse">
+     <div class="table-responsive">
+      <table class="table table-striped table-sm cart">
+       <thead>
+        <tr>
+         <th>API</th>
+         <th>Return page with ...</th>
+         <th>ArgName[Type]: Description</th>
+         <th>Example(s)</th>
+        </tr>
+       </thead>
+       <tbody>
+         <tr>
+            <td class="blue"> ?&amp;page=<em><font type="lucinda" color="green">num</font></em></td>
+            <td> given page number</td>
+            <td><em><font type="lucinda" color="green">num</font></em>[None]: page number</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf?&amp;page=2" class="hasTooltip">{{ url['url'] }}/ztf?&amp;page=2
+                <span></span>
+              </a></td>
+          </tr>
+          <tr>
+            <td class="blue"> ?format=<em><font type="lucinda" color="green">fmt</font></em></td>
+            <td> given format</td>
+            <td><em><font type="lucinda" color="green">fmt</font></em>[string]: JSON</td>
+            <td>
+              <a href="{{ url['url'] }}/ztf/777?format=json" class="hasTooltip">{{ url['url'] }}/ztf/777?format=json
+                <span class="tooltiptext">Only JSON is supported</span>
+              </a>
+            </td>
+          </tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+{% endblock %}

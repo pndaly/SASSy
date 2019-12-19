@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" >
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link type="image/x-icon" rel="shortcut icon" href="./favicon.ico">
+  <link type="text/css" rel="stylesheet" href="js9-allinone.css">
+  <script type="text/javascript" src="js9-allinone.js"></script>
+  <style>
+      #centerdiv {
+      width: 512px;
+      margin-left: auto ;
+      margin-right: auto ;
+      }
+  </style>
+</head>
+<body>
+    <div id="centerdiv">
+    <font size="+1">
+    <center><b>JS9 Demo: the allinone configuration</b></center>
+    </font>
+    <p>
+      The <b>js9-allinone.css</b> and <b>js9-allinone.js</b> files can
+      be served via CDN, obviating the need to install JS9 on your web site.
+      <p>
+      JS9 install files and directories (other than .css and .js
+      files) are not available in this mode, leading to the following
+      limitations:
+      <ul>
+	<li> no js9Prefs.json for site-wide configuration
+	<li> no back-end helper will be run
+	<li> no help files will be available (and no Help menu option)
+	<li> no server-side analysis (including proxy load and large file support)
+      </ul>
+    <p>
+    <table cellspacing="15">
+    <tr valign="top">
+    <td>
+    FITS representation files:
+    <ul>
+    <li> <a href='javascript:JS9.Load("fits/casa.fits.gz", {scale:"log", parentFile:"fits/casa.fits"});'>CAS-A (Chandra)</a>
+    <li> <a href='javascript:JS9.Load("fits/3c273.fits.gz", {scale:"log", colormap:"heat", parentFile:"fits/3c273.fits"});'>3c273 (Chandra)</a>
+    <li> <a href='javascript:JS9.Load("fits/3c58.fits.gz", {scale:"log", colormap:"cool", parentFile:"fits/3c58.fits"});'>3c58 (Chandra)</a>
+    </ul>
+    </td>
+    <td>
+    FITS images and binary tables:
+    <ul>
+    <li> <a href='javascript:JS9.Load("fits/snr.fits", {scale:"log", colormap:"heat"});'>CTB 109 (Einstein, small)</a>
+    <li> <a href='javascript:JS9.Load("fits/ngc1316.fits", {scale:"linear", colormap:"cool"});'>ngc1316 (AIPS, small)</a>
+    <li> <a href='javascript:JS9.Load("fits/ngkper.fits", {scale:"log"});'>gkper (Chandra, 7.6Mb)</a>
+    </ul>
+    </td>
+    </tr>
+    </table>
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+    </div>
+<p>
+JS9 Demos:
+<ul>
+<li><a href='js9basics.html'>JS9 Demo: the basics</a>
+<li><a href='js9bespoke.html'>JS9 Demo: web page control of JS9</a>
+<li><a href='js9menustyles.html'>JS9 Demo: JS9 menubar styles</a>
+<li><a href='js9sizes.html'>JS9 Demo: setting the size of the JS9 display</a>
+<li><a href='js9super.html'>JS9 Demo: control multiple JS9 displays</a>
+<li><a href='js9large.html'>JS9 Demo: support for large FITS files</a>
+<li><a href='js9plugins.html'>JS9 Demo: adding plugins to JS9</a> 
+<li><a href='js9imexam.html'>JS9 Demo: the imexam plugin for JS9</a> 
+<li><a href='js9blend.html'>JS9 Demo: image blending</a> 
+<li><a href='js9sync.html'>JS9 Demo: sync images</a> 
+<li><a href='js9cat.html'>JS9 Demo: overlaying catalogs</a>
+<li><a href='js9panzoom.html'>JS9 Demo: pan and zoom</a> 
+<li><a href='js9rgb.html'>JS9 Demo: RGB composite images</a> 
+<li><a href='js9multi.html'>JS9 Demo: independent instances of JS9</a> 
+<li><a href='js9analysis.html'>JS9 Demo: remote data analysis</a> 
+<li><a href='js9onchange.html'>JS9 Demo: running tasks when a region changes</a>
+<li><a href='js9create.html'>JS9 Demo: creating a JS9 instance dynamically</a> 
+<li><a href='js9preload.html'>JS9 Demo: preloading images into JS9</a>
+<li><a href='js9bitpix.html'>JS9 Demo: displaying different FITS datatypes</a> 
+<li><a href='js9allinone.html'>JS9 Demo: using the all-in-one files</a> 
+<li><a href='js9pngvsfits.html'>JS9 Demo: PNG representation files vs FITS files</a> 
+</ul>
+</body>
+</html>

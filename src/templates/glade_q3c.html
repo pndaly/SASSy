@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--suppress ALL -->
+<!-- globl container -->
+<div class="container">
+
+  <!-- introduction -->
+  <div class="row">
+    <div class="col-md-12">
+      <h2><font color="purple">G</font>alaxy <font color="purple">L</font>ist for the <font color="purple">A</font>dvanced
+	      <font color="purple">D</font>etector <font color="purple">E</font>ra (<a href="{{ url_for('glade_q3c_text') }}">GLADE</a>) [Q3C]</h2>
+      This page provides a default interface to the GLADE catalog with Q3C indexing.
+      The table lists GLADE records in ascending order by database <i>id</i>. Use the filters on the right to
+      narrow down the results to areas of interest. When the results look good, add <code>?format=json</code>
+      to the URL. You can then access the URL to retrieve the full data and use it in your scripts.<p></p>
+    </div>
+  </div>
+  <!-- end of introduction -->
+
+  <div class="row">
+
+    <!-- sort section -->
+    <div class="col-md-2">
+      <form method="GET" action="/sassy/glade_q3c">
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/glade_q3c" class="btn btn-warning">Reset</a>
+        </div>
+        <div class="form-group">
+          <label for="sort_value">Sort By ...</label>
+	  <!-- SORT_VALUE = ['id', 'pgc', 'gwgc', 'hyperleda', 'twomass', 'sdss', 'flag1', 'ra', 'dec', 'dist', 'disterr', 'z', 'b', 'b_err', 'b_abs', 'j', 'j_err', 'h', 'h_err', 'k', 'k_err', 'flag2', 'flag3'] -->
+          <select id="sort_value" name="sort_value" class="form-control form-control-sm" value="{{ request.args.sort_value }}">
+            <option value="id"        {% if request.args.sort_value=='id' %}        selected {% endif %}>Database ID</option>
+            <option value="pgc"       {% if request.args.sort_value=='pgc' %}       selected {% endif %}>PGC</option>
+            <option value="gwgc"      {% if request.args.sort_value=='gwgc' %}      selected {% endif %}>GWGC Name</option>
+            <option value="hyperleda" {% if request.args.sort_value=='hyperleda' %} selected {% endif %}>HyperLEDA Name</option>
+            <option value="twomass"   {% if request.args.sort_value=='twomass' %}   selected {% endif %}>2MASS Name</option>
+            <option value="sdss"      {% if request.args.sort_value=='sdss' %}      selected {% endif %}>SDSS DR12 Name</option>
+            <option value="flag1"     {% if request.args.sort_value=='flag1' %}     selected {% endif %}>Flag 1</option>
+            <option value="ra"        {% if request.args.sort_value=='ra' %}        selected {% endif %}>RA (J2k&deg;)</option>
+            <option value="dec"       {% if request.args.sort_value=='dec' %}       selected {% endif %}>Dec (J2k&deg;)</option>
+            <option value="dist"      {% if request.args.sort_value=='dist' %}      selected {% endif %}>Distance (Mpc)</option>
+            <option value="disterr"   {% if request.args.sort_value=='disterr' %}   selected {% endif %}>&plusmn; Distance (Mpc)</option>
+            <option value="z"         {% if request.args.sort_value=='z' %}         selected {% endif %}>Redshift</option>
+            <option value="b"         {% if request.args.sort_value=='b' %}         selected {% endif %}>B (mag)</option>
+            <option value="b_err"     {% if request.args.sort_value=='b_err' %}     selected {% endif %}>&plusmn; B (mag)</option>
+            <option value="b_abs"     {% if request.args.sort_value=='b_abs' %}     selected {% endif %}>|B| (mag)</option>
+            <option value="j"         {% if request.args.sort_value=='j' %}         selected {% endif %}>J (mag)</option>
+            <option value="j_err"     {% if request.args.sort_value=='j_err' %}     selected {% endif %}>&plusmn; J (mag)</option>
+            <option value="h"         {% if request.args.sort_value=='h' %}         selected {% endif %}>H (mag)</option>
+            <option value="h_err"     {% if request.args.sort_value=='h_err' %}     selected {% endif %}>&plusmn; H (mag)</option>
+            <option value="k"         {% if request.args.sort_value=='k' %}         selected {% endif %}>K (mag)</option>
+            <option value="k_err"     {% if request.args.sort_value=='k_err' %}     selected {% endif %}>&plusmn; K (mag)</option>
+            <option value="flag2"     {% if request.args.sort_value=='flag2' %}     selected {% endif %}>Flag 2</option>
+            <option value="flag3"     {% if request.args.sort_value=='flag3' %}     selected {% endif %}>Flag 3</option>
+          </select>
+        </div>
+
+        <div>
+          <select id="sort_order" name="sort_order" class="form-control form-control-sm" value="{{ request.args.sort_order }}">
+            <option value="descending" {% if request.args.sort_order=='descending' %} selected {% endif %}>Descending</option>
+            <option value="ascending"  {% if request.args.sort_order=='ascending' %}  selected {% endif %}>Ascending</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sort_value">Using Filters ...</label>
+          <input type="text" class="form-control form-control-sm" id="GWGC Name" name="gwgcName" value="{{ request.args.gwgc }}" placeholder="gwgc name">
+          <input type="text" class="form-control form-control-sm" id="HyperLEDA Name" name="hyperledaName" value="{{ request.args.hyperleda }}" placeholder="hyperleda name">
+          <input type="text" class="form-control form-control-sm" id="2MASS Name" name="twomass" value="{{ request.args.twomass }}" placeholder="twomass name">
+          <input type="text" class="form-control form-control-sm" id="SDSS Name" name="sdssName" value="{{ request.args.sdss }}" placeholder="sdss name">
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="ra__gte" name="ra__gte" value="{{ request.args.ra__gte }}" placeholder="0">
+          </div>
+          <label for="ra__gte"><font color="grey">&le;</font><small>RA</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="ra__lte" name="ra__lte" value="{{ request.args.ra__lte }}" placeholder="360">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dec__gte" name="dec__gte" value="{{ request.args.dec__gte }}" placeholder="-90">
+          </div>
+          <label for="dec__gte"><font color="grey">&le;</font><small>Dec</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dec__lte" name="dec__lte" value="{{ request.args.dec__lte }}" placeholder="+90">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dist__gte" name="dist__gte" value="{{ request.args.dist__gte }}" placeholder="0">
+          </div>
+          <label for="dist__gte"><font color="grey">&le;</font><small>Dist</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dist__lte" name="dist__lte" value="{{ request.args.dist__lte }}" placeholder="10">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="z__gte" name="z__gte" value="{{ request.args.z__gte }}" placeholder="0">
+          </div>
+          <label for="z__gte"><font color="grey">&le;</font><small>z</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="z__lte" name="z__lte" value="{{ request.args.z__lte }}" placeholder="5">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_abs__gte" name="b_abs__gte" value="{{ request.args.b_abs__gte }}" placeholder="-20">
+          </div>
+          <label for="b_abs__gte"><font color="grey">&le;</font><small>|B|</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_abs__lte" name="b_abs__lte" value="{{ request.args.b_abs__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b__gte" name="b__gte" value="{{ request.args.b__gte }}" placeholder="-20">
+          </div>
+          <label for="b__gte"><font color="grey">&le;</font><small>B</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b__lte" name="b__lte" value="{{ request.args.b__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="j__gte" name="j__gte" value="{{ request.args.j__gte }}" placeholder="-20">
+          </div>
+          <label for="j__gte"><font color="grey">&le;</font><small>J</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="j__lte" name="j__lte" value="{{ request.args.j__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="h__gte" name="h__gte" value="{{ request.args.h__gte }}" placeholder="-20">
+          </div>
+          <label for="h__gte"><font color="grey">&le;</font><small>H</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="h__lte" name="h__lte" value="{{ request.args.h__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="k__gte" name="k__gte" value="{{ request.args.k__gte }}" placeholder="-20">
+          </div>
+          <label for="k__gte"><font color="grey">&le;</font><small>K</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="k__lte" name="k__lte" value="{{ request.args.k__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/glade_q3c" class="btn btn-warning">Reset</a>
+        </div>
+      </form>
+    </div>
+    <!-- end of sort section -->
+
+    <!-- table section -->
+    <div class="col-md-10">
+      <div class="table-responsive">
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/glade_q3c?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found, showing page {{ page }} / {{ context.pages }}.
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/glade_q3c?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th><font color="blue">ID</font></th>
+              <th><font color="blue">PGC</font></th>
+              <th><font color="blue">GWGC</font></th>
+              <th><font color="blue">HyperLEDA</font></th>
+              <th><font color="blue">2MASS</font></th>
+              <th><font color="blue">SDSS</font></th>
+              <th><font color="blue">RA</font></th>
+              <th><font color="blue">Dec</font></th>
+              <th><font color="blue">Dist</font></th>
+              <th><font color="blue">&plusmn;Dist</font></th>
+              <th><font color="blue">z</font></th>
+              <th><font color="blue">B</font></th>
+              <th><font color="blue">&plusmn;B</font></th>
+              <th><font color="blue">|B|</font></th>
+              <th><font color="blue">J</font></th>
+              <th><font color="blue">&plusmn;J</font></th>
+              <th><font color="blue">H</font></th>
+              <th><font color="blue">&plusmn;H</font></th>
+              <th><font color="blue">K</font></th>
+              <th><font color="blue">&plusmn;K</font></th>
+              <th><font color="blue">flag1</font></th>
+              <th><font color="blue">flag2</font></th>
+              <th><font color="blue">flag3</font></th>
+            </tr>
+            <tr>
+              <th><font color="grey"></font></th>
+              <th><font color="grey">Code</font></th>
+              <th><font color="grey">Name</font></th>
+              <th><font color="grey">Name</font></th>
+              <th><font color="grey">Name</font></th>
+              <th><font color="grey">Name</font></th>
+              <th><font color="grey">J2k(&deg;)</font></th>
+              <th><font color="grey">J2k(&deg;)</font></th>
+              <th><font color="grey">Mpc</font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">{Q,C,G}</font></th>
+              <th><font color="grey">{0,1,2,3}</font></th>
+              <th><font color="grey">{0,1}</font></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for alert in context.results %}
+              <tr>
+                <td><a href="/sassy/glade_q3c/{{ alert.id }}/" title="{{ alert.id }}">{{ alert.id }}</a></td>
+                <td>{{ alert.pgc }}</td>
+                <td>{{ alert.gwgc }}</td>
+                <td>{{ alert.hyperlEDA }}</td>
+                <td>{{ alert.twomass }}</td>
+                <td>{{ alert.sdss }}</td>
+
+		{% if alert.ra|float("NaN") == "NaN" %}
+		  <td>{{ alert.ra }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.ra) }}</td>
+		{% endif %}
+
+		{% if alert.dec|float("NaN") == "NaN" %}
+		  <td>{{ alert.dec }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.dec) }}</td>
+		{% endif %}
+
+		{% if alert.dist|float("NaN") == "NaN" %}
+		  <td>{{ alert.dist }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.dist) }}</td>
+		{% endif %}
+
+		{% if alert.disterr|float("NaN") == "NaN" %}
+		  <td>{{ alert.disterr }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.disterr) }}</td>
+		{% endif %}
+
+		{% if alert.z|float("NaN") == "NaN" %}
+		  <td>{{ alert.z }}</td>
+		{% else %}
+		  <td>{{ "%.6f"|format(alert.z) }}</td>
+		{% endif %}
+
+		{% if alert.b|float("NaN") == "NaN" %}
+		  <td>{{ alert.b }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.b) }}</td>
+		{% endif %}
+
+		{% if alert.b_err|float("NaN") == "NaN" %}
+		  <td>{{ alert.b_err }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.b_err) }}</td>
+		{% endif %}
+
+		{% if alert.b_abs|float("NaN") == "NaN" %}
+		  <td>{{ alert.b_abs }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.b_abs) }}</td>
+		{% endif %}
+
+		{% if alert.j|float("NaN") == "NaN" %}
+		  <td>{{ alert.j }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.j) }}</td>
+		{% endif %}
+
+		{% if alert.j_err|float("NaN") == "NaN" %}
+		  <td>{{ alert.j_err }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.j_err) }}</td>
+		{% endif %}
+
+		{% if alert.h|float("NaN") == "NaN" %}
+		  <td>{{ alert.h }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.h) }}</td>
+		{% endif %}
+
+		{% if alert.h_err|float("NaN") == "NaN" %}
+		  <td>{{ alert.h_err }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.h_err) }}</td>
+		{% endif %}
+
+		{% if alert.k|float("NaN") == "NaN" %}
+		  <td>{{ alert.k }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.k) }}</td>
+		{% endif %}
+
+		{% if alert.k_err|float("NaN") == "NaN" %}
+		  <td>{{ alert.k_err }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.k_err) }}</td>
+		{% endif %}
+
+                <td>{{ alert.flag1 }}</td>
+                <td>{{ alert.flag2 }}</td>
+                <td>{{ alert.flag3 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/glade_q3c?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found. Showing page {{ page }} / {{ context.pages }}.
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/glade_q3c?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end of table section -->
+  </div>
+
+<!-- end of global container -->
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script type="text/javascript">
+  var raInputs = document.getElementsByClassName('ra-input');
+  for(var i=0; i<raInputs.length; i++){
+    raInputs[i].addEventListener('blur', function(){
+      this.value = Utils.sexagesimalRaToDecimal(this.value);
+    });
+  };
+  var decInputs = document.getElementsByClassName('dec-input');
+  for(var i=0; i<decInputs.length; i++){
+    decInputs[i].addEventListener('blur', function(){
+      this.value = Utils.sexagesimalDecToDecimal(this.value);
+    });
+  };
+  coneInput = document.getElementById('cone');
+  coneInput.addEventListener('blur', function(){
+    ra = this.value.split(',')[0];
+    dec = this.value.split(',')[1];
+    radius = this.value.split(',')[2];
+    ra = Utils.sexagesimalRaToDecimal(ra);
+    dec = Utils.sexagesimalDecToDecimal(dec);
+    this.value = ra + ',' + dec + ',' + radius;
+  });
+
+</script>
+{% endblock %}

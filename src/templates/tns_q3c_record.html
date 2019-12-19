@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+<!-- description -->
+{% block content %}
+
+<!--suppress ALL -->
+<hr>
+
+{% if record is defined %}
+<div class="container">
+
+    <h4>Details for TNS Q3C record</h4>
+
+    <!-- Table -->
+    <div class="col-md-12">
+        <div class="table-responsive">
+
+            <table class="table table-striped table-bordered table-hover table-lg">
+              <thead>
+                <tr>
+                    <th><font color="blue">Item</font></th>
+                    <th><font color="blue">Value</font></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="table-info">
+                    <td>ID</td>
+                    <td><a href="/sassy/tns/{{ record.id }}/" title="{{ record.id }}">{{ record.id }}</a></td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>TNS ID</td>
+                    <td>{{ record.tns_id }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>TNS Name</td>
+                    <td><a href="{{ record.tns_link }}" title="{{ record.tns_name }}">{{ record.tns_name }}</a></td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>RA (J2000&deg;)</td>
+                    <td>{{ record.ra }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Dec (J2000&deg;)</td>
+                    <td>{{ record.dec }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Redshift</td>
+                    <td>{{ record.redshift }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>Discovery Date</td>
+                    <td>{{ record.discovery_date }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Discovery Magnitude</td>
+                    <td>{{ record.discovery_mag }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Discovery Instrument</td>
+                    <td>{{ record.discovery_instrument }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>Filter Name</td>
+                    <td>{{ record.filter_name }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>TNS Class</td>
+                    <td>{{ record.tns_class }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>Host Object</td>
+                    <td>{{ record.host }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>Host Object Redshift</td>
+                    <td>{{ record.host_z }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>Source Group</td>
+                    <td>{{ record.source_group }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Alternate Name</td>
+                    <td>{{ record.alias }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Certificate</td>
+                    <td><a href="{{ record.certificate }}" title="{{ record.certificate }}">{{ record.certificate }}</a></td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+<hr>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

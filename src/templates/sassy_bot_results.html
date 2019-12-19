@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<!--suppress ALL -->
+<!-- globl container -->
+<div class="container">
+ <div class="col-md-12">
+  <h4>SASSyBot Records ({{ total }} found)</h4>
+  <br>
+  <div class="table-responsive">
+   <table class="table table-striped table-sm">
+    <thead>
+      <th colspan="9" style="border: 1px solid black; background-color: #ffffcc;"><center>ZTF</center></th>
+      <th colspan="5" style="border: 1px solid black; background-color: #ffffcc;"><center>GLADE</center></th>
+      <th colspan="4" style="border: 1px solid black; background-color: #ffffcc;"><center>Other</center></th>
+    </thead>
+    <thead>
+      <tr>
+       <!-- Thumbnail(s) -->
+       <th>Thumbnail(s)</th>
+       <!-- ObjectId -->
+       <th>ObjectId</th>
+       <!-- sid -->
+       <th>sid</th>
+       <!-- RA -->
+       <th>RA</th>
+       <!-- Dec -->
+       <th>Dec</th>
+       <!-- JD -->
+       <th>JD</th>
+       <!-- CandId -->
+       <th>CandId</th>
+       <!-- rb -->
+       <th>rb</th>
+       <!-- drb -->
+       <th>drb</th>
+       <!-- dbid -->
+       <th>dbid</th>
+       <!-- RA -->
+       <th>RA</th>
+       <!-- Dec -->
+       <th>Dec</th>
+       <!-- Mpc -->
+       <th>Distance</th>
+       <!-- z -->
+       <th>z</th>
+       <!-- Separation -->
+       <th>Separation</th>
+       <!-- Sci -->
+       <th>Science</th>
+       <!-- Tmp -->
+       <th>Template</th>
+       <!-- Dif -->
+       <th>Difference</th>
+      </tr>
+      <tr>
+       <!-- Thumbnail(s) -->
+       <th><font color="grey">png</font></th>
+       <!-- ObjectId -->
+       <th><font color="grey"> </font></th>
+       <!-- sid -->
+       <th><font color="grey"> </font></th>
+       <!-- RA -->
+       <th><font color="grey">J2k&deg;</font></th>
+       <!-- Dec -->
+       <th><font color="grey">J2k&deg;</font></th>
+       <!-- JD -->
+       <th><font color="grey"> </font></th>
+       <!-- CandId -->
+       <th><font color="grey"> </font></th>
+       <!-- rb -->
+       <th><font color="grey">0.0&mdash;1.0</font></th>
+       <!-- drb -->
+       <th><font color="grey">0.0&mdash;1.0</font></th>
+       <!-- dbid -->
+       <th><font color="grey"> </font></th>
+       <!-- RA -->
+       <th><font color="grey">J2k&deg;</font></th>
+       <!-- Dec -->
+       <th><font color="grey">J2k&deg;</font></th>
+       <!-- Mpc -->
+       <th><font color="grey">Mpc</font></th>
+       <!-- z -->
+       <th><font color="grey"> </font></th>
+       <!-- Separation -->
+       <th><font color="grey">&Prime;</font></th>
+       <!-- Sci -->
+       <th><font color="grey">.fits.gz</font></th>
+       <!-- Tmp -->
+       <th><font color="grey">.fits.gz</font></th>
+       <!-- Dif -->
+       <th><font color="grey">.fits.gz</font></th>
+      </tr>
+    </thead>
+    <tbody>
+     {% for _history in history %}
+      <tr>
+       <!-- Thumbnail(s) -->
+       {% if _history.png %}
+        <td><img src="{{ _history.png }}" alt="Unknown" height="75" width="225"></td>
+       {% else %}
+        <td>Not available</td>
+       {% endif %}
+       <!-- ObjectId -->
+       <td>{{ _history.objectId }}</td>
+       <!-- sid -->
+       <td><a href="{{ url_for('ztf_detail', id=_history.sid) }}">{{ _history.sid }}</a></td>
+       <!-- RA -->
+       <td>{{ "%.4f"|format(_history.RA) }}</td>
+       <!-- Dec -->
+       <td>{{ "%.4f"|format(_history.Dec) }}</td>
+       <!-- JD -->
+       <td>{{ _history.jd }}</td>
+       <!-- CandId -->
+       <td>{{ _history.candid }}</td>
+       <!-- rb -->
+       <td>{{ "%.3f"|format(_history.rb) }}</td>
+       <!-- drb -->
+       <td>{{ "%.3f"|format(_history.drb) }}</td>
+       <!-- dbid -->
+       <td><a href="{{ url_for('glade_q3c_detail', dbid=_history.gid) }}">{{ _history.gid }}</a></td>
+       <!-- RA -->
+       <td>{{ "%.4f"|format(_history.gRA) }}</td>
+       <!-- Dec -->
+       <td>{{ "%.4f"|format(_history.gDec) }}</td>
+       <!-- Mpc -->
+       <td>{{ "%.4f"|format(_history.gDist) }}</td>
+       <!-- z -->
+       <td>{{ "%.4f"|format(_history.gRedshift) }}</td>
+       <!-- Separation -->
+       <td>{{ "%.2f"|format(_history.gDelta) }}</td>
+       <td>
+	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Science') }}" class="btn btn-outline-success btn-sm">img</a>
+       </td>
+       <td>
+	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Template') }}" class="btn btn-outline-info btn-sm">img</a>
+       </td>
+       <td>
+	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Difference') }}" class="btn btn-outline-warning btn-sm">img</a>
+       </td>
+      </tr>
+     {% endfor %}
+    </tbody>
+   </table>
+  </div>
+  <div class="col-md-2"><a href="{{ url_for('sassy_home') }}" class="btn btn-md btn-info"><i class="fas fa-backward"></i></a></div>
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='js9/js9support.css') }}">
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='js9/js9.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Error status: </h2>
+        {% for _details in details %}
+        <h3> format: {{ _details.format }}</h3>
+        <h3> line: {{ _details.line }}</h3>
+        <h3> name: {{ _details.name }}</h3>
+        <h3> route: {{ _details.route }}</h3>
+        <h3> type: {{ _details.type }}</h3>
+        <h3> url: {{ _details.url }}</h3>
+        <h3> value: {{ _details.value }}</h3>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

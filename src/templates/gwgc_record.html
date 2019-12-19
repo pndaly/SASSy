@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+<!-- description -->
+{% block content %}
+
+<!--suppress ALL -->
+<hr>
+
+{% if record is defined %}
+<div class="container">
+
+    <h4>Details for GWGC record</h4>
+
+    <!-- Table -->
+    <div class="col-md-12">
+        <div class="table-responsive">
+
+            <table class="table table-striped table-bordered table-hover table-lg">
+                <thead>
+                <tr>
+                    <th><font color="blue">Item</font></th>
+                    <th><font color="blue">Value</font></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr class="table-info">
+                    <td>ID</td>
+                    <td><a href="/sassy/gwgc/{{ record.id }}/" title="{{ record.id }}">{{ record.id }}</a></td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>Name</td>
+                    <td>{{ record.name }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>RA (J2000&deg;)</td>
+                    <td>{{ record.ra }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Dec (J2000&deg;)</td>
+                    <td>{{ record.dec }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>B Magnitude (apparent)</td>
+                    <td>{{ record.b_app }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>&#0948;B Magnitude (apparent)</td>
+                    <td>&plusmn; {{ record.e_b_app }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>B Magnitude (absolute)</td>
+                    <td>{{ record.b_abs }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>&#0948;B Magnitude (absolute)</td>
+                    <td>&plusmn; {{ record.e_b_abs }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Distance (Mpc)</td>
+                    <td>{{ record.dist }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>&#0948;Distance (Mpc)</td>
+                    <td>&plusmn; {{ record.e_dist }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Position Angle (&deg;)</td>
+                    <td>{{ record.pa }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>Hyperleda (PGC) Code</td>
+                    <td>{{ record.pgc }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td> Morphological (TT) Code</td>
+                    <td>{{ record.tt }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Major Axis (&Prime;)</td>
+                    <td>{{ record.a }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>&#0948;Major Axis (&Prime;)</td>
+                    <td>&plusmn; {{ record.e_a }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Minor Axis (&Prime;)</td>
+                    <td>{{ record.b }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>&#0948;Minor Axis (&Prime;)</td>
+                    <td>&plusmn; {{ record.e_b }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>Axis Ratio</td>
+                    <td>{{ record.b_div_a }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>&#0948;Axis Ratio</td>
+                    <td>&plusmn; {{ record.e_b_div_a }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+<hr>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

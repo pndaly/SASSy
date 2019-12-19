@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--suppress ALL -->
+<!--global container -->
+<div class="container">
+
+  <!-- introduction -->
+  <div class="row">
+    <div class="col-md-12">
+      <h2><font color="purple">Z</font>wicky <font color="purple">T</font>ransient
+        <font color="purple">F</font>acility (<font color="purple">ZTF</font>)</h2>
+      This page provides a default interface to the ZTF. The table lists ZTF records in descending order by <i>jd</i>.
+      Use the filters on the right to narrow down the results to areas of interest.
+      When the results look good, add <code>?format=json</code> to the URL. You can then access the URL to
+      retrieve the full data and use it in your scripts.
+      You can access an alert's previous alerts by visiting <code>/&lt;sid&gt;/</code> where sid is the value
+      of the <i>sid</i> key in the JSON view or by clicking the <i>sid</i> link in the table. <p></p>
+    </div>
+  </div>
+  <!-- end of introduction -->
+
+  <div class="row">
+
+    <!-- sort section -->
+    <div class="col-md-2">
+      <form method="GET" action="/sassy/ztf">
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/ztf" class="btn btn-warning">Reset</a>
+        </div>
+        <div class="form-group">
+          <label for="sort_value">Sort By ...</label>
+          <select id="sort_value" name="sort_value" class="form-control form-control-sm" value="{{ request.args.sort_value }}">
+            <option value="jd" {% if request.args.sort_value=='jd' %} selected {% endif %}>JD</option>
+            <option value="id" {% if request.args.sort_value=='objectId' %} selected {% endif %}>objectId</option>
+            <option value="filter" {% if request.args.sort_value=='filter' %} selected {% endif %}>filter</option>
+            <option value="ra" {% if request.args.sort_value=='ra' %} selected {% endif %}>RA (J2000)</option>
+            <option value="dec" {% if request.args.sort_value=='dec' %} selected {% endif %}>Dec (J2000)</option>
+            <option value="magpsf" {% if request.args.sort_value=='magpsf' %} selected {% endif %}>magpsf (mag)</option>
+            <option value="magap" {% if request.args.sort_value=='magap' %} selected {% endif %}>magap (mag)</option>
+            <option value="distnr" {% if request.args.sort_value=='distnr' %} selected {% endif %}>distnr (Mpc)</option>
+            <option value="deltamaglatest" {% if request.args.sort_value=='deltamaglatest' %} selected {% endif %}>&#0948;maglatest (mag)</option>
+            <option value="deltamagref" {% if request.args.sort_value=='deltamagref' %} selected {% endif %}>&#0916;magref (mag)</option>
+            <option value="rb" {% if request.args.sort_value=='rb' %} selected {% endif %}>rb</option>
+            <option value="drb" {% if request.args.sort_value=='drb' %} selected {% endif %}>drb</option>
+          </select>
+        </div>
+
+        <div>
+          <select id="sort_order" name="sort_order" class="form-control form-control-sm" value="{{ request.args.sort_order }}">
+            <option value="desc" {% if request.args.sort_order=='desc' %} selected {% endif %}>Descending</option>
+            <option value="asc" {% if request.args.sort_order=='asc' %} selected {% endif %}>Ascending</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sort_value">Using Filters ...</label>
+          <input type="text" class="form-control form-control-sm" id="objectId" name="objectId" value="{{ request.args.objectId }}" placeholder="objectID">
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control form-control-sm" id="candid" name="candid" value="{{ request.args.candid }}" placeholder="candid">
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control form-control-sm" id="objectidps" name="objectidps" value="{{ request.args.objectidps }}" placeholder="objectIDPS">
+        </div>
+
+        <div class="form-group">
+          <label for="filter"><small>Filter</small></label>
+          <select id="filter" name="filter" class="form-control form-control-sm" value="{{ request.args.filter }}">
+            <option value="" {% if request.args.filter=='' %} selected {% endif %}></option>
+            <option value="g" {% if request.args.filter=='g' %} selected {% endif %}>g</option>
+            <option value="r" {% if request.args.filter=='r' %} selected {% endif %}>r</option>
+            <option value="i" {% if request.args.filter=='i' %} selected {% endif %}>i</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="time__gte"><small>Time after</small></label>
+          <div class="col">
+            <input type="date" class="form-control form-control-sm" id="time__gte" name="time__gte" value="{{ request.args.time__gte }}" placeholder="2017-07-17">
+          </div>
+          <label for="time__lte"><small>Time before</small></label>
+          <div class="col">
+            <input type="date" class="form-control form-control-sm" id="time__lte" name="time__lte" value="{{ request.args.time__lte }}" placeholder="2017-07-17">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="jd__gte" name="jd__gte" value="{{ request.args.jd__gte }}" placeholder="0.0">
+          </div>
+          <label for="jd__gte"><font color="grey">&le;</font><small>JD</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="jd__lte" name="jd__lte" value="{{ request.args.jd__lte }}" placeholder="0.0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input class="form-control form-control-sm ra-input" id="ra__gte" name="ra__gte" value="{{ request.args.ra__gte }}" placeholder="0">
+          </div>
+          <label for="ra__gte"><font color="grey">&le;</font><small>RA</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input class="form-control form-control-sm ra-input" id="ra__lte" name="ra__lte" value="{{ request.args.ra__lte }}" placeholder="360">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input class="form-control form-control-sm dec-input" id="dec__gte" name="dec__gte" value="{{ request.args.dec__gte }}" placeholder="-90">
+          </div>
+          <label for="dec__gte"><font color="grey">&le;</font><small>Dec</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input class="form-control form-control-sm dec-input" id="dec__lte" name="dec__lte" value="{{ request.args.dec__lte }}" placeholder="+90">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="l__gte" name="l__gte" value="{{ request.args.l__gte }}" placeholder="0">
+          </div>
+          <label for="l__gte"><font color="grey">&le;</font><small>l</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="l__lte" name="l__lte" value="{{ request.args.l__lte }}" placeholder="360">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="b__gte" name="b__gte" value="{{ request.args.b__gte }}" placeholder="0">
+          </div>
+          <label for="b__gte"><font color="grey">&le;</font><small>b</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="b__lte" name="b__lte" value="{{ request.args.b__lte }}" placeholder="360">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="distnr__gte" name="distnr__gte" value="{{ request.args.distnr__gte }}" placeholder="0">
+          </div>
+          <label for="distnr__gte"><font color="grey">&le;</font><small>Dist</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="distnr__lte" name="distnr__lte" value="{{ request.args.distnr__lte }}" placeholder="10">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="magpsf__gte" name="magpsf__gte" value="{{ request.args.magpsf__gte }}" placeholder="-20">
+          </div>
+          <label for="magpsf__gte"><font color="grey">&le;</font><small>mag<sub>psf</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="magpsf__lte" name="magpsf__lte" value="{{ request.args.magpsf__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="sigmapsf__gte" name="sigmapsf__gte" value="{{ request.args.sigmapsf__gte }}" placeholder="-2">
+          </div>
+          <label for="sigmapsf__gte"><font color="grey">&le;</font><small>&sigma;<sub>psf</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="sigmapsf__lte" name="sigmapsf__lte" value="{{ request.args.sigmapsf__lte }}" placeholder="2">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="magap__gte" name="magap__gte" value="{{ request.args.magap__gte }}" placeholder="-20">
+          </div>
+          <label for="magap__gte"><font color="grey">&le;</font><small>mag<sub>ap</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="magap__lte" name="magap__lte" value="{{ request.args.magap__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="deltamaglatest__gte" name="deltamaglatest__gte" value="{{ request.args.deltamaglatest__gte }}" placeholder="-2">
+          </div>
+          <label for="deltamaglatest__gte"><font color="grey">&le;</font><small>&delta;mag</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="deltamaglatest__lte" name="deltamaglatest__lte" value="{{ request.args.deltamaglatest__lte }}" placeholder="2">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="deltamagref__gte" name="deltamagref__gte" value="{{ request.args.deltamagref__gte }}" placeholder="-2">
+          </div>
+          <label for="deltamagref__gte"><font color="grey">&le;</font><small>&delta;mag<sub>ref</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="deltamagref__lte" name="deltamagref__lte" value="{{ request.args.deltamagref__lte }}" placeholder="2">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="rb__gte" name="rb__gte" value="{{ request.args.rb__gte }}" placeholder="0">
+          </div>
+          <label for="rb__gte"><font color="grey">&le;</font><small>rb<sub>score</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="rb__lte" name="rb__lte" value="{{ request.args.rb__lte }}" placeholder="1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="drb__gte" name="drb__gte" value="{{ request.args.drb__gte }}" placeholder="0">
+          </div>
+          <label for="drb__gte"><font color="grey">&le;</font><small>drb<sub>score</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="drb__lte" name="drb__lte" value="{{ request.args.drb__lte }}" placeholder="1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="classtar__gte" name="classtar__gte" value="{{ request.args.classtar__gte }}" placeholder="0">
+          </div>
+          <label for="ra__gte"><font color="grey">&le;</font><small>cla*</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="classtar__lte" name="classtar__lte" value="{{ request.args.classtar__lte }}" placeholder="1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="fwhm__gte" name="fwhm__gte" value="{{ request.args.fwhm__gte }}" placeholder="0">
+          </div>
+          <label for="fwhm__gte"><font color="grey">&le;</font><small>fwhm</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="fwhm__lte" name="fwhm__lte" value="{{ request.args.fwhm__lte }}" placeholder="1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cone"><small>Cone Search</small></label>
+          <input type="text" class="form-control form-control-sm" id="cone" name="cone" value="{{ request.args.cone }}" placeholder="RA(&deg;),Dec(&deg;),Radius">
+        </div>
+
+        <div class="form-group">
+          <label for="objectcone"><small>Sibmad2k Search</small></label>
+          <input type="text" class="form-control form-control-sm" id="objectcone" name="objectcone" value="{{ request.args.objectcone }}" placeholder="Name,Radius(&deg;)">
+        </div>
+
+        <div class="form-group">
+          <label for="astrocone"><small>Astropy Search</small></label>
+          <input type="text" class="form-control form-control-sm" id="astrocone" name="astrocone" value="{{ request.args.astrocone }}" placeholder="Name,Radius(&deg;)">
+        </div>
+
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/gwgc" class="btn btn-warning">Reset</a>
+        </div>
+      </form>
+    </div>
+    <!-- sort section -->
+
+    <!-- table section-->
+    <div class="col-md-10">
+      <div class="table-responsive">
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/ztf?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found. Showing page {{ page }} / {{ context.pages }}.<br>
+                Latest Alert: {{ latest.wall_time.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/ztf?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th>sid</th>
+              <th>objectId</th>
+              <th>Time</th>
+              <th>Filter</th>
+              <th title="degrees">RA</th>
+              <th title="degrees">Dec</th>
+              <th title="magnitude">mag<sub>psf</sub></th>
+              <th title="magap">mag<sub>ap</sub></th>
+              <th title="distnr">Dist</th>
+              <th title="Diff in magnitude from previous alert">&delta;mag<sub>latest</sub></th>
+              <th title="">&delta;mag<sub>ref</sub></th>
+              <th title="Real/Bogus score">rb<sub>score</sub></th>
+              <th title="Deep-Learning Real/Bogus score">drb<sub>score</sub></th>
+              <th title="Classtar score">cla*</th>
+            </tr>
+            <tr>
+              <th><font color="grey"></font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey">UTC</font></th>
+              <th><font color="grey">{g,i,r}</font></th>
+              <th><font color="grey">J2k(&deg;)</font></th>
+              <th><font color="grey">J2k(&deg;)</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">pxl</font></th>
+              <th><font color="grey">&delta;mag</font></th>
+              <th><font color="grey">&delta;mag</font></th>
+              <th><font color="grey">0&ndash;1</font></th>
+              <th><font color="grey">0&ndash;1</font></th>
+              <th><font color="grey">0&ndash;1</font></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for alert in context.results %}
+              <tr>
+                <td><a href="/sassy/ztf/{{ alert.sid }}/" title="{{ alert.sid }}">{{ alert.sid }}</a></td>
+                <td>{{ alert.objectId }}</td>
+                <td>{{ alert.candidate.wall_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ alert.candidate.filter }}</td>
+                {% if alert.candidate.ra|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.ra }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.candidate.ra) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.dec|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.dec }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.candidate.dec) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.magpsf|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.magpsf }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.candidate.magpsf) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.magap|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.magap }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.candidate.magap) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.distnr|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.distnr }}</td>
+		{% else %}
+		  <td>{{ "%.2f"|format(alert.candidate.distnr) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.deltamaglatest|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.deltamaglatest }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.candidate.deltamaglatest) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.deltamagref|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.deltamagref }}</td>
+		{% else %}
+		  <td>{{ "%.3f"|format(alert.candidate.deltamagref) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.rb|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.rb }}</td>
+		{% else %}
+		  <td>{{ "%.2f"|format(alert.candidate.rb) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.drb|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.drb }}</td>
+		{% else %}
+		  <td>{{ "%.2f"|format(alert.candidate.drb) }}</td>
+		{% endif %}
+
+                {% if alert.candidate.classtar|float("NaN") == "NaN" %}
+		  <td>{{ alert.candidate.classtar }}</td>
+		{% else %}
+		  <td>{{ "%.2f"|format(alert.candidate.classtar) }}</td>
+		{% endif %}
+
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/ztf?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found, showing page {{ page }} / {{ context.pages }}.<br>
+                Latest Alert: {{ latest.wall_time.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/ztf?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end of table section-->
+  </div>
+
+<!-- end of global container -->
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script type="text/javascript">
+  var raInputs = document.getElementsByClassName('ra-input');
+  for(var i=0; i<raInputs.length; i++){
+    raInputs[i].addEventListener('blur', function(){
+      this.value = Utils.sexagesimalRaToDecimal(this.value);
+    });
+  };
+  var decInputs = document.getElementsByClassName('dec-input');
+  for(var i=0; i<decInputs.length; i++){
+    decInputs[i].addEventListener('blur', function(){
+      this.value = Utils.sexagesimalDecToDecimal(this.value);
+    });
+  };
+  coneInput = document.getElementById('cone');
+  coneInput.addEventListener('blur', function(){
+    ra = this.value.split(',')[0];
+    dec = this.value.split(',')[1];
+    radius = this.value.split(',')[2];
+    ra = Utils.sexagesimalRaToDecimal(ra);
+    dec = Utils.sexagesimalDecToDecimal(dec);
+    this.value = ra + ',' + dec + ',' + radius;
+  });
+</script>
+{% endblock %}

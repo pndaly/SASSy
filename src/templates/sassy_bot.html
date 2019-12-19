@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+ <form action="" method="post">
+  <div class="container">
+   {{ form.hidden_tag() }}
+   <h3>SassyBot Search</h3>
+   <div class="row">
+    <div class="col-md-2">
+     {{ form.radius.label }}<br>
+     {{ form.radius(size=16) }}<br>
+     {% for error in form.radius.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>arcsec (&Prime;)</small></span><br>
+    </div>
+    <div class="col-md-3">
+     {{ form.begin_date.label }}<br>
+     {{ form.begin_date(size=32) }}<br>
+     {% for error in form.begin_date.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>YYYY-DD-MMThh:mm:ss.sss</small></span><br>
+    </div>
+    <div class="col-md-3">
+     {{ form.end_date.label }}<br>
+     {{ form.end_date(size=32) }}<br>
+     {% for error in form.end_date.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>YYYY-DD-MMThh:mm:ss.sss</small></span><br>
+    </div>
+    <div class="col-md-2">
+     {{ form.rb_min.label }}<br>
+     {{ form.rb_min(size=8) }}<br>
+     {% for error in form.rb_min.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>0.0 &ge; rb &ge; 1.0</small></span><br>
+    </div>
+    <div class="col-md-2">
+     {{ form.rb_max.label }}<br>
+     {{ form.rb_max(size=8) }}<br>
+     {% for error in form.rb_max.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>0.0 &ge; rb &ge; 1.0</small></span><br>
+    </div>
+   </div>
+   <br>
+
+   <div class="container">
+    <div class="d-flex justify-content-between">
+     <div class="row">
+      {{ form.submit(class_="btn btn-md btn-outline-success", type_="submit", name_="submit") }}<br>
+     </div>
+     <div>
+      <a href="{{ url_for('sassy_home') }}" class="btn btn-md btn-danger">Cancel</a>
+     </div>
+    </div>
+    <div class="row">
+     <span class="grey">
+      <small>
+       DROP VIEW IF EXISTS sassy_bot;
+       <br>
+      CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, (CASE WHEN ST_X(ST_AsText(location))<0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE ((jd BETWEEN date_to_jd('{{ form.begin_date.data }}') AND date_to_jd('{{ form.end_date.data }}')) AND ((rb BETWEEN {{ form.rb_min.data }} AND {{ form.rb_max.data }}) OR (drb BETWEEN {{ form.rb_min.data }} AND {{ form.rb_max.data }})))) SELECT * FROM e;
+       <br>
+      WITH x AS (SELECT * FROM sassy_bot), y AS (SELECT x.*, (g.id, g.ra, g.dec) FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {{ form.radius.data/3600.0 }})), z AS (SELECT * FROM y LEFT OUTER JOIN tns_q3c AS t ON q3c_join(y.ra, y.dec, t.ra, t.dec, {{ form.radius.data/3600.0 }})) SELECT * FROM z WHERE tns_id IS null;
+      </small>
+     </span><br>
+    </div>
+   </div>
+  </div>
+  <hr>
+ </form>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

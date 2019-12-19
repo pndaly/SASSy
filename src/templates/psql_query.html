@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+ <form action="" method="post">
+
+  {{ form.hidden_tag() }}
+
+  <h4>SQL Query Form</h4>
+
+  <br>
+
+  <div class="row">
+   <div class="col-md-12">
+    {{ form.sql_query.label }}<br>
+    {{ form.sql_query(size=80) }}<br>
+    {% for error in form.sql_query.errors %}
+     <span class="error-label"><small>[{{ error }}]</small></span>
+    {% endfor %}
+    <span class="purple-label"><i>Any standard syntax SQL query</i><small></small></span><br>
+   </div>
+  </div>
+
+  <br>
+
+  <div class="d-flex justify-content-between">
+   <div class="row">
+    {{ form.submit(class_="btn btn-md btn-primary") }}
+   </div>
+   <div>
+    <a href="{{ url_for('sassy_home') }}" class="btn btn-md btn-danger">Cancel</a>
+   </div>
+  </div>
+ 
+ </form>
+ <hr>
+{% endblock %}

@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--suppress ALL -->
+<!-- global container -->
+<div class="container">
+
+  <!-- introduction -->
+  <div class="row">
+    <div class="col-md-12">
+      <h2><font color="purple">G</font>ravitational <font color="purple">W</font>ave <font color="purple">G</font>alaxy
+        <font color="purple">C</font>atalog (<a href="{{ url_for('gwgc_text') }}">GWGC</a>)</h2>
+      This page provides a default interface to the GWGC. The table lists GWGC records in ascending
+      order by database <i>id</i>. Use the filters on the right to narrow down the results to areas of interest.
+      When the results look good, add <code>?format=json</code> to the URL. You can then access the URL to
+      retrieve the full data and use it in your scripts. <p></p>
+    </div>
+  </div>
+  <!-- end of introduction -->
+
+  <div class="row">
+
+    <!-- sort section -->
+    <div class="col-md-2">
+      <form method="GET" action="/sassy/gwgc">
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/gwgc" class="btn btn-warning">Reset</a>
+        </div>
+	<!-- SORT_VALUE = ['id', 'pgc', 'name', 'ra', 'dec', 'tt', 'b_app', 'a', 'e_a', 'b', 'e_b', 'b_div_a', 'e_b_div_a', 'pa', 'b_abs', 'dist', 'e_dist', 'e_b_app', 'e_b_abs'] -->
+        <div class="form-group">
+          <label for="sort_value">Sort By ...</label>
+          <select id="sort_value" name="sort_value" class="form-control form-control-sm" value="{{ request.args.sort_value }}">
+            <option value="id"        {% if request.args.sort_value=='id' %}        selected {% endif %}>Database ID</option>
+            <option value="pgc"       {% if request.args.sort_value=='pgc' %}       selected {% endif %}>PGC</option>
+            <option value="name"      {% if request.args.sort_value=='name' %}      selected {% endif %}>Name</option>
+	    <option value="ra"        {% if request.args.sort_value=='ra' %}        selected {% endif %}>RA (J2k&deg;)</option>
+            <option value="dec"       {% if request.args.sort_value=='dec' %}       selected {% endif %}>Dec (J2k&deg;)</option>
+            <option value="tt"        {% if request.args.sort_value=='tt' %}        selected {% endif %}>TT</option>
+            <option value="b_app"     {% if request.args.sort_value=='b_app' %}     selected {% endif %}>B (mag)</option>
+            <option value="a"         {% if request.args.sort_value=='a' %}         selected {% endif %}>a</option>
+	    <option value="e_a"       {% if request.args.sort_value=='e_a' %}       selected {% endif %}>&plusmn; a</option>
+            <option value="b"         {% if request.args.sort_value=='b' %}         selected {% endif %}>b</option>
+	    <option value="e_b"       {% if request.args.sort_value=='e_b' %}       selected {% endif %}>&plusmn; b</option>
+            <option value="b_div_a"   {% if request.args.sort_value=='b_div_a' %}   selected {% endif %}>b/a</option>
+            <option value="e_b_div_a" {% if request.args.sort_value=='e_b_div_a' %} selected {% endif %}>&plusmn; b/a</option>
+            <option value="pa"        {% if request.args.sort_value=='pa' %}        selected {% endif %}>PA (&deg;)</option>
+            <option value="b_abs"     {% if request.args.sort_value=='b_abs' %}     selected {% endif %}>|B| (mag)</option>
+            <option value="dist"      {% if request.args.sort_value=='dist' %}      selected {% endif %}>Dist (Mpc)</option>
+            <option value="e_dist"    {% if request.args.sort_value=='e_dist' %}    selected {% endif %}>&plusmn; Dist (Mpc)</option>
+            <option value="e_b_app"   {% if request.args.sort_value=='e_b_app' %}   selected {% endif %}>&plusmn; B (mag)</option>
+            <option value="e_b_abs"   {% if request.args.sort_value=='e_b_abs' %}   selected {% endif %}>&plusmn; |B| (mag)</option>
+          </select>
+        </div>
+
+        <div>
+          <select id="sort_order" name="sort_order" class="form-control form-control-sm" value="{{ request.args.sort_order }}">
+            <option value="descending" {% if request.args.sort_order=='descending' %} selected {% endif %}>Descending</option>
+            <option value="ascending"  {% if request.args.sort_order=='ascending' %}  selected {% endif %}>Ascending</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sort_value">Using Filters ...</label>
+          <input type="text" class="form-control form-control-sm" id="objectName" name="objectName" value="{{ request.args.name }}" placeholder="Object Name">
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="ra__gte" name="ra__gte" value="{{ request.args.ra__gte }}" placeholder="0">
+          </div>
+	      <label for="ra__gte"><font color="grey">&le;</font><small>RA</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="ra__lte" name="ra__lte" value="{{ request.args.ra__lte }}" placeholder="360">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dec__gte" name="dec__gte" value="{{ request.args.dec__gte }}" placeholder="-90">
+          </div>
+          <label for="dec__gte"><font color="grey">&le;</font><small>Dec</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dec__lte" name="dec__lte" value="{{ request.args.dec__lte }}" placeholder="+90">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_app__gte" name="b_app__gte" value="{{ request.args.b_app__gte }}" placeholder="-20">
+          </div>
+          <label for="b_app__gte"><font color="grey">&le;</font><small>B</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_app__lte" name="b_app__lte" value="{{ request.args.b_app__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_abs__gte" name="b_abs__gte" value="{{ request.args.b_abs__gte }}" placeholder="-20">
+          </div>
+          <label for="b_abs__gte"><font color="grey">&le;</font><small>|B|</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_abs__lte" name="b_abs__lte" value="{{ request.args.b_abs__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dist__gte" name="dist__gte" value="{{ request.args.dist__gte }}" placeholder="0">
+          </div>
+          <label for="dist__gte"><font color="grey">&le;</font><small>Dist</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="dist__lte" name="dist__lte" value="{{ request.args.dist__lte }}" placeholder="10">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="pa__gte" name="pa__gte" value="{{ request.args.pa__gte }}" placeholder="0">
+          </div>
+          <label for="pa__gte"><font color="grey">&le;</font><small>PA</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="pa__lte" name="pa__lte" value="{{ request.args.pa__lte }}" placeholder="360">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control form-control-sm" id="PGC" name="PGC" value="{{ request.args.pgc }}" placeholder="PGC Code">
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control form-control-sm" id="TT" name="TT" value="{{ request.args.tt }}" placeholder="TT Code">
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="a__gte" name="a__gte" value="{{ request.args.a__gte }}" placeholder="0">
+          </div>
+          <label for="a__gte"><font color="grey">&le;</font><small>a</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="a__lte" name="a__lte" value="{{ request.args.a__lte }}" placeholder="60">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b__gte" name="b__gte" value="{{ request.args.b__gte }}" placeholder="0">
+          </div>
+          <label for="b__gte"><font color="grey">&le;</font><small>b</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b__lte" name="b__lte" value="{{ request.args.b__lte }}" placeholder="60">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_div_a__gte" name="b_div_a__gte" value="{{ request.args.b_div_a__gte }}" placeholder="0">
+          </div>
+          <label for="b_div_a__gte"><font color="grey">&le;</font><small>b/a</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="b_div_a__lte" name="b_div_a__lte" value="{{ request.args.b_div_a__lte }}" placeholder="1">
+          </div>
+        </div>
+
+<!--
+	NB: THESE DON'T WORK UNTIL q3c HAS A SQLALCHEMY WRAPPER!!
+        <div class="form-group">
+          <label for="cone"><small>Cone Search</small></label>
+          <input type="text" class="form-control form-control-sm" id="cone" name="cone" value="{{ request.args.cone }}" placeholder="RA(&deg;),Dec(&deg;),Radius">
+        </div>
+        <div class="form-group">
+          <label for="astrocone"><small>Astropy Search</small></label>
+          <input type="text" class="form-control form-control-sm" id="astrocone" name="astrocone" value="{{ request.args.astrocone }}" placeholder="Name,Radius(&deg;)">
+        </div>
+-->
+
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/gwgc" class="btn btn-warning">Reset</a>
+        </div>
+      </form>
+    </div>
+    <!-- end of sort section -->
+
+    <!-- table section -->
+    <div class="col-md-10">
+      <div class="table-responsive">
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/gwgc?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found, showing page {{ page }} / {{ context.pages }}.
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/gwgc?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th><font color="blue">ID</font></th>
+              <th><font color="blue">Name</font></th>
+              <th><font color="blue">RA</font></th>
+              <th><font color="blue">Dec</font></th>
+              <th><font color="blue">B</font></th>
+              <th><font color="blue">&plusmn;B</font></th>
+              <th><font color="blue">|B|</font></th>
+              <th><font color="blue">&plusmn;|B|</font></th>
+              <th><font color="blue">Dist</font></th>
+              <th><font color="blue">&plusmn;Dist</font></th>
+              <th><font color="blue">PA</font></th>
+              <th><font color="blue">PGC</font></th>
+              <th><font color="blue">TT</font></th>
+              <th><font color="blue">a</font></th>
+              <th><font color="blue">&plusmn;a</font></th>
+              <th><font color="blue">b</font></th>
+              <th><font color="blue">&plusmn;b</font></th>
+              <th><font color="blue">b/a</font></th>
+              <th><font color="blue">&plusmn;b/a</font></th>
+            </tr>
+            <tr>
+              <th><font color="grey"> </font></th>
+              <th><font color="grey"> </font></th>
+              <th><font color="grey">J2k(&deg;)</font></th>
+              <th><font color="grey">J2k(&deg;)</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">mag</font></th>
+              <th><font color="grey">Mpc</font></th>
+              <th><font color="grey">Mpc</font></th>
+              <th><font color="grey">&deg;</font></th>
+              <th><font color="grey">Code</font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey">&acute;</font></th>
+              <th><font color="grey">&acute;</font></th>
+              <th><font color="grey">&acute;</font></th>
+              <th><font color="grey">&acute;</font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey"></font></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for alert in context.results %}
+              <tr>
+               <td><a href="/sassy/gwgc/{{ alert.id }}/" title="{{ alert.id }}">{{ alert.id }}</a></td>
+               <td>{{ alert.name }}</td>
+               {% if alert.ra|float("NaN") == "NaN" %}
+                 <td>{{ alert.ra }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.ra) }}</td>
+               {% endif %}
+
+               {% if alert.dec|float("NaN") == "NaN" %}
+                 <td>{{ alert.dec }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.dec) }}</td>
+               {% endif %}
+
+               {% if alert.b_app|float("NaN") == "NaN" %}
+                 <td>{{ alert.b_app }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.b_app) }}</td>
+               {% endif %}
+
+               {% if alert.e_b_app|float("NaN") == "NaN" %}
+                 <td>{{ alert.e_b_app }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.e_b_app) }}</td>
+               {% endif %}
+
+               {% if alert.b_abs|float("NaN") == "NaN" %}
+                 <td>{{ alert.b_abs }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.b_abs) }}</td>
+               {% endif %}
+
+               {% if alert.e_b_abs|float("NaN") == "NaN" %}
+                 <td>{{ alert.e_b_abs }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.e_b_abs) }}</td>
+               {% endif %}
+
+               {% if alert.dist|float("NaN") == "NaN" %}
+                 <td>{{ alert.dist }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.dist) }}</td>
+               {% endif %}
+
+               {% if alert.e_dist|float("NaN") == "NaN" %}
+                 <td>{{ alert.e_dist }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.e_dist) }}</td>
+               {% endif %}
+
+               {% if alert.pa|float("NaN") == "NaN" %}
+                 <td>{{ alert.pa }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.pa) }}</td>
+               {% endif %}
+
+               <td>{{ alert.pgc }}</td>
+
+               {% if alert.tt|float("NaN") == "NaN" %}
+                 <td>{{ alert.tt }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.tt) }}</td>
+               {% endif %}
+
+               {% if alert.a|float("NaN") == "NaN" %}
+                 <td>{{ alert.a }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.a) }}</td>
+               {% endif %}
+
+               {% if alert.e_a|float("NaN") == "NaN" %}
+                 <td>{{ alert.e_a }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.e_a) }}</td>
+               {% endif %}
+
+               {% if alert.b|float("NaN") == "NaN" %}
+                 <td>{{ alert.b }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.b) }}</td>
+               {% endif %}
+
+               {% if alert.e_b|float("NaN") == "NaN" %}
+                 <td>{{ alert.e_b }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.e_b) }}</td>
+               {% endif %}
+
+               {% if alert.b_div_a|float("NaN") == "NaN" %}
+                 <td>{{ alert.b_div_a }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.b_div_a) }}</td>
+               {% endif %}
+
+               {% if alert.e_b_div_a|float("NaN") == "NaN" %}
+                 <td>{{ alert.e_b_div_a }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.e_b_div_a) }}</td>
+               {% endif %}
+
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/gwgc?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found. Showing page {{ page }} / {{ context.pages }}.
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/gwgc?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end of table section -->
+  </div>
+
+<!-- end of global container -->
+</div>
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

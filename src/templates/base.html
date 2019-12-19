@@ -1,0 +1,175 @@
+<!doctype html>
+<!--suppress ALL -->
+<html lang="en">
+<head>
+ <!-- (required) meta tags -->
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ <!-- CSS loaded locally-->
+ <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+ <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+ <!-- font awesome -->
+ <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+       integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+ <!-- favicon ico -->
+ <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon64.ico') }}">
+ <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon16.ico') }}">
+ <!-- title -->
+ <title>SASSy - Steward Observatory</title>
+ {% block css %}
+ {% endblock %}
+</head>
+
+<body>
+
+<!-- navigation bar -->
+<nav class="navbar navbar-expand-md navbar-light fixed-top header">
+ <div class="container">
+
+  <!-- UA logo -->
+  <a class="navbar-brand" href="http://www.arizona.edu"><img title="UA" src="{{ url_for('static', filename='img/UA-transparent.png') }}"></a>
+  <!-- Steward logo -->
+  <a class="navbar-brand" href="http://www.as.arizona.edu"><img title="SO" src="{{ url_for('static', filename='img/Steward-transparent.png') }}"></a>
+  <div class="branding">
+   <!-- SASSy link -->
+   <span class="branding-lg"><a href="{{ url_for('sassy_home') }}" class="text-dark"><font color="blue"><strong>SASSy</strong></font></a></span><br/>
+   <!-- SASSy text -->
+   <small><span class="branding-lg text-muted"><i>The Steward Alerts for Science System</i></span></small>
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+          aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+   <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+   <ul class="navbar-nav ml-auto">
+    <!-- homepage link -->
+    <li class="nav-item"><a class="nav-link" href="{{ url_for('sassy_home') }}"><i class="fa fa-home" aria-hidden="true"></i><span class="sr-only">(current)</span></a></li>
+    <!-- mail link -->
+    <li class="nav-item"><a class="nav-link" href="mailto:pndaly@email.arizona.edu"><i class="fa fa-envelope"></i></a></li>
+    <!-- phone link -->
+    <li class="nav-item"><a class="nav-link" href="tel:+1(520) 621-3648"><i class="fa fa-phone"></i></a></li>
+    <!-- help link -->
+    <li class="nav-item"><a class="nav-link" href="{{ url_for('sassy_help') }}"><i class="fa fa-info" aria-hidden="true"></i></a></li>
+    <!-- api link -->
+    <li class="nav-item"><a class="nav-link" href="{{ url_for('sassy_api') }}"><i class="fa fa-book" aria-hidden="true"></i></a></li>
+    <!-- queries -->
+    <li class="nav-item dropdown active">
+     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Queries</a>
+     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2">
+      <a class="dropdown-item" href="{{ url_for('sassy_astronomical_elliptical') }}"><small>Astronomical Elliptical Query</small></a>
+      <a class="dropdown-item" href="{{ url_for('sassy_astronomical_radial') }}"><small>Astronomical Radial Query</small></a>
+      <a class="dropdown-item" href="{{ url_for('sassy_digital_elliptical') }}"><small>Digital Elliptical Query</small></a>
+      <a class="dropdown-item" href="{{ url_for('sassy_digital_radial') }}"><small>Digital Radial Query</small></a>
+      <a class="dropdown-item" href="{{ url_for('psql_query') }}"><small>General Psql</small></a>
+      <a class="dropdown-item" href="{{ url_for('sassy_sexagisimal_elliptical') }}"><small>Sexagisimal Elliptical Query</small></a>
+      <a class="dropdown-item" href="{{ url_for('sassy_sexagisimal_radial') }}"><small>Sexagisimal Radial Query</small></a>
+     </div>
+    </li>
+    <!-- database link(s) -->
+    <li class="nav-item dropdown active">
+     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Databases</a>
+     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+      <a class="dropdown-item" href="{{ url_for('glade_q3c_records') }}"><small>GLADE (Q3C)</small></a>
+      <a class="dropdown-item" href="{{ url_for('gwgc_q3c_records') }}"><small>GWGC (Q3C)</small></a>
+      <a class="dropdown-item" href="{{ url_for('ligo_q3c_records') }}"><small>LIGO (Q3C)</small></a>
+      <a class="dropdown-item" href="{{ url_for('tns_q3c_records') }}"><small>TNS (Q3C)</small></a>
+      <a class="dropdown-item" href="{{ url_for('ztf_alerts') }}"><small>ZTF</small></a>
+     </div>
+    </li>
+   </ul>
+  </div>
+ </div>
+
+ <script src="https://use.fontawesome.com/6819192c3d.js"></script>
+ <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</nav>
+
+<!-- main -->
+<main role="main" class="container" id="main">
+ <hr class="rainbow"/>
+ <p>
+  The <i><strong><font color="blue">S</font></strong>teward <strong><font color="blue">A</font></strong>lerts for
+  <strong><font color="blue">S</font></strong>cience <strong><font color="blue">Sy</font></strong>stem</i> (SASSy)
+  provides access to various alerts and cross-correlation with catalogs. We provide support for queries to
+  alerts and database(s) sourced from
+  the <i><strong><font color="purple">G</font></strong>alaxy <strong><font color="purple">L</font></strong>ist for the
+  <strong><font color="purple">A</font></strong>dvanced <strong><font color="purple">D</font></strong>etector</i>
+  <strong><font color="purple">E</font></strong>ra</i>
+  (<font color="purple">GLADE</font>),
+  the <i><strong><font color="purple">G</font></strong>ravitational <strong><font color="purple">W</font></strong>ave
+  <strong><font color="purple">G</font></strong>alaxy <strong><font color="purple">C</font></strong>atalog</i>
+  (<font color="purple">GWGC</font>),
+  <i>(ad-hoc)</i> alerts from
+  the <i><strong><font color="purple">L</font></strong>aser <strong><font color="purple">I</font></strong>nterferometer
+  <strong><font color="purple">G</font></strong>ravitational-Wave <strong><font color="purple">O</font></strong>bservatory</i>
+  (<font color="purple">LIGO</font>),
+  the <i><strong><font color="purple">T</font></strong>ransient <strong><font color="purple">N</font></strong>ame
+  <strong><font color="purple">S</font></strong>erver</i>
+  (<font color="purple">TNS</font>) and
+  the <i><strong><font color="purple">Z</font></strong>wicky <strong><font color="purple">T</font></strong>ransient
+  <strong><font color="purple">F</font></strong>acility</i>
+  (<font color="purple">ZTF</font>).
+  Further information is available in the <a href="{{ url_for('sassy_help') }}" title="help"><i class="fa fa-info" aria-hidden="true"></i> </a> (help) and
+  <a href="{{ url_for('sassy_api') }}" title="api"><i class="fa fa-book" aria-hidden="true"></i> </a> (api) sections.
+ </p><p>
+  These pages are adapted from the <a href="https://github.com/LCOGT/ztf-alert-server" title="mars-code">code</a> from
+  <a href="https://lco.global" title="LCOGT">LCOGT</a> (<i>Las Cumbres Observatory Global Telescope</i>) which delivers
+  the
+  <a href="https://mars.lco.global" title="MARS">MARS</a> (<i>Make Alerts Really Simple</i>) website.
+ </p>
+ <hr class="rainbow"/>
+ {% block content %}
+ {% endblock %}
+ <!-- <hr class="rainbow"/> -->
+</main>
+
+<!-- footer -->
+<footer class="footer">
+ <div class="container">
+  <p class="thanks"></p>
+   <h4>Acknowledgements</h4>
+   <figure>
+    <a href="https://lco.global/">
+     <img title="LCO" src="{{ url_for('static', filename='img/LCO-half-transparent.png') }}"  hspace="50">
+     <figcaption>
+      <small>
+       <a href="https://github.com/LCOGT/ztf-alert-server" title="LCO">MARS</a> &copy; <a href="https://lco.global">Las
+       Cumbres Observatory</a>
+      </small>
+     </figcaption>
+    </a>
+   </figure>
+   <figure>
+    <a href="https://wis-tns.weizmann.ac.il/">
+     <img title="TNS" src="{{ url_for('static', filename='img/TNS-half-transparent.png') }}"  hspace="50">
+     <figcaption>
+      <small>
+       <a href="https://wis-tns.weizmann.ac.il" title="TNS">TNS</a> &copy; <a href="https://wis-tns.weizmann.ac.il">Weizmann
+       Institute of Science</a>
+      </small>
+     </figcaption>
+    </a>
+   </figure>
+   <figure>
+    <a href="https://www.ztf.caltech.edu/">
+     <img title="ZTF" src="{{ url_for('static', filename='img/ZTF-half-transparent.png') }}" hspace="50">
+     <figcaption>
+      <small>
+       <a href="https://www.ztf.caltech.edu" title="ZTF">ZTF</a> &copy; <a href="https://www.ztf.caltech.edu">California
+       Institute of Techonology</a>
+      </small>
+     </figcaption>
+    </a>
+   </figure>
+   <br/>
+   <strong>SASSy &copy; 2018&ndash;2020</strong> <a href="https://www.as.arizona.edu">Steward Observatory</a>, <a
+          href="https://www.arizona.edu">The University of Arizona</a>.
+ </div>
+</footer>
+{% block js %}
+{% endblock %}
+</body>
+</html>

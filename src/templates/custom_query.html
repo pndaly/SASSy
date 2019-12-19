@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<hr>
+ <form action="" method="post">
+
+  {{ form.hidden_tag() }}
+
+  <h2>Custom Query Form</h2>
+
+  <br>
+
+  <h4>Show all objects centred on given RA, Dec within the specified cone radius from the named catalog or database:</h4>
+
+  <div class="d-flex justify-content-between">
+   <div class="row">
+    <div class="col-md-3">
+     {{ form.ra_hms.label }}<br>
+     {{ form.ra_hms(size=10) }}<br>
+     {% for error in form.ra_hms.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>HH:MM:SS.S (J2k&deg;)</small></span><br>
+    </div>
+    <div class="col-md-3">
+     {{ form.dec_dms.label }}<br>
+     {{ form.dec_dms(size=10) }}<br>
+     {% for error in form.dec_dms.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>&plusmn; dd:mm:ss.s (J2k&deg;)</small></span><br>
+    </div>
+    <div class="col-md-3">
+     {{ form.radius.label }}<br>
+     {{ form.radius(size=6) }}<br>
+     {% for error in form.radius.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>0.0&deg; &ndash; 360.0&deg;</small></span><br>
+    </div>
+    <div class="col-md-3">
+     {{ form.catalog.label }}<br>
+     {{ form.catalog }}<br>
+     {% for error in form.catalog.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+    </div>
+   </div>
+  </div>
+
+  <br>
+
+  <div class="d-flex justify-content-between">
+   <div class="row">
+    {{ form.submit(class_="btn btn-md btn-primary") }}
+   </div>
+   <div>
+    <a href="{{ url_for('sassy_home') }}" class="btn btn-md btn-danger">Cancel</a>
+   </div>
+  </div>
+ 
+ </form>
+ <hr>
+{% endblock %}

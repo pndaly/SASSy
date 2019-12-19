@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+<!-- description -->
+{% block content %}
+
+<!--suppress ALL -->
+<hr>
+
+{% if record is defined %}
+<div class="container">
+
+    <h4>Details for GLADE (Q3C) record</h4>
+
+    <!-- Table -->
+    <div class="col-md-12">
+        <div class="table-responsive">
+
+            <table class="table table-striped table-bordered table-hover table-lg">
+                <thead>
+                <tr>
+                    <th><font color="blue">Item</font></th>
+                    <th><font color="blue">Value</font></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr class="table-info">
+                    <td>ID</td>
+                    <td><a href="/sassy/glade/{{ record.id }}/" title="{{ record.id }}">{{ record.id }}</a></td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>Hyperleda (PGC) Code</td>
+                    <td>{{ record.pgc }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>GWGC Name</td>
+                    <td>{{ record.gwgc }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>Hyperleda (PGC) Name</td>
+                    <td>{{ record.hyperleda }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>2MASS Name</td>
+                    <td>{{ record.twomass }}</td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>SDSS-DR12 Name</td>
+                    <td>{{ record.sdss }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>RA (J2000&deg;)</td>
+                    <td>{{ record.ra }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Dec (J2000&deg;)</td>
+                    <td>{{ record.dec }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>Luminosity Distance (Mpc)</td>
+                    <td>{{ record.dist }}</td>
+                </tr>
+
+                <tr class="table-warning">
+                    <td>&#0948;Luminosity Distance (Mpc)</td>
+                    <td>&plusmn; {{ record.disterr }}</td>
+                </tr>
+
+                <tr class="table-info">
+                    <td>z (Redshift)</td>
+                    <td>{{ record.z }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>B Magnitude (apparent)</td>
+                    <td>{{ record.b }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>&#0948;B Magnitude (apparent)</td>
+                    <td>&plusmn; {{ record.b_err }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>B Magnitude (absolute)</td>
+                    <td>{{ record.b_abs }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>J Magnitude (apparent)</td>
+                    <td>{{ record.j }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>&#0948;J Magnitude (apparent)</td>
+                    <td>&plusmn; {{ record.j_err }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>H Magnitude (apparent)</td>
+                    <td>{{ record.h }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>&#0948;H Magnitude (apparent)</td>
+                    <td>&plusmn; {{ record.h_err }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>K Magnitude (apparent)</td>
+                    <td>{{ record.k }}</td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td>&#0948;K Magnitude (apparent)</td>
+                    <td>&plusmn; {{ record.k_err }}</td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>Flag1</td>
+                    <td>{{ record.flag1 }}</td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>Flag2</td>
+                    <td>{{ record.flag2 }}</td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>Flag3</td>
+                    <td>{{ record.flag3 }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+<hr>
+{% endblock %}
+
+{% block js %}
+{% endblock %}
