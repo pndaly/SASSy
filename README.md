@@ -1,6 +1,6 @@
 # The Steward Alerts for Science System #
 
-Welcome to *SASSy*, the **S**teward **A**lerts for **S**cience **Sy**tem. 
+Welcome to the **S**teward **A**lerts for **S**cience **Sy**tem (SASSy).
 
 This work is heavily based upon [MARS](https://mars.lco.global), the 
 Las Cumbras Observatory alert broker, and extended to ingest both 
@@ -162,7 +162,7 @@ If you carried out the above, and assuming the codebase is in /home/sassy/SASSy,
 
     ```bash
     % cd /home/sassy/SASSy
-    % source etc/Sassy.sh
+    % source etc/Sassy.sh `pwd` dev
     % bash ${SASSY_BIN}/Sassy.sh --type=dev --source=/home/sassy/SASSy --command=start --dry-run
     % bash ${SASSY_BIN}/Sassy.sh --type=dev --source=/home/sassy/SASSy --command=start
     ```
@@ -173,7 +173,7 @@ If you carried out the above, and assuming the codebase is in /home/sassy/SASSy,
 
     ```bash
     % cd /home/sassy/SASSy
-    % source etc/Sassy.sh
+    % source etc/Sassy.sh `pwd` prod
     % bash ${SASSY_BIN}/Sassy.sh --type=prod --source=/home/sassy/SASSy --command=start --dry-run
     % bash ${SASSY_BIN}/Sassy.sh --type=prod --source=/home/sassy/SASSy --command=start
     ```
