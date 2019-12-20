@@ -18,9 +18,7 @@ import sys
 # __doc__ string
 # -
 __doc__ = """
-
     % python3 glade_read.py --help
-
 """
 
 
@@ -30,7 +28,6 @@ __doc__ = """
 GLADE_ALLOWED_HEADERS = ('PGC', 'Gwgc_Name', 'HyperLEDA_Name', '2MASS_Name', 'SDSS-DR12_Name', 'flag1', 'RA',
                          'Dec', 'Dist', 'Dist_err', 'z', 'B_mag', 'B_err', 'B_abs', 'J_mag', 'J_err', 'H_mag',
                          'H_err', 'K_mag', 'K_err', 'flag2', 'flag3')
-
 GLADE_CATALOG_FILE = os.path.abspath(os.path.expanduser('glade.local.csv'))
 
 SASSY_DB_HOST = os.getenv('SASSY_DB_HOST', None)
@@ -41,19 +38,20 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 
 
 # +
-# function: read_glade()
+# function: glade_read()
 # -
-def read_glade(_file=''):
+# noinspection PyBroadException
+def glade_read(_file=''):
 
     # check input(s)
-    if not isinstance(_file, str) or _file.strip() == '' or \
-            not os.path.isfile(os.path.abspath(os.path.expanduser(_file))):
+    _file = os.path.abspath(os.path.expanduser(_file))
+    if not isinstance(_file, str) or not os.path.exists(_file):
         raise Exception(f'invalid input, _file={_file}')
 
     # get number of lines in file
     _num = 0
     with open(_file, 'r') as _fd:
-        _num = sum(1 for l in _fd if (l.strip() != '' and l.strip()[0] not in r'#%!<>+\/'))
+        _num = sum(1 for _l in _fd if (_l.strip() != '' and _l.strip()[0] not in r'#%!<>+\/'))
 
     # check file type is supported
     _delimiter = ''
@@ -71,9 +69,11 @@ def read_glade(_file=''):
     with open(_file, 'r') as _fd:
         _r = csv.reader(_fd, delimiter=_delimiter)
         _headers = next(_r, None)
+
         # separate header line into column headings
         for _h in _headers:
             _columns[_h] = []
+
         # read rest of file into lists associated with each column heading
         for _row in _r:
             for _h, _v in zip(_headers, _row):
@@ -95,9 +95,8 @@ def read_glade(_file=''):
         raise Exception(f'Failed to get all allowed headers, please check {_file}'
                         f'\nfields expected are {GLADE_ALLOWED_HEADERS}')
 
-    # noinspection PyBroadException
+    # connect to database
     try:
-        # connect to database
         print(f'connection string = postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
               f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
         engine = create_engine(f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
@@ -107,10 +106,9 @@ def read_glade(_file=''):
     except Exception as e:
         raise Exception(f'Failed to connect to database, error={e}')
 
-    # noinspection PyBroadException
+    # loop around records
     _glade = None
     try:
-        # loop around records
         for _i in range(0, _num):
 
             # clean data
@@ -156,18 +154,6 @@ def read_glade(_file=''):
 
 
 # +
-# function: action()
-# -
-def action(iargs=None):
-
-    # check input(s)
-    if iargs is None:
-        raise Exception('invalid argument(s)')
-    else:
-        print(f'{read_glade(iargs.file)}')
-
-
-# +
 # main()
 # -
 if __name__ == '__main__':
@@ -180,6 +166,6 @@ if __name__ == '__main__':
 
     # execute
     if args.file:
-        action(args)
+        glade_read(args.file.strip())
     else:
         print(f'<<ERROR>> Insufficient command line arguments specified\nUse: python3 {sys.argv[0]} --help')

@@ -62,9 +62,7 @@ to use them!
     % cat /tmp/sassy.database.sh
     % bash ${SASSY_BIN}/sassy.database.sh --database=sassy --password=my_secret --username=sassy
     ```
- * Create the table(s)
-
-    Create database tables using the same credentials as defined above:
+ * Create the tables (using the same credentials as defined above):
 
     ```bash
     % bash ${SASSY_BIN}/sassy.glade.sh --database=sassy --password=my_secret --username=sassy --dry-run
@@ -113,6 +111,40 @@ to use them!
     % cat /tmp/sassy.tns_q3c.sh
     % bash ${SASSY_BIN}/sassy.tns_q3c.sh --database=sassy --password=my_secret --username=sassy
     ```
+
+ * Populating the database tables
+
+    To populate the GLADE tables, execute:
+
+    ```bash
+    % cd ${SASSY_UTILS}
+    % python3 ${SASSY_SRC}/models/glade.py --catalog --output=glade.local.csv
+    % python3 ${SASSY_UTILS}/glade_read.py --file=glade.local.csv
+    % python3 ${SASSY_UTILS}/glade_q3c_read.py --file=glade.local.csv
+    ```
+
+    To populate the GWGC tables, execute:
+
+    ```bash
+    % cd ${SASSY_UTILS}
+    % python3 ${SASSY_SRC}/models/gwgc.py --catalog >> gwgc.dat
+    % python3 ${SASSY_UTILS}/gwgc_read.py --file=gwgc.dat
+    % python3 ${SASSY_UTILS}/gwgc_q3c_read.py --file=gwgc.dat
+    ```
+
+   The *ligo*, *ligo_q3c*, *tns* and *tns_q3c* tables can be populated using the web-scraping code via the `crontab` entries.   
+
+   The ZTF *alerts* table is populated by the nightly `crontab` ingestion or manually via (*Eg* to retrieve the
+   data for the first night and assuming you have modified the scripts to suit your local installation):
+   
+   ```bash
+   % bash ${SASSY_CRON}/ztfgz.pull.sh --date=20180601 --dry-run
+   % bash ${SASSY_CRON}/ztfgz.pull.sh --date=20180601
+   % bash ${SASSY_CRON}/ztfgz.unpack.sh --date=20180601 --dry-run
+   % bash ${SASSY_CRON}/ztfgz.unpack.sh --date=20180601
+   % bash ${SASSY_CRON}/ztfgz.updatedb.sh --date=20180601 --dry-run
+   % bash ${SASSY_CRON}/ztfgz.updatedb.sh --date=20180601
+   ```
 
  * Database entity-relationship diagram 
 

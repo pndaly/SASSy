@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import argparse
+import math
 import os
 import sys
 
@@ -17,19 +18,14 @@ import sys
 # __doc__ string
 # -
 __doc__ = """
-
     % python3 gwgc_q3c_read.py --help
-
 """
 
 
 # +
 # constant(s)
 # -
-GWGC_BAD_VALUE = -999999999
-
 GWGC_CATALOG_FILE = os.path.abspath(os.path.expanduser('gwgc.dat'))
-
 GWGC_FORMAT = {
     'PGC':    [0,     7,  'int',     'None',    'Identifier from HYPERLEDA'],
     'Name':   [8,    36,  'string',  'None',    'Common name of galaxy or globular'],
@@ -59,13 +55,13 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 
 
 # +
-# function: read_gwgc_q3c()
+# function: read_gwgc_q3c_read()
 # -
-def read_gwgc_q3c(_file=''):
+def gwgc_q3c_read(_file=''):
 
     # check input(s)
-    if not isinstance(_file, str) or _file.strip() == '' or \
-            not os.path.isfile(os.path.abspath(os.path.expanduser(_file))):
+    _file = os.path.abspath(os.path.expanduser(_file))
+    if not isinstance(_file, str) or not os.path.exists(_file):
         raise Exception(f'invalid input, _file={_file}')
 
     # read contents
@@ -76,14 +72,13 @@ def read_gwgc_q3c(_file=''):
     _all_results = []
     for _i, _e in enumerate(_lines):
         _this_result = {}
-        # print(f'{_i}, {_e}')
         for _l in GWGC_FORMAT:
             _xoffset, _yoffset = GWGC_FORMAT[_l][0], GWGC_FORMAT[_l][1]
             _value = _e[_xoffset:_yoffset].strip()
             if GWGC_FORMAT[_l][2].strip().lower() == 'int':
-                _this_result[_l] = GWGC_BAD_VALUE if _value == '' else int(_value)
+                _this_result[_l] = -1 if _value == '' else int(_value)
             elif GWGC_FORMAT[_l][2].strip().lower() == 'float':
-                _this_result[_l] = float(GWGC_BAD_VALUE) if _value == '' else float(_value)
+                _this_result[_l] = float(math.nan) if _value == '' else float(_value)
             else:
                 _this_result[_l] = _value
             _this_result['id'] = int(_i)
@@ -139,18 +134,6 @@ def read_gwgc_q3c(_file=''):
 
 
 # +
-# function: action()
-# -
-def action(iargs=None):
-
-    # check input(s)
-    if iargs is None:
-        raise Exception('invalid argument(s)')
-    else:
-        print(f'{read_gwgc_q3c(iargs.file)}')
-
-
-# +
 # main()
 # -
 if __name__ == '__main__':
@@ -163,6 +146,6 @@ if __name__ == '__main__':
 
     # execute
     if args.file:
-        action(args)
+        gwgc_q3c_read(args.file.strip())
     else:
         print(f'<<ERROR>> Insufficient command line arguments specified\nUse: python3 {sys.argv[0]} --help')
