@@ -4,6 +4,7 @@ Flask-Paginate==0.5.5
 Flask-SQLAlchemy==2.4.1
 Flask-WTF==0.14.2
 GeoAlchemy2==0.5.0
+PyGreSQL==5.1
 Shapely==1.6.4.post2
 WTForms==2.2.1
 astroplan==0.6

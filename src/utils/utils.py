@@ -45,10 +45,11 @@ class UtilsLogger(object):
         # logger dictionary
         logname = '{}'.format(self.__name)
         try:
-            logfile = '/var/www/SASSy/logs/{}.log'.format(logname)
+            logfile = '{}/{}.log'.format(os.getenv("SASSY_LOGS"))
         except:
             logfile = '{}/{}.log'.format(os.getcwd(), logname)
-        logconsole = '/tmp/{}.log'.format(logname)
+        logconsole = '/tmp/console-{}.log'.format(logname)
+
         utils_logger_dictionary = {
 
             # logging version
