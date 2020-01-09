@@ -18,6 +18,9 @@
 HERE=${PWD}
 PARENT=$(dirname "${HERE}")
 
+def_credentials="sassy:db_secret"
+
+
 # +
 # set defaults: do not edit
 # -
@@ -53,18 +56,18 @@ write_cyan () {
   printf "${CYAN}${1}${NCOL}\n"
 }
 usage () {
-  write_blue   ""                                                                        2>&1
-  write_blue   "Scrape LIGO Data from TNS"                                               2>&1
-  write_blue   ""                                                                        2>&1
-  write_green  "Use:"                                                                    2>&1
-  write_green  " %% bash $0 [--dry-run]"                                                 2>&1
-  write_yellow ""                                                                        2>&1
-  write_yellow "Input(s):"                                                               2>&1
-  write_yellow "   None"                                                                 2>&1
-  write_yellow ""                                                                        2>&1
-  write_cyan   "Flags(s):"                                                               2>&1
-  write_cyan   "  --dry-run        show (but do not execute) commands,    default=false" 2>&1
-  write_cyan   ""                                                                        2>&1
+  write_blue   ""                                                                                                   2>&1
+  write_blue   "Scrape LIGO Data from TNS"                                                                          2>&1
+  write_blue   ""                                                                                                   2>&1
+  write_green  "Use:"                                                                                               2>&1
+  write_green  " %% bash $0 [--dry-run]"                                                                            2>&1
+  write_yellow ""                                                                                                   2>&1
+  write_yellow "Input(s):"                                                                                          2>&1
+  write_yellow "  --credentials=<str>, where <str> is of the form 'username:password',  default=${def_credentials}" 2>&1
+  write_yellow ""                                                                                                   2>&1
+  write_cyan   "Flags(s):"                                                                                          2>&1
+  write_cyan   "  --dry-run        show (but do not execute) commands,    default=false"                            2>&1
+  write_cyan   ""                                                                                                   2>&1
 }
 
 
@@ -73,6 +76,10 @@ usage () {
 # -
 while test $# -gt 0; do
   case "${1}" in
+    --credentials*|--CREDENTIALS*)
+      credentials=$(echo $1 | cut -d'=' -f2)
+      shift
+      ;;
     --dry-run|--DRY-RUN)
       dry_run=1
       shift
@@ -86,12 +93,20 @@ done
 
 
 # +
+# check input(s)
+# -
+if [[ -z ${credentials} ]]; then
+  credentials=${def_credentials}
+fi
+
+
+# +
 # execute (dry-run)
 # -
 write_blue "%% bash $0 --dry-run=${dry_run}"
 if [[ ${dry_run} -eq 1 ]]; then
   write_yellow "Dry-Run>> source ${PARENT}/etc/Sassy.sh ${PARENT}"
-  write_yellow "Dry-Run>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/ligo_scrape.py --verbose"
+  write_yellow "Dry-Run>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/ligo_scrape.py --verbose --credentials=${credentials}"
 
 
 # +
@@ -100,8 +115,8 @@ if [[ ${dry_run} -eq 1 ]]; then
 else
   write_yellow "Executing>> source ${PARENT}/etc/Sassy.sh ${PARENT}"
   source ${PARENT}/etc/Sassy.sh ${PARENT}
-  write_yellow "Executing>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/ligo_scrape.py --verbose"
-  PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/ligo_scrape.py --verbose
+  write_yellow "Executing>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/ligo_scrape.py --verbose --credentials=${credentials}"
+  PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/ligo_scrape.py --verbose --credentials=${credentials}
 fi
 
 
