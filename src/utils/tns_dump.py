@@ -48,7 +48,7 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 # default(s)
 # -
 DEFAULT_BASE_URL = f'https://wis-tns.weizmann.ac.il'
-DEFAULT_CREDENTIALS = f'phil_daly:8rG9VPXYXwKG'
+DEFAULT_CREDENTIALS = f':'
 DEFAULT_LOGIN_URL = f'{DEFAULT_BASE_URL}/user'
 DEFAULT_NPAGE = 500
 DEFAULT_NUMBER = 1
