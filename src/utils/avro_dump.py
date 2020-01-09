@@ -28,9 +28,7 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 # dunder string(s)
 # -
 __doc__ = """
-
     % python3 avro_dump.py --help
-
 """
 
 __author__ = 'Philip N. Daly'

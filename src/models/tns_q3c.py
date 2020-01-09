@@ -13,13 +13,11 @@ from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 
 import argparse
-# import gzip
 import json
 import math
 import pytz
 import os
 import sys
-# import urllib.request
 
 
 # +

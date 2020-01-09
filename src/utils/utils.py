@@ -25,6 +25,7 @@ MAX_BYTES = 9223372036854775807
 # +
 # class: UtilsLogger() inherits from the object class
 # -
+# noinspection PyBroadException
 class UtilsLogger(object):
 
     # +
@@ -45,8 +46,8 @@ class UtilsLogger(object):
         # logger dictionary
         logname = '{}'.format(self.__name)
         try:
-            logfile = '{}/{}.log'.format(os.getenv("SASSY_LOGS"))
-        except:
+            logfile = '{}/{}.log'.format(os.getenv("SASSY_LOGS"), logname)
+        except Exception:
             logfile = '{}/{}.log'.format(os.getcwd(), logname)
         logconsole = '/tmp/console-{}.log'.format(logname)
 

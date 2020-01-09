@@ -7,26 +7,21 @@
 import argparse
 import math
 import hashlib
-import json
 import os
-import re
 import requests
 import sys
 import time
 import warnings
 
-from astropy.time import Time
 from astropy.coordinates import Angle
 from astropy.coordinates import SkyCoord
 from bs4 import BeautifulSoup
 from bs4.dammit import EncodingDetector
 from datetime import datetime
 from datetime import timedelta
-from pprint import pprint
 from src.models.tns_q3c import TnsQ3cRecord
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from utils import UtilsLogger
 
 # noinspection PyUnresolvedReferences
 from utils import UtilsLogger
@@ -57,6 +52,7 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 # +
 # function(s)
 # -
+# noinspection PyBroadException
 def ra_from_angle(_ra=''):
     if not isinstance(_ra, str) or _ra.strip() == '':
         return math.nan
@@ -67,6 +63,8 @@ def ra_from_angle(_ra=''):
     except Exception:
         return math.nan
 
+
+# noinspection PyBroadException
 def dec_from_angle(_dec=''):
     if not isinstance(_dec, str) or _dec.strip() == '':
         return math.nan
@@ -77,6 +75,7 @@ def dec_from_angle(_dec=''):
     except Exception:
         return math.nan
 
+
 def coord_from_angle(_ra='', _dec=''):
     if not isinstance(_ra, str) or _ra.strip() == '':
         return math.nan, math.nan
@@ -84,6 +83,8 @@ def coord_from_angle(_ra='', _dec=''):
         return math.nan, math.nan
     return ra_from_angle(_ra), dec_from_angle(_dec)
 
+
+# noinspection PyUnresolvedReferences
 def coord_from_sky(_ra='', _dec=''):
     if not isinstance(_ra, str) or _ra.strip() == '':
         return math.nan, math.nan
@@ -92,13 +93,16 @@ def coord_from_sky(_ra='', _dec=''):
     _coord = SkyCoord(f'{_ra} {_dec}', unit=(u.hourangle, u.deg))
     return _coord.ra.degree, _coord.dec.degree
 
+
 def get_date_time(offset=0):
     """ return local time string like YYYY-MM-DDThh:mm:ss.ssssss with/without offset """
     return (datetime.now() + timedelta(days=offset)).isoformat()
 
+
 def get_date_utctime(offset=0):
     """ return UTC time string like YYYY-MM-DDThh:mm:ss.ssssss with/without offset """
     return (datetime.utcnow() + timedelta(days=offset)).isoformat()
+
 
 def get_unique_hash():
     _date = get_date_time(0)
@@ -197,6 +201,7 @@ __doc__ = """
 # +
 # class: TnsQ3cTableParser()
 # -
+# noinspection PyBroadException
 class TnsQ3cTableParser(object):
 
     # +
@@ -361,10 +366,10 @@ class TnsQ3cTableParser(object):
         if self.__verbose:
             _log.info(f"len(_rows)={len(_rows)}")
 
-        # scrape each row wich should look like this
+        # scrape each row which should look like this
         for _e in _rows:
 
-            # ignore elements that have no find or ginal_all
+            # ignore elements that have no find original_all
             if not (hasattr(_e, 'find') or hasattr(_e, 'find_all')):
                 continue
 
@@ -380,7 +385,8 @@ class TnsQ3cTableParser(object):
                 _ans_tmp['tns_name'] = (_e.find('td', attrs={'class': 'cell-name'})).find('a').text
                 _link = (_e.find('td', attrs={'class': 'cell-name'})).find('a', href=True)['href']
                 _ans_tmp['tns_link'] = f"{DEFAULT_BASE_URL}{_link}"
-                # <td class="cell-reps">1<a class="cert-open" href="/object/2019oel/discovery-cert" rel="43659"></a><a class="at-reps-open clearfix" href="/%23" rel="43659"></a></td>
+                # <td class="cell-reps">1<a class="cert-open" href="/object/2019oel/discovery-cert" rel="43659"></a>
+                # <a class="at-reps-open clearfix" href="/%23" rel="43659"></a></td>
                 _cert = (_e.find('td', attrs={'class': 'cell-reps'})).find('a', href=True)['href']
                 _ans_tmp['tns_cert'] = f"{DEFAULT_BASE_URL}{_cert}"
                 # <td class="cell-class"></td>
@@ -400,7 +406,8 @@ class TnsQ3cTableParser(object):
                 # <td class="cell-source_group_name">ATLAS</td>
                 _ans_tmp['source_group'] = _e.find('td', attrs={'class': 'cell-source_group_name'}).text
                 # <td class="cell-classifying_source_group_name"></td>
-                _ans_tmp['classifying_group'] = _e.find('td', attrs={'class': 'cell-classifying_source_group_name'}).text
+                _ans_tmp['classifying_group'] = _e.find('td',
+                                                        attrs={'class': 'cell-classifying_source_group_name'}).text
                 # <td class="cell-groups">ATLAS</td>
                 _ans_tmp['groups'] = _e.find('td', attrs={'class': 'cell-groups'}).text
                 # <td class="cell-internal_name">ATLAS19svo</td>
@@ -408,7 +415,8 @@ class TnsQ3cTableParser(object):
                 # <td class="cell-discovering_instrument_name">ATLAS1 - ACAM1</td>
                 _ans_tmp['instrument_name'] = _e.find('td', attrs={'class': 'cell-discovering_instrument_name'}).text
                 # <td class="cell-classifing_instrument_name"></td>
-                _ans_tmp['classifying_instrument'] = _e.find('td', attrs={'class': 'cell-classifing_instrument_name'}).text
+                _ans_tmp['classifying_instrument'] = _e.find('td',
+                                                             attrs={'class': 'cell-classifing_instrument_name'}).text
                 # <td class="cell-isTNS_AT">Y</td>
                 _ans_tmp['isTNS_AT'] = _e.find('td', attrs={'class': 'cell-isTNS_AT'}).text
                 # <td class="cell-public">Y</td>
@@ -442,7 +450,6 @@ class TnsQ3cTableParser(object):
             if self.__verbose:
                 _log.debug(f"scraped row {_ans_tmp}")
             self.__ans.append(_ans_tmp)
-
 
     # +
     # method: get_soup()
@@ -521,8 +528,6 @@ class TnsQ3cTableParser(object):
         # get record(s) for other pages
         if self.__pages > 0:
             for _i in range(1, self.__pages):
-        #if self.__pages > 107:
-        #   for _i in range(107, self.__pages):
                 self.get_soup(_i)
                 self.get_records()
                 if self.__verbose:
@@ -539,8 +544,9 @@ class TnsQ3cTableParser(object):
 # +
 # function: tns_q3c_scrape()
 # -
+# noinspection PyBroadException
 def tns_q3c_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, number=DEFAULT_NUMBER,
-               unit=DEFAULT_UNIT, verbose=False, force=False, dry_run=False):
+                   unit=DEFAULT_UNIT, verbose=False, force=False):
 
     # check input(s)
     login = login if (isinstance(login, str) and login.strip() != '' and
@@ -551,7 +557,6 @@ def tns_q3c_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, num
     unit = unit if (isinstance(unit, str) and unit in DEFAULT_UNITS) else DEFAULT_UNIT
     verbose = verbose if isinstance(verbose, bool) else False
     force = force if isinstance(force, bool) else False
-    dry_run = dry_run if isinstance(dry_run, bool) else False
 
     # instantiate the class
     try:
@@ -647,7 +652,7 @@ def tns_q3c_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, num
         if _tns_id > 0:
             try:
                 _rec = session.query(TnsQ3cRecord).filter_by(tns_id=_tns_id).first()
-            except Exception as e:
+            except Exception:
                 _rec = None
             if _rec is not None:
                 if force:
@@ -666,13 +671,14 @@ def tns_q3c_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, num
         # create record
         _tns_q3c = None
         if '0000-00-00' in _e['date']:
-            _log.info(f'Ignoring record {_tns_name} with null discovery date')
+            _log.info(f"Ignoring record {_e['tns_name']} with null discovery date")
         else:
             _tns_q3c = TnsQ3cRecord(tns_id=_tns_id, tns_name=_e['tns_name'], tns_link=_e['tns_link'],
-                ra=_ra, dec=_dec, redshift=_z, discovery_date=_e['date'], discovery_mag=_mag,
-                discovery_instrument=_e['instrument_name'], filter_name=_e['filter'], tns_class=_e['tns_class'],
-                host=_e['hostname'], host_z=_h_z, source_group=_e['source_group'], alias=_e['internal_name'],
-                certificate=_e['tns_cert'])
+                                    ra=_ra, dec=_dec, redshift=_z, discovery_date=_e['date'], discovery_mag=_mag,
+                                    discovery_instrument=_e['instrument_name'], filter_name=_e['filter'],
+                                    tns_class=_e['tns_class'], host=_e['hostname'], host_z=_h_z,
+                                    source_group=_e['source_group'], alias=_e['internal_name'],
+                                    certificate=_e['tns_cert'])
 
         # update database with results
         if _tns_q3c is not None:
@@ -712,12 +718,10 @@ if __name__ == '__main__':
                          help='if present, produce more verbose output')
     _parser.add_argument(f'--force', default=False, action='store_true',
                          help='if present, force updates by first deleting existing records')
-    _parser.add_argument(f'--dry-run', default=False, action='store_true',
-                         help='if present, show actions')
     args = _parser.parse_args()
 
     # execute
     if args:
-        tns_q3c_scrape(args.login, args.credentials, int(args.number), args.unit, bool(args.verbose), bool(args.force), bool(args.dry_run))
+        tns_q3c_scrape(args.login, args.credentials, int(args.number), args.unit, bool(args.verbose), bool(args.force))
     else:
         _log.critical(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help')

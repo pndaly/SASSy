@@ -7,15 +7,14 @@
 import argparse
 import math
 import os
-import re
 import requests
 import sys
 import time
 import warnings
 
+from astropy.coordinates import Angle
 from bs4 import BeautifulSoup
 from bs4.dammit import EncodingDetector
-from utils import UtilsLogger
 
 # noinspection PyUnresolvedReferences
 from utils import UtilsLogger
@@ -41,7 +40,6 @@ SASSY_DB_USER = os.getenv('SASSY_DB_USER', None)
 SASSY_DB_PASS = os.getenv('SASSY_DB_PASS', None)
 SASSY_DB_NAME = os.getenv('SASSY_DB_NAME', None)
 SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
-
 
 
 # +
@@ -132,6 +130,41 @@ __doc__ = """
     % python3 tns_dump.py --help
 
 """
+
+
+# +
+# function(s)
+# -
+# noinspection PyBroadException
+def ra_from_angle(_ra=''):
+    if not isinstance(_ra, str) or _ra.strip() == '':
+        return math.nan
+    if not _ra.lower().endswith('hours'):
+        _ra = f'{_ra} hours'
+    try:
+        return float(Angle(_ra).degree)
+    except Exception:
+        return math.nan
+
+
+# noinspection PyBroadException
+def dec_from_angle(_dec=''):
+    if not isinstance(_dec, str) or _dec.strip() == '':
+        return math.nan
+    if not _dec.lower().endswith('degrees'):
+        _dec = f'{_dec} degrees'
+    try:
+        return float(Angle(_dec).degree)
+    except Exception:
+        return math.nan
+
+
+def coord_from_angle(_ra='', _dec=''):
+    if not isinstance(_ra, str) or _ra.strip() == '':
+        return math.nan, math.nan
+    if not isinstance(_dec, str) or _dec.strip() == '':
+        return math.nan, math.nan
+    return ra_from_angle(_ra), dec_from_angle(_dec)
 
 
 # +
@@ -285,6 +318,7 @@ class TnsTableParser(object):
     # +
     # method: get_records()
     # -
+    # noinspection PyBroadException
     def get_records(self):
         """ scrape records from soup """
 
@@ -333,7 +367,8 @@ class TnsTableParser(object):
                 _ans_tmp['tns_name'] = (_e.find('td', attrs={'class': 'cell-name'})).find('a').text
                 _link = (_e.find('td', attrs={'class': 'cell-name'})).find('a', href=True)['href']
                 _ans_tmp['tns_link'] = f"{DEFAULT_BASE_URL}{_link}"
-                # <td class="cell-reps">1<a class="cert-open" href="/object/2019oel/discovery-cert" rel="43659"></a><a class="at-reps-open clearfix" href="/%23" rel="43659"></a></td>
+                # <td class="cell-reps">1<a class="cert-open" href="/object/2019oel/discovery-cert" rel="43659">
+                # </a><a class="at-reps-open clearfix" href="/%23" rel="43659"></a></td>
                 _cert = (_e.find('td', attrs={'class': 'cell-reps'})).find('a', href=True)['href']
                 _ans_tmp['tns_cert'] = f"{DEFAULT_BASE_URL}{_cert}"
                 # <td class="cell-class"></td>
@@ -353,7 +388,8 @@ class TnsTableParser(object):
                 # <td class="cell-source_group_name">ATLAS</td>
                 _ans_tmp['source_group'] = _e.find('td', attrs={'class': 'cell-source_group_name'}).text
                 # <td class="cell-classifying_source_group_name"></td>
-                _ans_tmp['classifying_group'] = _e.find('td', attrs={'class': 'cell-classifying_source_group_name'}).text
+                _ans_tmp['classifying_group'] = _e.find('td',
+                                                        attrs={'class': 'cell-classifying_source_group_name'}).text
                 # <td class="cell-groups">ATLAS</td>
                 _ans_tmp['groups'] = _e.find('td', attrs={'class': 'cell-groups'}).text
                 # <td class="cell-internal_name">ATLAS19svo</td>
@@ -361,7 +397,8 @@ class TnsTableParser(object):
                 # <td class="cell-discovering_instrument_name">ATLAS1 - ACAM1</td>
                 _ans_tmp['instrument_name'] = _e.find('td', attrs={'class': 'cell-discovering_instrument_name'}).text
                 # <td class="cell-classifing_instrument_name"></td>
-                _ans_tmp['classifying_instrument'] = _e.find('td', attrs={'class': 'cell-classifing_instrument_name'}).text
+                _ans_tmp['classifying_instrument'] = _e.find('td',
+                                                             attrs={'class': 'cell-classifing_instrument_name'}).text
                 # <td class="cell-isTNS_AT">Y</td>
                 _ans_tmp['isTNS_AT'] = _e.find('td', attrs={'class': 'cell-isTNS_AT'}).text
                 # <td class="cell-public">Y</td>
@@ -396,7 +433,6 @@ class TnsTableParser(object):
             if self.__verbose:
                 _log.debug(f"scraped row {_ans_tmp}")
             self.__ans.append(_ans_tmp)
-
 
     # +
     # method: get_soup()
@@ -476,8 +512,6 @@ class TnsTableParser(object):
         # get record(s) for other pages
         if self.__pages > 0:
             for _i in range(1, self.__pages):
-        #if self.__pages > 107:
-        #   for _i in range(107, self.__pages):
                 self.get_soup(_i)
                 self.get_records()
                 if self.__verbose:
@@ -494,8 +528,9 @@ class TnsTableParser(object):
 # +
 # function: tns_dump()
 # -
+# noinspection PyBroadException
 def tns_dump(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, number=DEFAULT_NUMBER,
-               unit=DEFAULT_UNIT, npage=DEFAULT_NPAGE, verbose=False, force=False):
+             unit=DEFAULT_UNIT, npage=DEFAULT_NPAGE, verbose=False):
 
     # check input(s)
     login = login if (isinstance(login, str) and login.strip() != '' and
@@ -506,7 +541,6 @@ def tns_dump(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, number=DE
     unit = unit if (isinstance(unit, str) and unit in DEFAULT_UNITS) else DEFAULT_UNIT
     npage = npage if (isinstance(npage, int) and (1 <= npage <= 1000)) else DEFAULT_NPAGE
     verbose = verbose if isinstance(verbose, bool) else False
-    force = force if isinstance(force, bool) else False
 
     # instantiate the class
     try:
@@ -607,12 +641,10 @@ if __name__ == '__main__':
                          help=f"""Unit <str>, defaults to '%(default)s' from {DEFAULT_UNITS}""")
     _parser.add_argument(f'--verbose', default=False, action='store_true',
                          help='if present, produce more verbose output')
-    _parser.add_argument(f'--force', default=False, action='store_true',
-                         help='if present, force updates by first deleting existing records')
     args = _parser.parse_args()
 
     # execute
     if args:
-        tns_dump(args.login, args.credentials, int(args.number), args.unit, int(args.npage), bool(args.verbose), bool(args.force))
+        tns_dump(args.login, args.credentials, int(args.number), args.unit, int(args.npage), bool(args.verbose))
     else:
         _log.critical(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help')

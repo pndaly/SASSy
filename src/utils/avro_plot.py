@@ -19,10 +19,11 @@ import random
 # +
 # initialize
 # -
+# noinspection PyBroadException
 try:
     import matplotlib as mpl
     mpl.use('Agg')
-except:
+except Exception:
     pass
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -50,6 +51,7 @@ def _get_fits_data(_s=None):
 # +
 # function: avro_plot()
 # -
+# noinspection PyBroadException
 def avro_plot(_file='', _www=False):
 
     # check input(s)
@@ -66,8 +68,8 @@ def avro_plot(_file='', _www=False):
     # read the packets
     try:
         with open(_file, 'rb') as _f:
-            for _p in fastavro.reader(_f):
-                _packets.append(_p)
+            for _pk in fastavro.reader(_f):
+                _packets.append(_pk)
     except Exception as _e:
         return
 
@@ -86,7 +88,7 @@ def avro_plot(_file='', _www=False):
         try:
             _fig = plt.figure()
             if _sci is not None:
-                _fig.add_subplot(1,3,1)
+                _fig.add_subplot(1, 3, 1)
                 if 'coolwarm' in COLOUR_MAPS:
                     _col = 'coolwarm'
                 else:
@@ -95,7 +97,7 @@ def avro_plot(_file='', _www=False):
                 # plt.title(f'color map: {_col}')
                 plt.title(f'Science')
             if _tem is not None:
-                _fig.add_subplot(1,3,2)
+                _fig.add_subplot(1, 3, 2)
                 if 'coolwarm_r' in COLOUR_MAPS:
                     _col = 'coolwarm_r'
                 else:
@@ -104,7 +106,7 @@ def avro_plot(_file='', _www=False):
                 # plt.title(f'color map: {_col}')
                 plt.title(f'Template')
             if _dif is not None:
-                _fig.add_subplot(1,3,3)
+                _fig.add_subplot(1, 3, 3)
                 if 'Spectral' in COLOUR_MAPS:
                     _col = 'Spectral'
                 else:

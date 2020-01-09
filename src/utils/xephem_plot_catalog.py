@@ -17,6 +17,7 @@ import sys
 # +
 # function: xephem_plot_catalog()
 # -
+# noinspection PyUnresolvedReferences
 def xephem_plot_catalog(_file='', _catalog=''):
 
     # check input(s)
@@ -30,12 +31,6 @@ def xephem_plot_catalog(_file='', _catalog=''):
     print(f"name={_t['objectId'][1]}, RA={_t['ra'][1]}, Dec={_t['dec'][1]}, mag={_t['magpsf'][1]}")
     print(f"name={_t['objectId'][-1]}, RA={_t['ra'][-1]}, Dec={_t['dec'][-1]}, mag={_t['magpsf'][-1]}")
 
-    # read catalog data
-    # with open('_catalog', 'r') as _rf:
-    #     for line in _rf.readlines():
-    #         if '#' not in line.strip()[0]:
-    #             elements = line.replace('\n', '').strip().split(',')
-
     # plot RA vs. Dec
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1, aspect='equal')
@@ -47,11 +42,8 @@ def xephem_plot_catalog(_file='', _catalog=''):
     plt.show()
 
     # plot aitoff
-    # noinspection PyUnresolvedReferences
     ra = coord.Angle(_t['ra']*u.degree)
-    # noinspection PyUnresolvedReferences
     ra = ra.wrap_at(180*u.degree)
-    # noinspection PyUnresolvedReferences
     dec = coord.Angle(_t['dec']*u.degree)
     fig = plt.figure(figsize=(8, 6))
     bx = fig.add_subplot(111, projection="aitoff")

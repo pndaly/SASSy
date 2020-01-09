@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 
 
 # +
@@ -21,7 +21,7 @@ import sys
 # __doc__ string
 # -
 __doc__ = """
-    % python3.7 dlt40.py --help
+    % python3 dlt40.py --help
 """
 
 

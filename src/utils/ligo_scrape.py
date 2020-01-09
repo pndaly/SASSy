@@ -16,10 +16,11 @@ import warnings
 from bs4 import BeautifulSoup
 from bs4.dammit import EncodingDetector
 from datetime import datetime
-from pprint import pprint
 from src.models.ligo import LigoRecord
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+# noinspection PyUnresolvedReferences
 from utils import UtilsLogger
 
 
@@ -139,7 +140,8 @@ class LigoTableParser(object):
     # +
     # method: dump()
     # -
-    def dump(self, _item=None, _delimiter='\n'):
+    @staticmethod
+    def dump(_item=None, _delimiter='\n'):
         if _item is None:
             _res = f''
         elif isinstance(_item, tuple) and _item is not ():
@@ -161,7 +163,7 @@ class LigoTableParser(object):
         """ gets links labelled as after the event """
 
         # check input(s)
-        self.__after= []
+        self.__after = []
         if _table is None or not hasattr(_table, f'find_all'):
             return
 
@@ -172,7 +174,8 @@ class LigoTableParser(object):
             for _a in _td.find_all('a', href=True):
 
                 # check names are in correct format
-                if _a['href'].strip().lower().startswith(f'http') and _a['href'].strip().lower().endswith(self.__schema):
+                if _a['href'].strip().lower().startswith(f'http') \
+                        and _a['href'].strip().lower().endswith(self.__schema):
 
                     # check for search pattern
                     if f'after' in _a['href'].strip().lower() and f"{_a['href'].strip()}" not in self.__after:
@@ -239,7 +242,7 @@ class LigoTableParser(object):
         """ gets links labelled as before the event """
 
         # check input(s)
-        self.__before= []
+        self.__before = []
         if _table is None or not hasattr(_table, f'find_all'):
             return
 
@@ -250,7 +253,8 @@ class LigoTableParser(object):
             for _a in _td.find_all('a', href=True):
 
                 # check names are in correct format
-                if _a['href'].strip().lower().startswith(f'http') and _a['href'].strip().lower().endswith(self.__schema):
+                if _a['href'].strip().lower().startswith(f'http') \
+                        and _a['href'].strip().lower().endswith(self.__schema):
 
                     # check for search pattern
                     if f'before' in _a['href'].strip().lower() and f"{_a['href'].strip()}" not in self.__before:
@@ -359,20 +363,20 @@ class LigoTableParser(object):
                             'ra': float(_before_entry['ra']) if 'ra' in _before_entry else math.nan,
                             'dec': float(_before_entry['dec']) if 'dec' in _before_entry else math.nan,
                             'transient_type': _before_entry['type'] if 'type' in _before_entry else '',
-                            'discovery_date': _before_entry['discoverydate'] if 'discoverydate' in _before_entry else '',
-                            'discovery_mag': float(_before_entry['discoverymag']) if 'discoverymag' in _before_entry else math.nan,
+                            'discovery_date':
+                                _before_entry['discoverydate'] if 'discoverydate' in _before_entry else '',
+                            'discovery_mag':
+                                float(_before_entry['discoverymag']) if 'discoverymag' in _before_entry else math.nan,
                             'filter_name': _before_entry['filter'] if 'filter' in _before_entry else '',
                             'source_group': _before_entry['source_group'] if 'source_group' in _before_entry else '',
-                            'probability': float(_before_entry['probability']) if 'probability' in _before_entry else math.nan,
+                            'probability':
+                                float(_before_entry['probability']) if 'probability' in _before_entry else math.nan,
                             'sigma': float(_before_entry['sigma']) if 'sigma' in _before_entry else math.nan,
                             'gw_aka': self.__aka[_i],
                             'gw_event': self.__names[_i],
                             'gw_date': self.__dates[_i],
                             'before': True
                         }
-                        # if self.__verbose:
-                        #     _log.debug(f"_ans['{_name}']={_ans[_name]}")
-
    
             # get after data from json
             if self.__schema == 'json':
@@ -430,18 +434,18 @@ class LigoTableParser(object):
                             'dec': float(_after_entry['dec']) if 'dec' in _after_entry else math.nan,
                             'transient_type': _after_entry['type'] if 'type' in _after_entry else '',
                             'discovery_date': _after_entry['discoverydate'] if 'discoverydate' in _after_entry else '',
-                            'discovery_mag': float(_after_entry['discoverymag']) if 'discoverymag' in _after_entry else math.nan,
+                            'discovery_mag':
+                                float(_after_entry['discoverymag']) if 'discoverymag' in _after_entry else math.nan,
                             'filter_name': _after_entry['filter'] if 'filter' in _after_entry else '',
                             'source_group': _after_entry['source_group'] if 'source_group' in _after_entry else '',
-                            'probability': float(_after_entry['probability']) if 'probability' in _after_entry else math.nan,
+                            'probability':
+                                float(_after_entry['probability']) if 'probability' in _after_entry else math.nan,
                             'sigma': float(_after_entry['sigma']) if 'sigma' in _after_entry else math.nan,
                             'gw_aka': self.__aka[_i],
                             'gw_event': self.__names[_i],
                             'gw_date': self.__dates[_i],
                             'before': False
                         }
-                        # if self.__verbose:
-                        #     _log.debug(f"_ans['{_name}']={_ans[_name]}")
 
         # return
         return _ans
@@ -480,18 +484,21 @@ class LigoTableParser(object):
                 _log.debug(f"Calling requests.get('{self.__url}', auth='{self.__username, self.__password}')")
             _requests = requests.get(self.__url, auth=(self.__username, self.__password))
             if self.__verbose:
-                _log.debug(f"Called requests.get('{self.__url}', auth='{self.__username, self.__password}'), _requests={_requests}")
+                _log.debug(f"Called requests.get('{self.__url}', "
+                           f"auth='{self.__username, self.__password}'), _requests={_requests}")
 
             if _requests.status_code == 200:
                 return _requests
             else:
                 if self.__verbose:
-                    _log.error(f"Bad status code ({_requests.status_code})  calling requests.get('{self.__url}', auth='{self.__username, self.__password}')")
+                    _log.error(f"Bad status code ({_requests.status_code})  calling requests.get('{self.__url}', "
+                               f"auth='{self.__username, self.__password}')")
                 return None
 
         except Exception as e:
             if self.__verbose:
-                _log.error(f"Failed calling requests.get('{self.__url}', auth='{self.__username, self.__password}'), error={e}")
+                _log.error(f"Failed calling requests.get('{self.__url}', "
+                           f"auth='{self.__username, self.__password}'), error={e}")
             return None
 
     # +
@@ -566,7 +573,9 @@ def get_unique_hash():
 # +
 # function: ligo_scrape()
 # -
-def ligo_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS, schema=DEFAULT_SCHEMA, verbose=False, force=False, dry_run=False):
+# noinspection PyBroadException
+def ligo_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS,
+                schema=DEFAULT_SCHEMA, verbose=False, force=False, dry_run=False):
 
     # check input(s)
     verbose = verbose if isinstance(verbose, bool) else False
@@ -581,7 +590,8 @@ def ligo_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS, schema=DEFAULT
         if verbose:
             _log.critical(f'Invalid input, credentials={credentials}')
         return
-    if (not isinstance(schema, str)) or (schema.strip() == '') or (args.schema.strip().lower() not in TNS_LIGO_SUPPORTED_SCHEMAS):
+    if (not isinstance(schema, str)) or (schema.strip() == '') \
+            or (args.schema.strip().lower() not in TNS_LIGO_SUPPORTED_SCHEMAS):
         if verbose:
             _log.critical(f'Invalid input, schema={schema}')
         return
@@ -630,7 +640,7 @@ def ligo_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS, schema=DEFAULT
             _rec = None
             try:
                 _rec = session.query(LigoRecord).filter_by(name=f'{_name}').first()
-            except Exception as e:
+            except Exception:
                 _rec = None
 
             if force:
@@ -665,22 +675,23 @@ def ligo_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS, schema=DEFAULT
             _ligo = None
             try:
                 _ligo = LigoRecord(
-                    name = f'{_name}',
-                    name_prefix = _ev['name_prefix'] if 'name_prefix' in _ev else '',
-                    name_suffix = _ev['name_suffix'] if 'name_suffix' in _ev else '',
-                    ra = float(_ev['ra']) if 'ra' in _ev else math.nan,
-                    dec = float(_ev['dec']) if 'dec' in _ev else math.nan,
-                    transient_type = _ev['transient_type'] if ('transient_type' in _ev and _ev['transient_type'].lower() != 'null') else '',
-                    discovery_date = _ev['discovery_date'] if 'discovery_date' in _ev else '',
-                    discovery_mag = float(_ev['discovery_mag']) if 'discovery_mag' in _ev else math.nan,
-                    filter_name = _ev['filter_name'] if 'filter_name' in _ev else '',
-                    source_group = _ev['source_group'] if 'source_group' in _ev else '',
-                    probability = float(_ev['probability']) if 'probability' in _ev else math.nan,
-                    sigma = float(_ev['sigma']) if 'sigma' in _ev else math.nan,
-                    gw_aka = _ev['gw_aka'] if 'gw_aka' in _ev else '',
-                    gw_date = _ev['gw_date'] if 'gw_date' in _ev else '',
-                    gw_event = _ev['gw_event'] if 'gw_event' in _ev else '',
-                    before = bool(_ev['before']) if 'before' in _ev else False)
+                    name=f'{_name}',
+                    name_prefix=_ev['name_prefix'] if 'name_prefix' in _ev else '',
+                    name_suffix=_ev['name_suffix'] if 'name_suffix' in _ev else '',
+                    ra=float(_ev['ra']) if 'ra' in _ev else math.nan,
+                    dec=float(_ev['dec']) if 'dec' in _ev else math.nan,
+                    transient_type=_ev['transient_type'] if ('transient_type' in _ev
+                                                             and _ev['transient_type'].lower() != 'null') else '',
+                    discovery_date=_ev['discovery_date'] if 'discovery_date' in _ev else '',
+                    discovery_mag=float(_ev['discovery_mag']) if 'discovery_mag' in _ev else math.nan,
+                    filter_name=_ev['filter_name'] if 'filter_name' in _ev else '',
+                    source_group=_ev['source_group'] if 'source_group' in _ev else '',
+                    probability=float(_ev['probability']) if 'probability' in _ev else math.nan,
+                    sigma=float(_ev['sigma']) if 'sigma' in _ev else math.nan,
+                    gw_aka=_ev['gw_aka'] if 'gw_aka' in _ev else '',
+                    gw_date=_ev['gw_date'] if 'gw_date' in _ev else '',
+                    gw_event=_ev['gw_event'] if 'gw_event' in _ev else '',
+                    before=bool(_ev['before']) if 'before' in _ev else False)
             except Exception as e:
                 _ligo = None
                 if verbose:

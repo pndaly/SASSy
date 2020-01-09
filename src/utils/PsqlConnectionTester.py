@@ -247,7 +247,6 @@ class PsqlConnectionTester(object):
         self.__result = self.__cursor.fetchall()
         return self.__result
 
-
     # +
     # method: raw()
     # -

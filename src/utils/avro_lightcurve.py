@@ -5,17 +5,12 @@
 # import(s)
 # -
 from astropy.time import Time
-from astropy.io import fits
 
 import argparse
-import aplpy
 import fastavro
-import gzip
-import io
 import numpy as np
 import os
 import pandas as pd
-import matplotlib
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
@@ -39,6 +34,7 @@ AVRO_DATES = ['ago', 'iso', 'jd']
 # +
 # (hidden) function: _jd_to_iso()
 # -
+# noinspection PyBroadException
 def _jd_to_iso(_jd=0.0):
     try:
         return Time(_jd, format='jd', precision=6).isot
@@ -49,6 +45,7 @@ def _jd_to_iso(_jd=0.0):
 # +
 # (hidden) function: _pandify_data()
 # -
+# noinspection PyBroadException
 def _pandify_data(packet=None):
     try:
         if 'candidate' in packet and 'prv_candidates' in packet:
@@ -128,8 +125,8 @@ def avro_lightcurve(_in='', _out='', _plot=False):
     _packets = []
     try:
         with open(_in, 'rb') as _f:
-            for _p in fastavro.reader(_f):
-                _packets.append(_p)
+            for _pk in fastavro.reader(_f):
+                _packets.append(_pk)
     except Exception as _e:
         return
 

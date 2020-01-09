@@ -172,7 +172,7 @@ class XephemCatalogParser(object):
         _rows = 0
         if self.__catalog_exists:
             with open(self.__catalog, 'r') as fd:
-                _rows = sum(1 for l in fd if (l.strip() != '' and l.strip()[0].isalnum()))
+                _rows = sum(1 for _l in fd if (_l.strip() != '' and _l.strip()[0].isalnum()))
         return _rows
 
     # +
