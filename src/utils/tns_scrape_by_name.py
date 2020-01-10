@@ -479,7 +479,7 @@ class TnsTableParser(object):
 
 
             # add it to the result(s)
-            if _ans_tmp['tns_id'] != '' and _ans_tmp['tns_name'] != '' and _ans_tmp['ra'] != '' and _ans_tmp['decl'] != '' and _ans_tmp['mag'] != '' and _ans_tmp['date'] != '':
+            if _ans_tmp['tns_id'] != '' and _ans_tmp['tns_name'] != '' and _ans_tmp['ra'] != '' and _ans_tmp['decl'] != '':
                 if self.__verbose:
                     _log.debug(f"scraped row {_ans_tmp}")
                 self.__ans.append(_ans_tmp)
@@ -544,12 +544,13 @@ class TnsTableParser(object):
             _div = self.__soup.find_all('div', attrs={'class': 'count rsults'})
             if self.__verbose:
                 _log.debug(f'_div={_div}')
-            _ems = [_e.find_all('em', attrs={'class': 'placeholder'}) for _e in _div][0]
-            if self.__verbose:
-                _log.debug(f'_ems={_ems}')
-            self.__total = int(_ems[-1].text)
-            if self.__verbose:
-                _log.debug(f'self.__total={self.__total}')
+            if _div is not None or _div is not []:
+                _ems = [_e.find_all('em', attrs={'class': 'placeholder'}) for _e in _div][0]
+                if self.__verbose:
+                    _log.debug(f'_ems={_ems}')
+                self.__total = int(_ems[-1].text)
+                if self.__verbose:
+                    _log.debug(f'self.__total={self.__total}')
         else:
             return self.__total, self.__ans
 
@@ -597,7 +598,7 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
         _log.info(f'Scraped pages OK')
     except Exception as e:
         if verbose:
-            _log.error(f'Failed scraping pages, error={e}')
+            _log.error(f'Failed scraping pages, name={name}, error={e}')
         return
 
     if verbose:
@@ -670,6 +671,10 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
             if verbose:
                 _log.info(f"_e['host_redshift']={_e['host_redshift']}, _h_z={_h_z}")
 
+         
+        if _e.get('date', '') == '':
+            _e['date'] = '1900-01-01 00:00:00.0'
+
         # does record already exist?
         _rec = None
         if _tns_id > 0:
@@ -693,14 +698,14 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
 
         # create record
         _tns = None
-        if '0000-00-00' in _e['date']:
-            _log.info(f"Ignoring record {_e['tns_name']} with null discovery date")
-        else:
-            _tns = TnsRecord(tns_id=_tns_id, tns_name=_e['tns_name'], tns_link=_e['tns_link'],
-                             ra=_ra, dec=_dec, redshift=_z, discovery_date=_e['date'], discovery_mag=_mag,
-                             discovery_instrument=_e['instrument_name'], filter_name=_e['filter'],
-                             tns_class=_e['tns_class'], host=_e['hostname'], host_z=_h_z,
-                             source_group=_e['source_group'], alias=_e['internal_name'], certificate=_e['tns_cert'])
+        #if '0000-00-00' in _e['date']:
+        #    _log.info(f"Ignoring record {_e['tns_name']} with null discovery date")
+        #else:
+        _tns = TnsRecord(tns_id=_tns_id, tns_name=_e['tns_name'], tns_link=_e['tns_link'],
+                         ra=_ra, dec=_dec, redshift=_z, discovery_date=_e['date'], discovery_mag=_mag,
+                         discovery_instrument=_e['instrument_name'], filter_name=_e['filter'],
+                         tns_class=_e['tns_class'], host=_e['hostname'], host_z=_h_z,
+                         source_group=_e['source_group'], alias=_e['internal_name'], certificate=_e['tns_cert'])
 
         # update database with results
         if _tns is not None:
