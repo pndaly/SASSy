@@ -121,7 +121,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
         _logger.info(f'Executed {_cmd_drop} OK')
 
     # create new view
-    _cmd_view = f'CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, (CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE (("objectId" LIKE \'%ZTF20%\') AND (jd BETWEEN {_begin_jd} AND {_end_jd}) AND ((rb BETWEEN {_rb_min} AND {_rb_max}) OR (drb BETWEEN {_rb_min} AND {_rb_max})))) SELECT * FROM e;'
+    _cmd_view = f'CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, (CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE (("objectId" LIKE \'%ZTF2%\') AND (jd BETWEEN {_begin_jd} AND {_end_jd}) AND ((rb BETWEEN {_rb_min} AND {_rb_max}) OR (drb BETWEEN {_rb_min} AND {_rb_max})))) SELECT * FROM e;'
     if _logger:
         _logger.info(f'Executing {_cmd_view}')
     try:
