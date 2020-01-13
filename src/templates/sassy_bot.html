@@ -68,7 +68,7 @@
        DROP VIEW IF EXISTS sassy_bot;
        <br>
        <br>
-      CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, (CASE WHEN ST_X(ST_AsText(location))<0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE (("objectId" Like 'ZTF2%') AND (jd BETWEEN date_to_jd('{{ form.begin_date.data }}') AND date_to_jd('{{ form.end_date.data }}')) AND ((rb BETWEEN {{ form.rb_min.data }} AND {{ form.rb_max.data }}) OR (drb BETWEEN {{ form.rb_min.data }} AND {{ form.rb_max.data }})))) SELECT * FROM e;
+      CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, (CASE WHEN ST_X(ST_AsText(location))<0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE (("objectId" LIKE 'ZTF2%') AND (jd BETWEEN date_to_jd('{{ form.begin_date.data }}') AND date_to_jd('{{ form.end_date.data }}')) AND ((rb BETWEEN {{ form.rb_min.data }} AND {{ form.rb_max.data }}) OR (drb BETWEEN {{ form.rb_min.data }} AND {{ form.rb_max.data }})))) SELECT * FROM e;
        <br>
        <br>
       WITH x AS (SELECT * FROM sassy_bot), y AS (SELECT x.*, (g.id, g.ra, g.dec) FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {{ form.radius.data/3600.0 }})), z AS (SELECT * FROM y LEFT OUTER JOIN tns_q3c AS t ON q3c_join(y.ra, y.dec, t.ra, t.dec, {{ form.radius.data/3600.0 }})) SELECT * FROM z WHERE tns_id IS null;
