@@ -3,11 +3,11 @@
 
 # +
 #
-# Name:        psql.size.sh
-# Description: returns PostGresQL database size
+# Name:        psql.cleanup.sh
+# Description: cleanup a PostGresQL database
 # Author:      Phil Daly (pndaly@email.arizona.edu)
 # Date:        20181205
-# Execute:     % bash psql.size.sh --help
+# Execute:     % bash psql.cleanup.sh --help
 #
 # -
 
@@ -18,11 +18,18 @@
 today=$(date "+%Y%m%d")
 default_authorization="sassy:S@ssy_520"
 default_database="sassy"
-default_server="localhost"
 default_port=5432
+default_server="localhost"
 default_table=""
 
 dry_run=0
+
+
+# +
+# env(s)
+# -
+export PATH=/usr/lib/postgresql/10/bin:${PATH}
+export PATH=/usr/lib/postgresql/11/bin:${PATH}
 
 
 # +
@@ -55,23 +62,20 @@ write_cyan () {
 }
 usage () {
   write_blue   ""                                                                                                             2>&1
-  write_blue   "Return size of PostGreSQL database or table"                                                                  2>&1
+  write_blue   "Cleanup a PostGreSQL database"                                                                                2>&1
   write_blue   ""                                                                                                             2>&1
   write_green  "Use:"                                                                                                         2>&1
   write_green  " %% bash $0 --authorization=<str> --database=<str> --port=<int> --server=<address> --table=<str> [--dry-run]" 2>&1
-  write_green  ""                                                                                                             2>&1
+  write_yellow ""                                                                                                             2>&1
   write_yellow "Input(s):"                                                                                                    2>&1
   write_yellow "  --authorization=<str>, where <str> is of the form 'username:password',  default=${default_authorization}"   2>&1
   write_yellow "  --database=<str>,      where <str> is a database name,                  default=${default_database}"        2>&1
   write_yellow "  --port=<int>,          where <int> is a port number,                    default=${default_port}"            2>&1
   write_yellow "  --server=<address>,    where <address> is a hostname or IP-address,     default=${default_server}"          2>&1
-  write_yellow "  --table=<str>,         where <str> is a database table,                 default=${default_table}"           2>&1
+  write_yellow "  --table=<str>,         where <str> is a table name within the database, default=${default_table}"           2>&1
   write_yellow ""                                                                                                             2>&1
   write_cyan   "Flag(s):"                                                                                                     2>&1
   write_cyan   "  --dry-run,             show (but do not execute) commands,              default=false"                      2>&1
-  write_cyan   ""                                                                                                             2>&1
-  echo         "Output(s):"                                                                                                   2>&1
-  echo         "  size of database or table"                                                                                  2>&1
   echo         ""                                                                                                             2>&1
 }
 
@@ -134,20 +138,14 @@ if ! ping -c 1 -w 5 ${rs_server} &>/dev/null; then
   exit 0 
 fi
 
-if [[ -z ${rs_password} ]]; then
+if [[ -z "${rs_password}" ]]; then
   write_red "<ERROR> invalid password (${rs_password}) ... exiting"
   exit 0 
 fi
 
-if [[ -z ${rs_username} ]]; then
+if [[ -z "${rs_username}" ]]; then
   write_red "<ERROR> invalid username (${rs_username}) ... exiting"
   exit 0 
-fi
-
-if [[ -z ${rs_table} ]]; then
-  _command="SELECT pg_size_pretty(pg_database_size('${rs_database}'));"
-else
-  _command="SELECT pg_size_pretty(pg_total_relation_size('${rs_table}'));"
 fi
 
 
@@ -156,26 +154,25 @@ fi
 # -
 write_blue "%% bash $0 --authorization=${rs_username}:${rs_password} --database=${rs_database} --port=${rs_port} --server=${rs_server} --table=${rs_table} --dry-run=${dry_run}"
 if [[ ${dry_run} -eq 1 ]]; then
-  write_yellow "Dry-Run>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} -c \"${_command}\""
+  write_yellow "Dry-Run>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c 'VACUUM(FULL, ANALYZE, VERBOSE) ${rs_table};'"
+
+  if [[ ! -z ${rs_table} ]]; then
+    write_yellow "Dry-Run>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c 'REINDEX TABLE ${rs_table};'"
+    write_yellow "Dry-Run>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c 'VACUUM(FULL, ANALYZE, VERBOSE) ${rs_table};'"
+  fi
 
 # +
 # execute (for-real)
 # -
 else
-  write_green "Executing>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} -c \"${_command}\""
-  _response=$(PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} -c "${_command}" 2>/dev/null)
-  if [[ ! -z "${_response}" ]]; then
-    if [[ -z ${rs_table} ]]; then
-      echo 'Database is '$(echo ${_response} | cut -d' ' -f3)' '$(echo ${_response} | cut -d' ' -f4)
-    else
-      echo 'Table is '$(echo ${_response} | cut -d' ' -f3)' '$(echo ${_response} | cut -d' ' -f4)
-    fi
-  else
-    if [[ -z ${rs_table} ]]; then
-      write_red "<ERROR> invalid access to table (${rs_table}) on server (${rs_server}:${rs_port}) using authorization (${rs_username}:${rs_password}) ... exiting"
-    else
-      write_red "<ERROR> invalid access to database (${rs_database}) on server (${rs_server}:${rs_port}) using authorization (${rs_username}:${rs_password}) ... exiting"
-    fi
+  write_green "Executing>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c 'VACUUM(FULL, ANALYZE, VERBOSE) ${rs_table};'"
+  PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c "VACUUM(FULL, ANALYZE, VERBOSE) ${rs_table};"
+
+  if [[ ! -z ${rs_table} ]]; then
+    write_green "Executing>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c 'REINDEX TABLE ${rs_table};'"
+    PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c "REINDEX TABLE ${rs_table};"
+    write_green "Executing>> PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c 'VACUUM(FULL, ANALYZE, VERBOSE) ${rs_table};'"
+    PGPASSWORD=${rs_password} psql -h ${rs_server} -p ${rs_port} -U ${rs_username} -d ${rs_database} ${rs_table} -c "VACUUM(FULL, ANALYZE, VERBOSE) ${rs_table};"
   fi
 fi
 

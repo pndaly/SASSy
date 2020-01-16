@@ -20,6 +20,7 @@ from bs4.dammit import EncodingDetector
 from datetime import datetime
 from datetime import timedelta
 from src.models.tns import TnsRecord
+from src.models.tns_q3c import TnsQ3cRecord
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -130,10 +131,10 @@ __doc__ = """
 
 
 # +
-# class: TnsTableParser()
+# class: TnsTableParserByName()
 # -
 # noinspection PyBroadException
-class TnsTableParser(object):
+class TnsTableParserByName(object):
 
     # +
     # method: __init__()
@@ -569,7 +570,7 @@ class TnsTableParser(object):
 # -
 # noinspection PyBroadException
 def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, name='',
-                 exact=False, verbose=False, force=False):
+                 exact=False, force=False, q3c=False, verbose=False):
 
     # check input(s)
     login = login if (isinstance(login, str) and login.strip() != '' and
@@ -578,16 +579,17 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
                                   and ':' in credentials.strip()) else DEFAULT_CREDENTIALS
     name = name if isinstance(name, str) else ''
     exact = exact if isinstance(exact, bool) else False
-    verbose = verbose if isinstance(verbose, bool) else False
     force = force if isinstance(force, bool) else False
+    q3c = q3c if isinstance(q3c, bool) else False
+    verbose = verbose if isinstance(verbose, bool) else False
 
     # instantiate the class
     try:
-        _log.info(f"Instantiating TnsTableParser('{login}', '{credentials}', '{name}', {exact}, {verbose})")
-        _ttp = TnsTableParser(login, credentials, name, exact, verbose)
-        _log.info(f"Instantiated TnsTableParser('{login}', '{credentials}', '{name}', {exact}, {verbose}) OK")
+        _log.info(f"Instantiating TnsTableParserByName('{login}', '{credentials}', '{name}', {exact}, {verbose})")
+        _ttp = TnsTableParserByName(login, credentials, name, exact, verbose)
+        _log.info(f"Instantiated TnsTableParserByName('{login}', '{credentials}', '{name}', {exact}, {verbose}) OK")
     except Exception as e:
-        _log.error(f"Failed instantiating TnsTableParser("
+        _log.error(f"Failed instantiating TnsTableParserByName("
                    f"'{login}', '{credentials}', '{name}', '{exact}', {verbose}), error={e}")
         return
 
@@ -679,7 +681,7 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
         _rec = None
         if _tns_id > 0:
             try:
-                _rec = session.query(TnsRecord).filter_by(tns_id=_tns_id).first()
+                _rec = session.query(TnsQ3cRecord).filter_by(tns_id=_tns_id).first()
             except Exception:
                 _rec = None
             if _rec is not None:
@@ -698,10 +700,7 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
 
         # create record
         _tns = None
-        #if '0000-00-00' in _e['date']:
-        #    _log.info(f"Ignoring record {_e['tns_name']} with null discovery date")
-        #else:
-        _tns = TnsRecord(tns_id=_tns_id, tns_name=_e['tns_name'], tns_link=_e['tns_link'],
+        _tns = TnsQ3cRecord(tns_id=_tns_id, tns_name=_e['tns_name'], tns_link=_e['tns_link'],
                          ra=_ra, dec=_dec, redshift=_z, discovery_date=_e['date'], discovery_mag=_mag,
                          discovery_instrument=_e['instrument_name'], filter_name=_e['filter'],
                          tns_class=_e['tns_class'], host=_e['hostname'], host_z=_h_z,
@@ -743,12 +742,14 @@ if __name__ == '__main__':
                          help='if present, name value must be an exact match')
     _parser.add_argument(f'--force', default=False, action='store_true',
                          help='if present, force updates by first deleting existing records')
+    _parser.add_argument(f'--q3c', default=False, action='store_true',
+                         help='if present, update Q3C table')
     _parser.add_argument(f'--verbose', default=False, action='store_true',
                          help='if present, produce more verbose output')
     args = _parser.parse_args()
 
     # execute
     if args:
-        tns_scrape_by_name(args.login, args.credentials, args.name, bool(args.exact), bool(args.verbose), bool(args.force))
+        tns_scrape_by_name(args.login, args.credentials, args.name, bool(args.exact), bool(args.force), bool(args.q3c), bool(args.verbose))
     else:
         _log.critical(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help')
