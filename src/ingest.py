@@ -92,14 +92,15 @@ def do_ingest(encoded_packet=None):
         raise Exception(f'Packet read error, unable to ingest data, error={e}')
 
     # get data
-    try:
-        freader = fastavro.reader(io.BytesIO(f_data))
-        for packet in freader:
-            fname = '{}.avro'.format(packet['candid'])
-            logger.info('Calling upload_avro()')
-            upload_avro(io.BytesIO(f_data), fname, packet)
-    except Exception as e:
-        raise Exception(f'Packet upload error, unable to upload data, error={e}')
+    if AWS_USE_S3:
+        try:
+            freader = fastavro.reader(io.BytesIO(f_data))
+            for packet in freader:
+                fname = '{}.avro'.format(packet['candid'])
+                logger.info('Calling upload_avro()')
+                upload_avro(io.BytesIO(f_data), fname, packet)
+        except Exception as e:
+            raise Exception(f'Packet upload error, unable to upload data, error={e}')
 
 
 # +
