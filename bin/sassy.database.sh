@@ -26,10 +26,10 @@ dry_run=0
 # +
 # variable(s)
 # -
-sassy_db_name="${def_db_name}"
-sassy_db_pass="${def_db_pass}"
-sassy_db_host="${def_db_host}"
-sassy_db_user="${def_db_user}"
+db_name="${def_db_name}"
+db_pass="${def_db_pass}"
+db_host="${def_db_host}"
+db_user="${def_db_user}"
 
 
 # +
@@ -62,7 +62,7 @@ write_cyan () {
 }
 usage () {
   write_blue   ""                                                                                                 2>&1
-  write_blue   "SASSY Database Control"                                                                            2>&1
+  write_blue   "Database Control"                                                                                 2>&1
   write_blue   ""                                                                                                 2>&1
   write_green  "Use:"                                                                                             2>&1
   write_green  "  %% bash $0 --database=<str> --hostname=<str:int> --password=<str> --username=<str> [--dry-run]" 2>&1
@@ -85,7 +85,7 @@ usage () {
 while test $# -gt 0; do
   case "${1}" in
     --database*|--DATABASE*)
-      sassy_db_name=$(echo $1 | cut -d'=' -f2)
+      db_name=$(echo $1 | cut -d'=' -f2)
       shift
       ;;
     --dry-run|--DRY-RUN)
@@ -93,15 +93,15 @@ while test $# -gt 0; do
       shift
       ;;
     --password*|--PASSWORD*)
-      sassy_db_pass=$(echo $1 | cut -d'=' -f2)
+      db_pass=$(echo $1 | cut -d'=' -f2)
       shift
       ;;
     --username*|--USERNAME*)
-      sassy_db_user=$(echo $1 | cut -d'=' -f2)
+      db_user=$(echo $1 | cut -d'=' -f2)
       shift
       ;;
     --hostname*|--HOSTNAME*)
-      sassy_db_host=$(echo $1 | cut -d'=' -f2)
+      db_host=$(echo $1 | cut -d'=' -f2)
       shift
       ;;
     --help|*)
@@ -115,25 +115,25 @@ done
 # +
 # check and (re)set variable(s)
 # -
-if [[ -z ${sassy_db_name} ]]; then
-  sassy_db_name=${def_db_name}
+if [[ -z ${db_name} ]]; then
+  db_name=${def_db_name}
 fi
-if [[ -z ${sassy_db_host} ]]; then
-  sassy_db_host=${def_db_host}
+if [[ -z ${db_host} ]]; then
+  db_host=${def_db_host}
 fi
-if [[ -z ${sassy_db_pass} ]]; then
-  sassy_db_pass=${def_db_pass}
+if [[ -z ${db_pass} ]]; then
+  db_pass=${def_db_pass}
 fi
-if [[ -z ${sassy_db_user} ]]; then
-  sassy_db_user=${def_db_user}
+if [[ -z ${db_user} ]]; then
+  db_user=${def_db_user}
 fi
 
 
 # +
 # write file to create database
 # -
-_host=$(echo ${sassy_db_host} | cut -d':' -f1)
-_port=$(echo ${sassy_db_host} | cut -d':' -f2)
+_host=$(echo ${db_host} | cut -d':' -f1)
+_port=$(echo ${db_host} | cut -d':' -f2)
 _os=`echo $(uname -sr) | cut -d' ' -f1`
 
 if [[ "${_os}" == "Darwin" ]]; then
@@ -142,40 +142,40 @@ else
   PSQL_CMD="sudo -u postgres psql --echo-all -h ${_host} -p ${_port}"
 fi
 
-if [[ -f /tmp/sassy.database.sh ]]; then
-  rm -f /tmp/sassy.database.sh
+if [[ -f /tmp/${db_name}.database.sh ]]; then
+  rm -f /tmp/${db_name}.database.sh
 fi
 
-echo "#!/bin/sh"                                                                               >> /tmp/sassy.database.sh 2>&1
-echo "${PSQL_CMD} << EOF"                                                                      >> /tmp/sassy.database.sh 2>&1
-echo "DROP DATABASE IF EXISTS ${sassy_db_name};"                                               >> /tmp/sassy.database.sh 2>&1
-echo "DROP USER IF EXISTS ${sassy_db_user};"                                                   >> /tmp/sassy.database.sh 2>&1
-echo "CREATE ROLE ${sassy_db_user} LOGIN SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS;" >> /tmp/sassy.database.sh 2>&1
-echo "ALTER ROLE ${sassy_db_user} WITH ENCRYPTED PASSWORD '${sassy_db_pass}';"                 >> /tmp/sassy.database.sh 2>&1
-echo "CREATE DATABASE ${sassy_db_name};"                                                       >> /tmp/sassy.database.sh 2>&1
-echo "CREATE EXTENSION postgis;"                                                               >> /tmp/sassy.database.sh 2>&1
-echo "CREATE EXTENSION postgis_topology;"                                                      >> /tmp/sassy.database.sh 2>&1
-echo "CREATE EXTENSION q3c;"                                                                   >> /tmp/sassy.database.sh 2>&1
-echo "GRANT ALL PRIVILEGES ON DATABASE ${sassy_db_name} TO ${sassy_db_user};"                  >> /tmp/sassy.database.sh 2>&1
-echo "ALTER DATABASE ${sassy_db_name} OWNER TO ${sassy_db_user};"                              >> /tmp/sassy.database.sh 2>&1
-echo "EOF"                                                                                     >> /tmp/sassy.database.sh 2>&1
+echo "#!/bin/sh"                                                                         >> /tmp/${db_name}.database.sh 2>&1
+echo "${PSQL_CMD} << EOF"                                                                >> /tmp/${db_name}.database.sh 2>&1
+echo "DROP DATABASE IF EXISTS ${db_name};"                                               >> /tmp/${db_name}.database.sh 2>&1
+echo "DROP USER IF EXISTS ${db_user};"                                                   >> /tmp/${db_name}.database.sh 2>&1
+echo "CREATE ROLE ${db_user} LOGIN SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS;" >> /tmp/${db_name}.database.sh 2>&1
+echo "ALTER ROLE ${db_user} WITH ENCRYPTED PASSWORD '${db_pass}';"                       >> /tmp/${db_name}.database.sh 2>&1
+echo "CREATE DATABASE ${db_name};"                                                       >> /tmp/${db_name}.database.sh 2>&1
+echo "CREATE EXTENSION postgis;"                                                         >> /tmp/${db_name}.database.sh 2>&1
+echo "CREATE EXTENSION postgis_topology;"                                                >> /tmp/${db_name}.database.sh 2>&1
+echo "CREATE EXTENSION q3c;"                                                             >> /tmp/${db_name}.database.sh 2>&1
+echo "GRANT ALL PRIVILEGES ON DATABASE ${db_name} TO ${db_user};"                        >> /tmp/${db_name}.database.sh 2>&1
+echo "ALTER DATABASE ${db_name} OWNER TO ${db_user};"                                    >> /tmp/${db_name}.database.sh 2>&1
+echo "EOF"                                                                               >> /tmp/${db_name}.database.sh 2>&1
 
 
 
 # +
 # execute
 # -
-write_blue "%% bash $0 --database=${sassy_db_name} --hostname=${sassy_db_host} --password=${sassy_db_pass} --username=${sassy_db_user} --dry-run=${dry_run}"
+write_blue "%% bash $0 --database=${db_name} --hostname=${db_host} --password=${db_pass} --username=${db_user} --dry-run=${dry_run}"
 if [[ ${dry_run} -eq 1 ]]; then
   if [[ "${USER}" != "root" ]]; then
     write_red "WARNING: you need to be root to execute these commands!"
   fi
-  if [[ ! -f /tmp/sassy.database.sh ]]; then
-    write_red "WARNING: /tmp/sassy.database.sh does not exist!"
+  if [[ ! -f /tmp/${db_name}.database.sh ]]; then
+    write_red "WARNING: /tmp/${db_name}.database.sh does not exist!"
   fi
-  write_yellow "Dry-Run> chmod a+x /tmp/sassy.database.sh"
-  write_yellow "Dry-Run> bash /tmp/sassy.database.sh"
-  write_yellow "Dry-Run> rm -f /tmp/sassy.database.sh"
+  write_yellow "Dry-Run> chmod a+x /tmp/${db_name}.database.sh"
+  write_yellow "Dry-Run> bash /tmp/${db_name}.database.sh"
+  write_yellow "Dry-Run> rm -f /tmp/${db_name}.database.sh"
 
 else
   if [[ "${USER}" != "root" ]]; then
@@ -183,17 +183,17 @@ else
     usage
     exit
   fi
-  if [[ ! -f /tmp/sassy.database.sh ]]; then
-    write_red "ERROR: /tmp/sassy.database.sh does not exist!"
+  if [[ ! -f /tmp/${db_name}.database.sh ]]; then
+    write_red "ERROR: /tmp/${db_name}.database.sh does not exist!"
     usage
     exit
   fi
-  write_green "Executing> chmod a+x /tmp/sassy.database.sh"
-  chmod a+x /tmp/sassy.database.sh
-  write_green "Executing> bash /tmp/sassy.database.sh"
-  bash /tmp/sassy.database.sh
-  write_green "Executing> rm -f /tmp/sassy.database.sh"
-  rm -f /tmp/sassy.database.sh
+  write_green "Executing> chmod a+x /tmp/${db_name}.database.sh"
+  chmod a+x /tmp/${db_name}.database.sh
+  write_green "Executing> bash /tmp/${db_name}.database.sh"
+  bash /tmp/${db_name}.database.sh
+  write_green "Executing> rm -f /tmp/${db_name}.database.sh"
+  rm -f /tmp/${db_name}.database.sh
 fi
 
 
