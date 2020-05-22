@@ -27,7 +27,7 @@ __doc__ = """
 # +
 # constant(s)
 # -
-AVRO_FILTERS = {1: 'green', 2: 'red', 3: 'blue'}
+AVRO_FILTERS = {1: 'g', 2: 'r', 3: 'i'}
 AVRO_DATES = ['ago', 'iso', 'jd']
 
 

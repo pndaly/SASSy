@@ -40,7 +40,7 @@ __institution__ = 'Steward Observatory, 933 N. Cherry Avenue, Tucson AZ 85719'
 # +
 # constant(s)
 # -
-AVRO_FILTERS = {1: 'green', 2: 'red', 3: 'blue'}
+AVRO_FILTERS = {1: 'g', 2: 'r', 3: 'i'}
 AVRO_OPTIONS = ['curve', 'cutouts', 'image', 'keyword', 'packet', 'schema', 'table']
 
 
