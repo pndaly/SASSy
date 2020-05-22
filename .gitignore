@@ -7,6 +7,7 @@ __pycache__
 # +
 # Packages
 # -
+*.csv
 *.dmg
 *.gz
 *.tar
@@ -40,7 +41,6 @@ Thumbs.db
 bin/Sassy.sh
 etc/Sassy.sh
 src/common.py
-Kafka
 
 # +
 # other repositories
