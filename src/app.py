@@ -6,11 +6,11 @@
 # -
 import glob
 import io
-# import math
+import math
 import pytz
 # import requests
 
-# from astropy.time import Time
+from astropy.time import Time
 from astropy.coordinates import Angle
 from astropy.coordinates import SkyCoord
 # from datetime import datetime
@@ -154,7 +154,7 @@ from src.models.tns_q3c import tns_q3c_get_text
 
 # noinspection PyUnresolvedReferences
 from src.utils.utils import *
-from src.utils.sassy_bot import *
+# from src.utils.sassy_bot import *
 
 # get environmental variable(s)
 from src.common import *
@@ -2130,6 +2130,39 @@ def ztf_alert_stamp(id=0, stamp=''):
         details[0]['line'] = 'at exit'
         details[1]['line'] = 'at exit'
         return render_template('error.html', details=details)
+
+
+# +
+# route(s): /ztf/<int:id>/cutout/<stamp>/, /sassy/ztf/<int:id>/cutout/<stamp>/
+# -
+# noinspection PyShadowingBuiltins
+@app.route('/sassy/ztf/<int:id>/photometry//')
+@app.route('/ztf/<int:id>/photometry/')
+def ztf_photometry(id=0):
+    logger.debug(f'ztf_photometry> entry, id={id}')
+
+    # check input(s)
+    details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
+                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/photometry', 'value': f'{id}'}]
+    logger.info(f'route /sassy/ztf/{id}/photometry on entry')
+    if not isinstance(id, int) or id <= 0:
+        logger.warning(f'route /sassy/ztf/{id}/photometry input(s) are invalid')
+        details[0]['line'] = 'at entry'
+        return render_template('error.html', details=details)
+
+    # noinspection PyBroadException
+    try:
+        # get data
+        alert = db_ztf.session.query(ZtfAlert).get(id)
+    except Exception:
+        logger.warning(f'route /sassy/ztf/{id}/photometry not found')
+        details[0]['line'] = 'at db.session.query()'
+        return render_template('error.html', details=details)
+    else:
+        logger.info(f'route /sassy/ztf/{id}/photometry alert={alert} is OK, type={type(alert)}')
+
+    # return
+    return jsonify(alert.get_photometry())
 
 
 # +

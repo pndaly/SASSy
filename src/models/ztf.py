@@ -413,28 +413,27 @@ class ZtfAlert(db.Model):
                 'drbversion': self.drbversion,
             }
         }
-        # if prv_candidate:
-        #     alert['prv_candidate'] = ZtfAlert.serialize_list(self.prv_candidate)
-        # return alert
 
     def get_photometry(self):
-        filter_mapping = ['g', 'r', 'i']
-        prv_candidates = Alert.serialize_list(self.prv_candidate)
-        # non_detections = NonDetection.serialize_list(self.non_detection)
-        # Alert.add_candidates(prv_candidates, non_detections)
+        filter_mapping = ['x', 'g', 'r', 'i']
+        prv_candidates = ZtfAlert.serialize_list(self.prv_candidate)
         photometry = {}
         index = 0
         for candidate in prv_candidates:
             values = candidate['candidate']
             photometry[index] = {}
             for key in values.keys():
-                if key in ['jd', 'diffmaglim', 'magpsf', 'sigmapsf']:
+                if key in ['diffmaglim', 'magpsf', 'sigmapsf']:
                     photometry[index][key] = values[key]
                 elif key == 'fid':
                     photometry[index]['filter'] = filter_mapping[values[key]]
+                elif key == 'jd':
+                    photometry[index][key] = values[key]
+                    photometry[index]['isot'] = Time(values[key], format='jd').isot
             index += 1
         photometry[index] = {
             'jd': self.jd,
+            'isot': Time(self.jd, format='jd').isot,
             'filter': filter_mapping[self.fid],
             'magpsf': self.magpsf,
             'sigmapsf': self.sigmapsf,
