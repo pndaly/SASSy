@@ -41,7 +41,7 @@ __institution__ = 'Steward Observatory, 933 N. Cherry Avenue, Tucson AZ 85719'
 # constant(s)
 # -
 AVRO_FILTERS = {1: 'g', 2: 'r', 3: 'i'}
-AVRO_OPTIONS = ['curve', 'cutouts', 'image', 'keyword', 'packet', 'schema', 'table']
+AVRO_OPTIONS = ['csv', 'curve', 'cutouts', 'image', 'keyword', 'packet', 'schema', 'table']
 
 
 # +
@@ -53,17 +53,16 @@ def make_dataframe(packet=None):
     if packet is None or not isinstance(packet, dict):
         raise Exception(f'invalid input, packet={packet}')
 
-    # set variable(s)
-    _retval = None
-
     # create pandas data frame
-    if 'candidate' in packet and 'prv_candidates' in packet:
-        df_1 = pd.DataFrame(packet['candidate'], index=[0])
-        df_2 = pd.DataFrame(packet['prv_candidates'])
-        _retval = pd.concat([df_1, df_2], ignore_index=True)
-
-    # return
-    return _retval
+    try:
+        if 'candidate' in packet and 'prv_candidates' in packet:
+            df_1 = pd.DataFrame(packet['candidate'], index=[0])
+            df_2 = pd.DataFrame(packet['prv_candidates'])
+            return pd.concat([df_1, df_2], ignore_index=True)
+        else:
+            return None
+    except Exception:
+        return None
 
 
 # +
@@ -196,7 +195,21 @@ def action(iargs):
 
     # dump lightcurve
     _show = _show.lower()
-    if _show == 'curve':
+    _of = f"{os.path.basename(_ifile).split('.')[0]}.csv"
+    _of = os.path.abspath(os.path.expanduser(_of))
+    print(f'Creating CSV: {_of}')
+    if _show == 'csv':
+        _total = pd.DataFrame()
+        for _i in range(len(_packets)):
+            _df = make_dataframe(_packets[_i])
+            _df.rename(columns={'fid': 'filter'}, inplace=True)
+            _df['filter'] = _df['filter'].map(AVRO_FILTERS)
+            _total = pd.concat([_total, _df])
+        _total.to_csv(f"{_of}", index=False, columns=['jd', 'filter', 'diffmaglim', 'magpsf', 'sigmapsf'], header=['#jd', 'filter', 'diffmaglim', 'magpsf', 'sigmapsf'])
+
+
+    # dump lightcurve
+    elif _show == 'curve':
         for _i in range(len(_packets)):
             plot_lightcurve(f'{_ifile}', f"{_packets[_i]['candid']}", make_dataframe(_packets[_i]))
 
