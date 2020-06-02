@@ -249,9 +249,9 @@ if [[ ${dry_run} -eq 1 ]]; then
 # -
 else
 
-  if [[ -f ${rs_directoy}/${rs_filename} ]]; then
+  if [[ -f ${rs_directory}/${rs_filename} ]]; then
     if [[ ${over_ride} -eq 1 ]]; then
-      rm -f ${rs_directoy}/${rs_filename} 2>&1 >> /dev/null
+      rm -f ${rs_directory}/${rs_filename} 2>&1 >> /dev/null
     else
       write_red "<ERROR> backup file (${rs_directory}/${rs_filename}) already exists ... exiting"
       exit 0 

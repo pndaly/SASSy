@@ -15,8 +15,9 @@
 # +
 # default(s)
 # -
+_sassy_home=$(env | grep '^SASSY_HOME=')
 def_sassy_command="status"
-def_sassy_source="${SASSY_HOME}"
+def_sassy_source="${_sassy_home}"
 def_sassy_type="dev"
 
 def_dev_host="localhost"

@@ -165,9 +165,10 @@ echo "EOF"                                                                      
 # +
 # execute
 # -
+_user=$(env | grep '^USER=')
 write_blue "%% bash $0 --database=${db_name} --hostname=${db_host} --password=${db_pass} --username=${db_user} --dry-run=${dry_run}"
 if [[ ${dry_run} -eq 1 ]]; then
-  if [[ "${USER}" != "root" ]]; then
+  if [[ "${_user}" != "root" ]]; then
     write_red "WARNING: you need to be root to execute these commands!"
   fi
   if [[ ! -f /tmp/${db_name}.database.sh ]]; then
@@ -178,7 +179,7 @@ if [[ ${dry_run} -eq 1 ]]; then
   write_yellow "Dry-Run> rm -f /tmp/${db_name}.database.sh"
 
 else
-  if [[ "${USER}" != "root" ]]; then
+  if [[ "${_user}" != "root" ]]; then
     write_red "ERROR: you need to be root to execute these commands!"
     usage
     exit
