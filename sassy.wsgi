@@ -12,7 +12,7 @@ import sys
 # +
 # code base
 # -
-BASE = "/var/www/SASSy"
+BASE = os.getenv("SASSY_HOME")
 KEY = hashlib.sha256(BASE.encode('utf-8')).hexdigest()
 
 
@@ -27,6 +27,5 @@ sys.path.append(f'{BASE}/src')
 # +
 # start
 # -
-# noinspection PyPep8
 from src.app import app as application
 application.secret_key = KEY
