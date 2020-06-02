@@ -38,6 +38,7 @@ Thumbs.db
 # +
 # secret stuff
 # -
+Docker/docker.sh
 bin/Sassy.sh
 etc/Sassy.sh
 src/common.py
