@@ -6,11 +6,11 @@
 # -
 import glob
 import io
-import math
+# import math
 import pytz
 # import requests
 
-from astropy.time import Time
+# from astropy.time import Time
 from astropy.coordinates import Angle
 from astropy.coordinates import SkyCoord
 # from datetime import datetime
@@ -154,7 +154,12 @@ from src.models.tns_q3c import tns_q3c_get_text
 
 # noinspection PyUnresolvedReferences
 from src.utils.utils import *
-# from src.utils.sassy_bot import *
+
+# noinspection PyBroadException
+try:
+    from src.utils.sassy_bot import *
+except:
+    sassy_bot_read = None
 
 # get environmental variable(s)
 from src.common import *
@@ -535,8 +540,11 @@ def sassy_bot():
                      f'_rb_min={_rb_min}, _rb_max={_rb_max}')
 
         # paginate
-        _history = sassy_bot_read(_radius, _begin_iso, _end_iso, _rb_min, _rb_max, logger)
-        _total = len(_history)
+        _history = []
+        _total = 0
+        if sassy_bot_read is not None:
+            _history = sassy_bot_read(_radius, _begin_iso, _end_iso, _rb_min, _rb_max, logger)
+            _total = len(_history)
         # page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
         # per_page = BOT_RESULTS_PER_PAGE
         # offset = (page - 1) * BOT_RESULTS_PER_PAGE
