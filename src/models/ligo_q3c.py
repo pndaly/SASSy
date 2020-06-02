@@ -13,13 +13,11 @@ from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 
 import argparse
-# import gzip
 import json
 import math
 import pytz
 import os
 import sys
-# import urllib.request
 
 
 # +
@@ -490,6 +488,7 @@ def ligo_q3c_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query LIGO_Q3C database', formatter_class=argparse.RawTextHelpFormatter)
 
     _p.add_argument(f'--astrocone', help=f'Cone search <name,radius>')

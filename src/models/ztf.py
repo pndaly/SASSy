@@ -417,6 +417,31 @@ class ZtfAlert(db.Model):
         #     alert['prv_candidate'] = ZtfAlert.serialize_list(self.prv_candidate)
         # return alert
 
+    def get_photometry(self):
+        filter_mapping = ['g', 'r', 'i']
+        prv_candidates = Alert.serialize_list(self.prv_candidate)
+        non_detections = NonDetection.serialize_list(self.non_detection)
+        Alert.add_candidates(prv_candidates, non_detections)
+        photometry = {}
+        index = 0
+        for candidate in prv_candidates:
+            values = candidate['candidate']
+            photometry[index] = {}
+            for key in values.keys():
+                if key in ['jd', 'diffmaglim', 'magpsf', 'sigmapsf']:
+                    photometry[index][key] = values[key]
+                elif key == 'fid':
+                    photometry[index]['filter'] = filter_mapping[values[key]]
+            index += 1
+        photometry[index] = {
+            'jd': self.jd,
+            'filter': filter_mapping[self.fid],
+            'magpsf': self.magpsf,
+            'sigmapsf': self.sigmapsf,
+            'diffmaglim': self.diffmaglim
+        }
+        return photometry
+
     # +
     # (overload) method: __str__()
     # -
@@ -960,6 +985,7 @@ if __name__ == '__main__':
     max_jd = float(Time(Time.now().iso).jd)
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query ZTF database', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument(f'--astrocone', help=f'Cone search by name <str, str>')
     _p.add_argument(f'--b__gte', help=f'Galactic b >= <float>')

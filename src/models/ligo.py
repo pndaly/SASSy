@@ -11,13 +11,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import argparse
-# import gzip
 import json
 import math
 import pytz
 import os
 import sys
-# import urllib.request
 
 
 # +
@@ -439,6 +437,7 @@ def ligo_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query LIGO database', formatter_class=argparse.RawTextHelpFormatter)
 
     _p.add_argument(f'--before', help=f'Before transient = <boolean>')

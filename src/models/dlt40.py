@@ -411,6 +411,7 @@ def dlt40_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query DLT40 database', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument(f'--classType', help=f'class type <str>')
     _p.add_argument(f'--cx__gte', help=f'cx__gte >= <float>')

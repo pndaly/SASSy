@@ -563,6 +563,7 @@ def glade_q3c_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query GLADE_Q3C database', formatter_class=argparse.RawTextHelpFormatter)
 
     _p.add_argument(f'--astrocone', help=f'Astrocone search <name,radius>')

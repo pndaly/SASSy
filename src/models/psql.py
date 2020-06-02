@@ -9,12 +9,11 @@ from src.utils.utils import UtilsLogger
 import argparse
 import pprint
 import psycopg2
-# import os
 import sys
 
 
 # +
-# dunder string(s)
+# doc string(s)
 # -
 __doc__ = """
     % python3 psql.py --help
@@ -325,6 +324,7 @@ def psql(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Test PostGresQL Database Connection',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-a', f'--authorization', default=f'{SASSY_DB_AUTHORIZATION}',

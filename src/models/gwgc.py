@@ -536,6 +536,7 @@ def gwgc_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query GWGC database', formatter_class=argparse.RawTextHelpFormatter)
 
     _p.add_argument(f'--a__gte', help=f'Major axis >= <float>')

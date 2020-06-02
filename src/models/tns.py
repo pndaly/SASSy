@@ -455,6 +455,7 @@ def tns_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query TNS database', formatter_class=argparse.RawTextHelpFormatter)
 
     _p.add_argument(f'--alias', help=f'Alternate name <str>')

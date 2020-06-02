@@ -512,6 +512,7 @@ def glade_cli_db(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s) alphabetically
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query GLADE database', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument(f'--b__gte', help=f'b__gte >= <float>')
     _p.add_argument(f'--b__lte', help=f'b__lte <= <float>')
