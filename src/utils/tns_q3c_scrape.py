@@ -192,9 +192,7 @@ DEFAULT_SEARCH_PARAMS = {
 # __doc__ string
 # -
 __doc__ = """
-
     % python3 tns_q3c_scrape.py --help
-
 """
 
 
@@ -373,83 +371,196 @@ class TnsQ3cTableParser(object):
             if not (hasattr(_e, 'find') or hasattr(_e, 'find_all')):
                 continue
 
+
             # initialize a dictionary
             if self.__verbose:
                 _log.info(f"scraping row {_e}")
             _ans_tmp = {}
 
             try:
-                # <td class="cell-id">43659</td>
-                _ans_tmp['tns_id'] = _e.find('td', attrs={'class': 'cell-id'}).text
-                # <td class="cell-name"><a href="/object/2019oel">AT 2019oel</a></td>
-                _ans_tmp['tns_name'] = (_e.find('td', attrs={'class': 'cell-name'})).find('a').text
+                # <td class="cell-id">6565</td>
+                _ans_tmp['tns_id'] = _e.find('td', attrs={'class': 'cell-id'}).text.strip()
+            except Exception:
+                _ans_tmp['tns_id'] = ''
+
+            try:
+                # <td class="cell-name"><a href="/object/2015z">SN 2015Z</a></td>
+                _ans_tmp['tns_name'] = (_e.find('td', attrs={'class': 'cell-name'})).find('a').text.strip()
                 _link = (_e.find('td', attrs={'class': 'cell-name'})).find('a', href=True)['href']
                 _ans_tmp['tns_link'] = f"{DEFAULT_BASE_URL}{_link}"
+            except Exception:
+                _ans_tmp['tns_name'] = ''
+                _ans_tmp['tns_link'] = ''
+
+            try:
                 # <td class="cell-reps">1<a class="cert-open" href="/object/2019oel/discovery-cert" rel="43659"></a>
                 # <a class="at-reps-open clearfix" href="/%23" rel="43659"></a></td>
                 _cert = (_e.find('td', attrs={'class': 'cell-reps'})).find('a', href=True)['href']
                 _ans_tmp['tns_cert'] = f"{DEFAULT_BASE_URL}{_cert}"
+            except Exception:
+                _ans_tmp['tns_cert'] = ''
+
+            try:
                 # <td class="cell-class"></td>
-                _ans_tmp['tns_class'] = _e.find('td', attrs={'class': 'cell-class'}).text
+                _ans_tmp['tns_class'] = _e.find('td', attrs={'class': 'cell-class'}).text.strip()
+            except Exception:
+                _ans_tmp['tns_class'] = ''
+
+            try:
                 # <td class="cell-ra">17:18:23.982</td>
-                _ans_tmp['ra'] = _e.find('td', attrs={'class': 'cell-ra'}).text
+                _ans_tmp['ra'] = _e.find('td', attrs={'class': 'cell-ra'}).text.strip()
+            except Exception:
+                _ans_tmp['ra'] = ''
+
+            try:
                 # <td class="cell-decl">-31:04:29.63</td>
-                _ans_tmp['decl'] = _e.find('td', attrs={'class': 'cell-decl'}).text
+                _ans_tmp['decl'] = _e.find('td', attrs={'class': 'cell-decl'}).text.strip()
+            except Exception:
+                _ans_tmp['decl'] = ''
+
+            try:
                 # <td class="cell-ot_name"></td>
-                _ans_tmp['ot_name'] = _e.find('td', attrs={'class': 'cell-ot_name'}).text
+                _ans_tmp['ot_name'] = _e.find('td', attrs={'class': 'cell-ot_name'}).text.strip()
+            except Exception:
+                _ans_tmp['ot_name'] = ''
+
+            try:
                 # <td class="cell-redshift"></td>
-                _ans_tmp['redshift'] = _e.find('td', attrs={'class': 'cell-redshift'}).text
+                _ans_tmp['redshift'] = _e.find('td', attrs={'class': 'cell-redshift'}).text.strip()
+            except Exception:
+                _ans_tmp['redshift'] = ''
+
+            try:
                 # <td class="cell-hostname"></td>
-                _ans_tmp['hostname'] = _e.find('td', attrs={'class': 'cell-hostname'}).text
+                _ans_tmp['hostname'] = _e.find('td', attrs={'class': 'cell-hostname'}).text.strip()
+            except Exception:
+                _ans_tmp['hostname'] = ''
+
+            try:
                 # <td class="cell-host_redshift"></td>
-                _ans_tmp['host_redshift'] = _e.find('td', attrs={'class': 'cell-host_redshift'}).text
+                _ans_tmp['host_redshift'] = _e.find('td', attrs={'class': 'cell-host_redshift'}).text.strip()
+            except Exception:
+                _ans_tmp['host_redshift'] = ''
+
+            try:
                 # <td class="cell-source_group_name">ATLAS</td>
-                _ans_tmp['source_group'] = _e.find('td', attrs={'class': 'cell-source_group_name'}).text
+                _ans_tmp['source_group'] = _e.find('td', attrs={'class': 'cell-source_group_name'}).text.strip()
+            except Exception:
+                _ans_tmp['source_group'] = ''
+
+            try:
                 # <td class="cell-classifying_source_group_name"></td>
                 _ans_tmp['classifying_group'] = _e.find('td',
-                                                        attrs={'class': 'cell-classifying_source_group_name'}).text
+                                                        attrs={'class': 'cell-classifying_source_group_name'}).text.strip()
+            except Exception:
+                _ans_tmp['classifying_group'] = ''
+
+            try:
                 # <td class="cell-groups">ATLAS</td>
-                _ans_tmp['groups'] = _e.find('td', attrs={'class': 'cell-groups'}).text
+                _ans_tmp['groups'] = _e.find('td', attrs={'class': 'cell-groups'}).text.strip()
+            except Exception:
+                _ans_tmp['groups'] = ''
+
+            try:
                 # <td class="cell-internal_name">ATLAS19svo</td>
-                _ans_tmp['internal_name'] = _e.find('td', attrs={'class': 'cell-internal_name'}).text
+                _ans_tmp['internal_name'] = _e.find('td', attrs={'class': 'cell-internal_name'}).text.strip()
+            except Exception:
+                _ans_tmp['internal_name'] = ''
+
+            try:
                 # <td class="cell-discovering_instrument_name">ATLAS1 - ACAM1</td>
-                _ans_tmp['instrument_name'] = _e.find('td', attrs={'class': 'cell-discovering_instrument_name'}).text
+                _ans_tmp['instrument_name'] = _e.find('td', attrs={'class': 'cell-discovering_instrument_name'}).text.strip()
+            except Exception:
+                _ans_tmp['instrument_name'] = ''
+
+            try:
                 # <td class="cell-classifing_instrument_name"></td>
                 _ans_tmp['classifying_instrument'] = _e.find('td',
-                                                             attrs={'class': 'cell-classifing_instrument_name'}).text
-                # <td class="cell-isTNS_AT">Y</td>
-                _ans_tmp['isTNS_AT'] = _e.find('td', attrs={'class': 'cell-isTNS_AT'}).text
-                # <td class="cell-public">Y</td>
-                _ans_tmp['public'] = _e.find('td', attrs={'class': 'cell-public'}).text
-                # <td class="cell-end_prop_period"></td>
-                _ans_tmp['end_prop_period'] = _e.find('td', attrs={'class': 'cell-end_prop_period'}).text
-                # <td class="cell-spectra_count"></td>
-                _ans_tmp['spectra_count'] = _e.find('td', attrs={'class': 'cell-spectra_count'}).text
-                # <td class="cell-discoverymag">17.775</td>
-                _ans_tmp['mag'] = _e.find('td', attrs={'class': 'cell-discoverymag'}).text
-                # <td class="cell-disc_filter_name">orange-ATLAS</td>
-                _ans_tmp['filter'] = _e.find('td', attrs={'class': 'cell-disc_filter_name'}).text
-                # <td class="cell-discoverydate">2019-08-22 06:59:02</td>
-                _ans_tmp['date'] = _e.find('td', attrs={'class': 'cell-discoverydate'}).text
-                # <td class="cell-discoverer">ATLAS_Bot1</td>
-                _ans_tmp['discoverer'] = _e.find('td', attrs={'class': 'cell-discoverer'}).text
-                # <td class="cell-remarks"></td>
-                _ans_tmp['remarks'] = _e.find('td', attrs={'class': 'cell-remarks'}).text
-                # <td class="cell-sources"></td>
-                _ans_tmp['sources'] = _e.find('td', attrs={'class': 'cell-sources'}).text
-                # <td class="cell-bibcode"></td>
-                _ans_tmp['bibcode'] = _e.find('td', attrs={'class': 'cell-bibcode'}).text
-                # _log.info(f"_ans_tmp['bibcode']={_ans_tmp['bibcode']}")
-                _ans_tmp['catalogs'] = _e.find('td', attrs={'class': 'cell-ext_catalogs'}).text
+                                                             attrs={'class': 'cell-classifing_instrument_name'}).text.strip()
             except Exception:
-                if self.__verbose:
-                    _log.info(f"ignoring row {_e}")
-                continue
+                _ans_tmp['classifying_instrument'] = ''
+
+            try:
+                # <td class="cell-isTNS_AT">Y</td>
+                _ans_tmp['isTNS_AT'] = _e.find('td', attrs={'class': 'cell-isTNS_AT'}).text.strip()
+            except Exception:
+                _ans_tmp['isTNS_AT'] = ''
+
+            try:
+                # <td class="cell-public">Y</td>
+                _ans_tmp['public'] = _e.find('td', attrs={'class': 'cell-public'}).text.strip()
+            except Exception:
+                _ans_tmp['public'] = ''
+
+            try:
+                # <td class="cell-end_prop_period"></td>
+                _ans_tmp['end_prop_period'] = _e.find('td', attrs={'class': 'cell-end_prop_period'}).text.strip()
+            except Exception:
+                _ans_tmp['end_prop_period'] = ''
+
+            try:
+                # <td class="cell-spectra_count"></td>
+                _ans_tmp['spectra_count'] = _e.find('td', attrs={'class': 'cell-spectra_count'}).text.strip()
+            except Exception:
+                _ans_tmp['spectra_count'] = ''
+
+            try:
+                # <td class="cell-discoverymag">17.775</td>
+                _ans_tmp['mag'] = _e.find('td', attrs={'class': 'cell-discoverymag'}).text.strip()
+            except Exception:
+                _ans_tmp['mag'] = ''
+
+            try:
+                # <td class="cell-disc_filter_name">orange-ATLAS</td>
+                _ans_tmp['filter'] = _e.find('td', attrs={'class': 'cell-disc_filter_name'}).text.strip()
+            except Exception:
+                _ans_tmp['filter'] = ''
+
+            try:
+                # <td class="cell-discoverydate">2019-08-22 06:59:02</td>
+                _ans_tmp['date'] = _e.find('td', attrs={'class': 'cell-discoverydate'}).text.strip()
+            except Exception:
+                _ans_tmp['date'] = ''
+
+            try:
+                # <td class="cell-discoverer">ATLAS_Bot1</td>
+                _ans_tmp['discoverer'] = _e.find('td', attrs={'class': 'cell-discoverer'}).text.strip()
+            except Exception:
+                _ans_tmp['discoverer'] = ''
+
+            try:
+                # <td class="cell-remarks"></td>
+                _ans_tmp['remarks'] = _e.find('td', attrs={'class': 'cell-remarks'}).text.strip()
+            except Exception:
+                _ans_tmp['remarks'] = ''
+
+            try:
+                # <td class="cell-sources"></td>
+                _ans_tmp['sources'] = _e.find('td', attrs={'class': 'cell-sources'}).text.strip()
+            except Exception:
+                _ans_tmp['sources'] = ''
+
+            try:
+                # <td class="cell-bibcode"></td>
+                _ans_tmp['bibcode'] = _e.find('td', attrs={'class': 'cell-bibcode'}).text.strip()
+            except Exception:
+                _ans_tmp['bibcode'] = ''
+
+            try:
+                # _log.info(f"_ans_tmp['bibcode']={_ans_tmp['bibcode']}")
+                _ans_tmp['catalogs'] = _e.find('td', attrs={'class': 'cell-ext_catalogs'}).text.strip()
+            except Exception:
+                _ans_tmp['catalogs'] = ''
+
 
             # add it to the result(s)
-            if self.__verbose:
-                _log.debug(f"scraped row {_ans_tmp}")
-            self.__ans.append(_ans_tmp)
+            if _ans_tmp['tns_id'] != '' and _ans_tmp['tns_name'] != '' and _ans_tmp['ra'] != '' and _ans_tmp['decl'] != '':
+                if self.__verbose:
+                    _log.debug(f"scraped row {_ans_tmp}")
+                self.__ans.append(_ans_tmp)
+            else:
+                if self.__verbose:
+                    _log.debug(f"ignoring {_ans_tmp}")
 
     # +
     # method: get_soup()
