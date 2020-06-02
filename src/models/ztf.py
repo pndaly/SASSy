@@ -420,8 +420,8 @@ class ZtfAlert(db.Model):
     def get_photometry(self):
         filter_mapping = ['g', 'r', 'i']
         prv_candidates = Alert.serialize_list(self.prv_candidate)
-        non_detections = NonDetection.serialize_list(self.non_detection)
-        Alert.add_candidates(prv_candidates, non_detections)
+        # non_detections = NonDetection.serialize_list(self.non_detection)
+        # Alert.add_candidates(prv_candidates, non_detections)
         photometry = {}
         index = 0
         for candidate in prv_candidates:
