@@ -197,9 +197,11 @@ fi
 # +
 # check input(s)
 # -
-if ! ping -c 1 -w 5 ${rs_server} &>/dev/null; then 
-  write_red "<ERROR> server (${rs_server}) is down ... exiting"
-  exit 0 
+if [[ ${rs_server} != "localhost" ]]; then
+  if ! ping -c 1 -w 5 ${rs_server} &>/dev/null; then
+    write_red "<ERROR> server (${rs_server}) is down ... exiting"
+    exit 0
+  fi
 fi
 
 if [[ -z "${rs_password}" ]]; then

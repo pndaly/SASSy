@@ -15,7 +15,7 @@
 # +
 # default(s)
 # -
-_sassy_home=$(env | grep '^SASSY_HOME=')
+_sassy_home=$(env | grep '^SASSY_HOME=' | cut -d'=' -f2)
 def_sassy_command="status"
 def_sassy_source="${_sassy_home}"
 def_sassy_type="dev"
@@ -146,16 +146,18 @@ case $(echo ${sassy_type} | tr '[A-Z]' '[a-z]') in
 esac
 
 
-if ! ping -c 1 -w 5 ${sassy_host} &>/dev/null; then 
-  write_red "<ERROR> server (${sassy_host}) is down ... exiting"
-  exit 0 
+if [[ ${sassy_host} != "localhost" ]]; then
+  if ! ping -c 1 -w 5 ${sassy_host} &>/dev/null; then
+    write_red "<ERROR> server (${sassy_host}) is down ... exiting"
+    exit 0
+  fi
 fi
 
 
 # +
 # env(s)
 # -
-_pythonpath=$(env | grep PYTHONPATH)
+_pythonpath=$(env | grep PYTHONPATH | cut -d'=' -f2)
 if [[ -z "${_pythonpath}" ]]; then
   export PYTHONPATH=`pwd`
 fi
@@ -207,6 +209,7 @@ case $(echo ${sassy_command} | tr '[A-Z]' '[a-z]') in
       fi
     ;;
 esac
+
 
 # +
 # exit

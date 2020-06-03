@@ -174,7 +174,7 @@ echo ""                                   >> /tmp/sassy.dlt40.sh 2>&1
 # +
 # execute
 # -
-_user=$(env | grep '^USER=')
+_user=$(env | grep '^USER=' | cut -d'=' -f2)
 write_blue "%% bash $0 --database=${sassy_db_name} --hostname=${sassy_db_host} --password=${sassy_db_pass} --username=${sassy_db_user} --dry-run=${dry_run}"
 if [[ ${dry_run} -eq 1 ]]; then
   if [[ "${_user}" != "root" ]]; then
