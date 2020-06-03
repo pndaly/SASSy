@@ -174,10 +174,9 @@ fi
 # execute (dry-run)
 # -
 parent=$(dirname ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day})
+write_blue "%% bash $0 --archive-dir=${rs_archive_dir} --avro-dir=${rs_avro_dir} --date=${rs_date} --dry-run=${dry_run} --over-ride=${over_ride}"
 if [[ ${dry_run} -eq 1 ]]; then
 
-  write_green "%% bash $0 --archive-dir=${rs_archive_dir} --avro-dir=${rs_avro_dir} --date=${rs_date} --dry-run=${dry_run} --over-ride=${over_ride}"
-  
   if [[ ! -d ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day} ]]; then
     write_yellow "Dry-Run>> mkdir -p ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}"
   fi
@@ -188,9 +187,7 @@ if [[ ${dry_run} -eq 1 ]]; then
 
   write_yellow "Dry-Run>> cd ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}"
   write_yellow "Dry-Run>> gzip -cd ${rs_archive_dir}/ztf_public_${rs_date}.tar.gz | tar xvf -"
-  # write_yellow "Dry-Run>> chown -R ${default_owner} ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}"
   write_yellow "Dry-Run>> chown -R ${default_owner} ${parent}"
-  # write_yellow "Dry-Run>> cd ${HERE}"
 
 
 # +
@@ -198,8 +195,6 @@ if [[ ${dry_run} -eq 1 ]]; then
 # -
 else
 
-  write_blue "%% bash $0 --archive-dir=${rs_archive_dir} --avro-dir=${rs_avro_dir} --date=${rs_date} --dry-run=${dry_run} --over-ride=${over_ride}"
-  
   if [[ ! -d ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day} ]]; then
     write_yellow "Executing>> mkdir -p ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}"
     mkdir -p ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}
@@ -214,12 +209,8 @@ else
   cd ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}
   write_yellow "Executing>> gzip -cd ${rs_archive_dir}/ztf_public_${rs_date}.tar.gz | tar xvf -"
   gzip -cd ${rs_archive_dir}/ztf_public_${rs_date}.tar.gz | tar xvf -
-  # write_yellow "Executing>> chown -R ${default_owner} ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}"
-  # chown -R ${default_owner} ${rs_avro_dir}/${rs_year}/${rs_month}/${rs_day}
   write_yellow "Executing>> chown -R ${default_owner} ${parent}"
   chown -R ${default_owner} ${parent}
-  # write_yellow "Executing>> cd ${HERE}"
-  # cd ${HERE}
 fi
 
 

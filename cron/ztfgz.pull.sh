@@ -153,9 +153,8 @@ fi
 # +
 # execute (dry-run)
 # -
+write_blue "%% bash $0 --date=${this_date} --dry-run=${dry_run} --ignore-checksum=${ignore_md5} --over-ride=${over_ride}"
 if [[ ${dry_run} -eq 1 ]]; then
-
-  write_green "%% bash $0 --date=${this_date} --dry-run=${dry_run} --ignore-checksum=${ignore_md5} --over-ride=${over_ride}"
 
   if [[ ${ignore_md5} -eq 1 ]]; then
     if [[ ${over_ride} -eq 1 ]]; then
@@ -183,8 +182,6 @@ if [[ ${dry_run} -eq 1 ]]; then
 # execute (for-real)
 # -
 else
-
-  write_blue "%% bash $0 --date=${this_date} --dry-run=${dry_run} --ignore-checksum=${ignore_md5} --over-ride=${over_ride}"
 
   if [[ ${ignore_md5} -eq 1 ]]; then
     if [[ ${over_ride} -eq 1 ]]; then

@@ -143,8 +143,8 @@ fi
 # +
 # execute (dry-run)
 # -
+write_blue "%% bash $0 --archive-dir=${rs_archive_dir} --date=${rs_date} --dry-run=${dry_run}"
 if [[ ${dry_run} -eq 1 ]]; then
-  write_green "%% bash $0 --archive-dir=${rs_archive_dir} --date=${rs_date} --dry-run=${dry_run}"
   write_yellow "Dry-Run>> source ${PARENT}/etc/Sassy.sh ${PARENT}"
   write_yellow "Dry-Run>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/ingest_from_gzip.py --file=${rs_archive_dir}/ztf_public_${rs_date}.tar.gz"
 
@@ -153,7 +153,6 @@ if [[ ${dry_run} -eq 1 ]]; then
 # execute (for-real)
 # -
 else
-  write_blue "%% bash $0 --archive-dir=${rs_archive_dir} --date=${rs_date} --dry-run=${dry_run}"
   write_yellow "Executing>> source ${PARENT}/etc/Sassy.sh ${PARENT}"
   source ${PARENT}/etc/Sassy.sh ${PARENT}
   write_yellow "Executing>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/ingest_from_gzip.py --file=${rs_archive_dir}/ztf_public_${rs_date}.tar.gz"
