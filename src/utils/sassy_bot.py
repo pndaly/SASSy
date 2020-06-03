@@ -7,7 +7,10 @@
 from astropy.time import Time
 from datetime import datetime
 from datetime import timedelta
+
+# noinspection PyUnresolvedReferences
 from pg import DB
+
 from src.common import *
 from src.utils.utils import *
 from src.utils.avro_plot import avro_plot
@@ -25,18 +28,24 @@ import sys
 def get_iso(offset=0):
     return (datetime.now() + timedelta(days=offset)).isoformat()
 
+
+# noinspection PyBroadException
 def iso_to_jd(_iso=''):
     try:
         return float(Time(_iso).mjd)+2400000.5
     except Exception:
         return float(math.nan)
 
+
+# noinspection PyBroadException
 def jd_to_iso(_jd=0.0):
     try:
         return Time(_jd, format='jd', precision=6).isot
     except Exception:
-        return None 
+        return None
 
+
+# noinspection PyBroadException
 def get_avro_filename(_jd=0.0, _avro=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/data/ztf")):
     try:
         _ts = jd_to_iso(_jd).split('T')[0].split('-')
@@ -67,8 +76,8 @@ RADIUS = 30.0
 # +
 # function: sassy_bot_read()
 # -
+# noinspection PyBroadException
 def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _rb_max=RB_MAX, _logger=None):
-
 
     # check input(s)
     _radius = _radius/3600.0 if (isinstance(_radius, float) and 0.0 <= _radius) else RADIUS/3600.0
@@ -86,6 +95,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
         _logger.info(f"_rb_max = {_rb_max}")
 
     # set default(s)
+    _res = None
     _results = []
     _begin_jd = iso_to_jd(_begin_iso)
     _end_jd = iso_to_jd(_end_iso)
@@ -235,6 +245,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'SASSy Bot', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument(f'--begin', default=BEGIN_ISO, help=f"""Begin date, defaults to %(default)s""")
     _p.add_argument(f'--end', default=END_ISO, help=f"""End date, defaults to %(default)s""")
