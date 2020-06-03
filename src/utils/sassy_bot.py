@@ -26,10 +26,12 @@ import sys
 # function(s)
 # -
 def get_iso(offset=0):
-    return (datetime.now() + timedelta(days=offset)).isoformat()
+    try:
+        return (datetime.now() + timedelta(days=offset)).isoformat()
+    except Exception:
+        return None 
 
 
-# noinspection PyBroadException
 def iso_to_jd(_iso=''):
     try:
         return float(Time(_iso).mjd)+2400000.5
@@ -37,16 +39,14 @@ def iso_to_jd(_iso=''):
         return float(math.nan)
 
 
-# noinspection PyBroadException
 def jd_to_iso(_jd=0.0):
     try:
         return Time(_jd, format='jd', precision=6).isot
     except Exception:
-        return None
+        return None 
 
 
-# noinspection PyBroadException
-def get_avro_filename(_jd=0.0, _avro=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/data/ztf")):
+def get_avro_filename(_jd=0.0, _avro=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/dataraid0/ztf")):
     try:
         _ts = jd_to_iso(_jd).split('T')[0].split('-')
         for _h in _dirs.split(':'):
@@ -76,8 +76,8 @@ RADIUS = 30.0
 # +
 # function: sassy_bot_read()
 # -
-# noinspection PyBroadException
 def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _rb_max=RB_MAX, _logger=None):
+
 
     # check input(s)
     _radius = _radius/3600.0 if (isinstance(_radius, float) and 0.0 <= _radius) else RADIUS/3600.0
@@ -131,7 +131,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
         _logger.info(f'Executed {_cmd_drop} OK')
 
     # create new view
-    _cmd_view = f'CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, (CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE (("objectId" LIKE \'%ZTF2%\') AND (jd BETWEEN {_begin_jd} AND {_end_jd}) AND ((rb BETWEEN {_rb_min} AND {_rb_max}) OR (drb BETWEEN {_rb_min} AND {_rb_max})))) SELECT * FROM e;'
+    _cmd_view = f'CREATE OR REPLACE VIEW sassy_bot ("objectId", jd, drb, rb, sid, candid, ssnamenr, ra, dec) AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, ssnamenr, (CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE (("objectId" LIKE \'%ZTF2%\') AND (jd BETWEEN {_begin_jd} AND {_end_jd}) AND ((rb BETWEEN {_rb_min} AND {_rb_max}) OR (drb BETWEEN {_rb_min} AND {_rb_max})))) SELECT * FROM e;'
     if _logger:
         _logger.info(f'Executing {_cmd_view}')
     try:
@@ -162,7 +162,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
     for _e in _res:
         if _logger:
             _logger.info(f'_e={_e}')
-        _gid, _gra, _gdec, _gz, _gdist, _gdelta = _e[8][1:-1].split(",")
+        _gid, _gra, _gdec, _gz, _gdist, _gdelta = _e[9][1:-1].split(",")
         _d = {"objectId": f"{_e[0]}"}
         try:
             _d["jd"] = float(f"{_e[1]}")
@@ -185,11 +185,15 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
         except Exception:
             _d["candid"] = -1
         try:
-            _d["RA"] = float(f"{_e[6]}")
+            _d["ssnamenr"] = '' if f"{_e[6]}".lower() == 'null' else f"{_e[6]}"
+        except Exception:
+            _d["ssnamenr"] = ''
+        try:
+            _d["RA"] = float(f"{_e[7]}")
         except Exception:
             _d["RA"] = float(math.nan)
         try:
-            _d["Dec"] = float(f"{_e[7]}")
+            _d["Dec"] = float(f"{_e[8]}")
         except Exception:
             _d["Dec"] = float(math.nan)
         try:
@@ -231,7 +235,11 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
             _logger.info(f'_d={_d}')
 
         try:
-            _results.append(_d)
+            if _d["ssnamenr"] != '':
+                if _logger:
+                    _logger.debug(f'ignoring solar system object, _d={_d}')
+            else:
+                _results.append(_d)
         except Exception:
             continue
 
@@ -245,7 +253,6 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
 if __name__ == '__main__':
 
     # get command line argument(s)
-    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'SASSy Bot', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument(f'--begin', default=BEGIN_ISO, help=f"""Begin date, defaults to %(default)s""")
     _p.add_argument(f'--end', default=END_ISO, help=f"""End date, defaults to %(default)s""")
@@ -260,7 +267,6 @@ if __name__ == '__main__':
         _l = UtilsLogger('SassyBot').logger if bool(args.verbose) else None
         _r = sassy_bot_read(_radius=float(args.radius), _begin=args.begin, _end=args.end, _rb_min=float(args.rb_min), _rb_max=float(args.rb_max), _logger=_l)
         if _l:
-            # _l.info(f"{_r}")
             _l.info(f"{len(_r)} records found")
     else:
         print(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help')
