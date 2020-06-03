@@ -233,6 +233,7 @@ def read_tns_q3c(_file=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Populate TNS_Q3C database from file',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default=TNS_Q3C_CATALOG_FILE, help="""Input file [%(default)s]""")

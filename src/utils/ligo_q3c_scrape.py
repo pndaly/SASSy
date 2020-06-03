@@ -731,6 +731,7 @@ def ligo_q3c_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS,
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Ingest LIGO_Q3C events from TNS',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-u', f'--url', default=f'{DEFAULT_URL}',

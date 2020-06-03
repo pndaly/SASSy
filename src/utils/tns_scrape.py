@@ -703,6 +703,7 @@ def tns_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, number=
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Ingest TNS events from TNS',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-l', f'--login', default=f'{DEFAULT_BASE_URL}/login',

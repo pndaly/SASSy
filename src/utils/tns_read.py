@@ -232,6 +232,7 @@ def read_tns(_file=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Populate TNS database from file',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default=TNS_CATALOG_FILE, help="""Input file [%(default)s]""")

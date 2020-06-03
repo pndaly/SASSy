@@ -371,7 +371,6 @@ class TnsQ3cTableParser(object):
             if not (hasattr(_e, 'find') or hasattr(_e, 'find_all')):
                 continue
 
-
             # initialize a dictionary
             if self.__verbose:
                 _log.info(f"scraping row {_e}")
@@ -551,7 +550,6 @@ class TnsQ3cTableParser(object):
                 _ans_tmp['catalogs'] = _e.find('td', attrs={'class': 'cell-ext_catalogs'}).text.strip()
             except Exception:
                 _ans_tmp['catalogs'] = ''
-
 
             # add it to the result(s)
             if _ans_tmp['tns_id'] != '' and _ans_tmp['tns_name'] != '' and _ans_tmp['ra'] != '' and _ans_tmp['decl'] != '':
@@ -815,6 +813,7 @@ def tns_q3c_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, num
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Ingest TNS events from TNS',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-l', f'--login', default=f'{DEFAULT_BASE_URL}/login',
