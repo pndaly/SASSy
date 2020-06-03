@@ -83,7 +83,10 @@ EARTH_RADIUS_METERS = 6371008.77141506
 
 SASSY_APP_HOST = os.getenv('SASSY_APP_HOST', "sassy.as.arizona.edu")
 SASSY_APP_PORT = os.getenv('SASSY_APP_PORT', 5000)
-SASSY_APP_ZTF_FILES_URL = f'https://{SASSY_APP_HOST}/sassy/ztf/files'
+if SASSY_APP_HOST.lower() == 'localhost' or SASSY_APP_HOST == '127.0.0.1':
+    SASSY_APP_ZTF_FILES_URL = f'http://{SASSY_APP_HOST}/sassy/ztf/files'
+else:
+    SASSY_APP_ZTF_FILES_URL = f'https://{SASSY_APP_HOST}/sassy/ztf/files'
 
 SASSY_DB_HOST = os.getenv('SASSY_DB_HOST', None)
 SASSY_DB_USER = os.getenv('SASSY_DB_USER', None)
@@ -692,6 +695,10 @@ def ztf_filters(query, request_args):
     if request_args.get('sigmapsf__lte'):
         query = query.filter(ZtfAlert.sigmapsf <= float(request_args['sigmapsf__lte']))
 
+    # return records with ssnamenr (API: ?ssnamenr=16495)
+    if request_args.get('ssnamenr'):
+        query = query.filter(ZtfAlert.ssnamenr == request_args['ssnamenr'])
+
     # return records with a wall time >= date (API: ?time__gte=2018-07-17)
     if request_args.get('time__gte'):
         a_time = Time(request_args['time__gte'], format='isot')
@@ -817,6 +824,8 @@ def ztf_cli_db(iargs=None):
         request_args['sigmagpsf__gte'] = f'{iargs.sigmagpsf__gte}'
     if iargs.sigmagpsf__lte:
         request_args['sigmagpsf__lte'] = f'{iargs.sigmagpsf__lte}'
+    if iargs.ssnamenr:
+        request_args['ssnamenr'] = f'{iargs.ssnamenr}'
     if iargs.time__gte:
         request_args['time__gte'] = f'{iargs.time__gte}'
     if iargs.time__lte:
@@ -1028,6 +1037,7 @@ if __name__ == '__main__':
     _p.add_argument(f'--sid__lte', help=f'SASSy id <= <int>')
     _p.add_argument(f'--sigmagpsf__gte', help=f'Magnitude sigma >= <float>')
     _p.add_argument(f'--sigmagpsf__lte', help=f'Magnitude sigma <= <float>')
+    _p.add_argument(f'--ssnamenr', help=f'Solar system name <str>')
     _p.add_argument(f'--time__gte', help=f'ISO time >= <str>')
     _p.add_argument(f'--time__lte', help=f'ISO time <= <str>')
 
