@@ -139,6 +139,7 @@ def gwgc_q3c_read(_file=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Populate GWGC_Q3C database from file',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default=GWGC_CATALOG_FILE, help="""Input file [%(default)s]""")

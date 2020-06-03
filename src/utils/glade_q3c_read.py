@@ -159,6 +159,7 @@ def glade_q3c_read(_file=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Populate GLADE_Q3C database from file',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default=GLADE_Q3C_CATALOG_FILE, help="""Input file [%(default)s]""")

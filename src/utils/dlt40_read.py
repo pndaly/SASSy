@@ -176,6 +176,7 @@ def dlt40_read(_file=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Populate DLT40 database from file',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default=DLT40_CATALOG_FILE, help="""Input file [%(default)s]""")

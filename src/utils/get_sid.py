@@ -5,7 +5,6 @@
 # import(s)
 # -
 import argparse
-import io
 import os
 import pandas as pd
 
@@ -51,12 +50,15 @@ def db_connect():
         print(f'Failed to connect to database, error={e}')
         return None
 
+
+# noinspection PyBroadException
 def db_disconnect(_session=None):
     try:
         _session.close()
         _session.close_all()
     except Exception:
         pass
+
 
 def db_sid(_session=None, _sid=0):
     alert = _session.query(ZtfAlert).get(_sid)
@@ -66,6 +68,7 @@ def db_sid(_session=None, _sid=0):
 # +
 # function: make_dataframe()
 # -
+# noinspection PyBroadException
 def make_dataframe(packet=None):
 
     # check input(s)
@@ -111,6 +114,7 @@ def get_sid(_sid=0):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Get AVRO Data',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-s', '--sid', default=0, help="""Database id""")
