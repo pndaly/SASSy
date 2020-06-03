@@ -10,7 +10,7 @@ import io
 import pytz
 # import requests
 
-# from astropy.time import Time
+from astropy.time import Time
 from astropy.coordinates import Angle
 from astropy.coordinates import SkyCoord
 # from datetime import datetime
@@ -420,12 +420,12 @@ def sassy_astronomical_elliptical():
         if _request_wants_json() or request.method == 'GET':
             return jsonify(response)
 
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': f'{_cat}'})
 
@@ -497,12 +497,12 @@ def sassy_astronomical_radial():
         if _request_wants_json() or request.method == 'GET':
             return jsonify(response)
 
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': f'{_cat}'})
 
@@ -628,12 +628,12 @@ def sassy_digital_elliptical():
         if _request_wants_json() or request.method == 'GET':
             return jsonify(response)
 
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': f'{_cat}'})
 
@@ -706,12 +706,12 @@ def sassy_digital_radial():
         if _request_wants_json() or request.method == 'GET':
             return jsonify(response)
 
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': f'{_cat}'})
 
@@ -789,12 +789,12 @@ def sassy_sexagisimal_elliptical():
         if _request_wants_json() or request.method == 'GET':
             return jsonify(response)
 
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': f'{_cat}'})
 
@@ -870,12 +870,12 @@ def sassy_sexagisimal_radial():
         if _request_wants_json() or request.method == 'GET':
             return jsonify(response)
 
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': f'{_cat}'})
 
@@ -966,12 +966,12 @@ def glade_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('glade.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'glade'})
 
@@ -1094,12 +1094,12 @@ def glade_q3c_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('glade_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'glade_q3c'})
 
@@ -1222,12 +1222,12 @@ def gwgc_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('gwgc.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'gwgc'})
 
@@ -1350,12 +1350,12 @@ def gwgc_q3c_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('gwgc_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'gwgc_q3c'})
 
@@ -1489,12 +1489,12 @@ def ligo_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('ligo.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'ligo'})
 
@@ -1617,12 +1617,12 @@ def ligo_q3c_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('ligo_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'ligo_q3c'})
 
@@ -1790,12 +1790,12 @@ def tns_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('tns.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'tns'})
 
@@ -1921,12 +1921,12 @@ def tns_q3c_records():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('tns_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'tns_q3c'})
 
@@ -2257,12 +2257,12 @@ def ztf_alerts():
     if _request_wants_json() or request.method == 'POST':
         return jsonify(response)
     else:
-        args = request.args.copy()
+        _args = request.args.copy()
         try:
-            args.pop('page')
+            _args.pop('page')
         except KeyError:
             pass
-        arg_str = urlencode(args)
+        arg_str = urlencode(_args)
         return render_template('ztf.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
                                url={'url': f'{SASSY_APP_URL}', 'page': 'ztf'})
 
