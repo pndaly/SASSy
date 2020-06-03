@@ -126,9 +126,7 @@ DEFAULT_SEARCH_PARAMS = {
 # __doc__ string
 # -
 __doc__ = """
-
     % python3 tns_dump.py --help
-
 """
 
 
