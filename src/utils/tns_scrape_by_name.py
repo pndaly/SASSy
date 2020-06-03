@@ -10,7 +10,6 @@ import hashlib
 import os
 import requests
 import sys
-import time
 import warnings
 
 from astropy.coordinates import Angle
@@ -478,7 +477,6 @@ class TnsTableParserByName(object):
             except Exception:
                 _ans_tmp['catalogs'] = ''
 
-
             # add it to the result(s)
             if _ans_tmp['tns_id'] != '' and _ans_tmp['tns_name'] != '' and _ans_tmp['ra'] != '' and _ans_tmp['decl'] != '':
                 if self.__verbose:
@@ -487,7 +485,6 @@ class TnsTableParserByName(object):
             else:
                 if self.__verbose:
                     _log.debug(f"ignoring {_ans_tmp}")
-
 
     # +
     # method: get_soup()
@@ -570,7 +567,7 @@ class TnsTableParserByName(object):
 # -
 # noinspection PyBroadException
 def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, name='',
-                 exact=False, force=False, q3c=False, verbose=False):
+                       exact=False, force=False, q3c=False, verbose=False):
 
     # check input(s)
     login = login if (isinstance(login, str) and login.strip() != '' and
@@ -673,7 +670,6 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
             if verbose:
                 _log.info(f"_e['host_redshift']={_e['host_redshift']}, _h_z={_h_z}")
 
-         
         if _e.get('date', '') == '':
             _e['date'] = '1900-01-01 00:00:00.0'
 
@@ -688,18 +684,19 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
             except Exception:
                 _rec = None
             if _rec is not None:
-              if force:
+                if force:
                     try:
                         _log.info(f"Deleting record tns_id={_tns_id} tns_name={_tns_name} from database")
                         session.delete(_rec)
                         session.commit()
                         _log.info(f"Deleted record tns_id={_tns_id} tns_name={_tns_name} from database")
                     except Exception as e:
-                        _log.error(f"Failed to delete record tns_id={_tns_id} tns_name={_tns_name} from database, error={e}")
+                        _log.error(
+                            f"Failed to delete record tns_id={_tns_id} tns_name={_tns_name} from database, error={e}")
                         session.rollback()
                         session.commit()
-              else:
-                  continue
+                else:
+                    continue
 
         # create record
         _tns = None
@@ -740,6 +737,7 @@ def tns_scrape_by_name(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS,
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Ingest TNS events from TNS',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-l', f'--login', default=f'{DEFAULT_BASE_URL}/login',
@@ -760,6 +758,7 @@ if __name__ == '__main__':
 
     # execute
     if args:
-        tns_scrape_by_name(args.login, args.credentials, args.name, bool(args.exact), bool(args.force), bool(args.q3c), bool(args.verbose))
+        tns_scrape_by_name(args.login, args.credentials, args.name, bool(args.exact),
+                           bool(args.force), bool(args.q3c), bool(args.verbose))
     else:
         _log.critical(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help')

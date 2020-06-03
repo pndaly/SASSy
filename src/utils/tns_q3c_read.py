@@ -119,7 +119,6 @@ def read_tns_q3c(_file=''):
         raise Exception(f'Failed to read {_file}')
 
     # noinspection PyBroadException
-    session = None
     try:
         # connect to database
         engine = create_engine(f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
