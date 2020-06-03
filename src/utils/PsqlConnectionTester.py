@@ -339,6 +339,7 @@ def action(iargs=None):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Test PostGresQL Database Connection',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-a', f'--authorization', default=f'{SASSY_DB_AUTHORIZATION}',

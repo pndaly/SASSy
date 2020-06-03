@@ -156,6 +156,7 @@ if __name__ == '__main__':
 
     # get command line argument(s)
     pstyle = str(VALID_PLOT_STYLES).replace("'", '').replace('[', '').replace(']', '').replace(', ', '\n')
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description='Show AVRO file counts for given year and/or month',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument(f'-d', f'--directory', default=DEFAULT_AVRO_DIR,

@@ -136,6 +136,7 @@ def avro_plot(_file='', _www=False):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Plot AVRO file FITS data', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('--file', default='', help="""AVRO file""")
     _p.add_argument(f'--www', default=False, action='store_true', help='if present, produce www output')

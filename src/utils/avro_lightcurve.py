@@ -170,6 +170,7 @@ def avro_lightcurve(_in='', _out='', _plot=False):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Dump AVRO lightcurve', formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-i', '--input', default='', help="""Input file""")
     _p.add_argument('-o', '--output', default='avro.csv', help="""Output file""")

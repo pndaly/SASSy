@@ -47,6 +47,7 @@ AVRO_OPTIONS = ['csv', 'curve', 'cutouts', 'image', 'keyword', 'packet', 'schema
 # +
 # function: make_dataframe()
 # -
+# noinspection PyBroadException
 def make_dataframe(packet=None):
 
     # check input(s)
@@ -193,7 +194,7 @@ def action(iargs):
     except Exception as e:
         raise Exception(f'failed to read, file={_ifile}, error={e}')
 
-    # dump lightcurve
+    # dump lightcurve to csv
     _show = _show.lower()
     _of = f"{os.path.basename(_ifile).split('.')[0]}.csv"
     _of = os.path.abspath(os.path.expanduser(_of))
@@ -206,7 +207,6 @@ def action(iargs):
             _df['filter'] = _df['filter'].map(AVRO_FILTERS)
             _total = pd.concat([_total, _df])
         _total.to_csv(f"{_of}", index=False, columns=['jd', 'filter', 'diffmaglim', 'magpsf', 'sigmapsf'], header=['#jd', 'filter', 'diffmaglim', 'magpsf', 'sigmapsf'])
-
 
     # dump lightcurve
     elif _show == 'curve':
@@ -258,6 +258,7 @@ def action(iargs):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Dump AVRO file',
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default='', help="""Input file""")
