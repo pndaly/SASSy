@@ -4,7 +4,7 @@
 # +
 # edit as you see fit
 # -
-_user=$(env | grep USERNAME)
+_user=$(env | grep USERNAME | cut -d'=' -f2)
 if [[ -z "${_user}" ]]; then
   export USERNAME="sassy"
 fi
