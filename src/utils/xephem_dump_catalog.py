@@ -106,56 +106,74 @@ class XephemCatalogParser(object):
     # +
     # (hidden) method: _parse_elliptical()
     # -
-    def _parse_elliptic(self, _inl=None):
+    def _parse_elliptic(self, _in_name='', _in_type=None, _in_fields=None):
         """ parses fields for heliocentric elliptical orbits """
-        if not isinstance(_inl, list) or _inl is None or _inl is []:
-            raise Exception('Invalid input to elliptical sub-parser')
-        self._ret = None
+        if not isinstance(_in_name, str) or _in_name.strip() == '':
+            raise Exception(f'Invalid input _in_name={_in_name}')
+        if _in_type is None or not isinstance(_in_type, list) or _in_type == []:
+            raise Exception(f'Invalid input _in_type={_in_type}')
+        self.__ret = None
+        return self.__ret
 
     # +
     # (hidden) method: _parse_hyperbolic()
     # -
-    def _parse_hyperbolic(self, _inl=None):
+    def _parse_hyperbolic(self, _in_name='', _in_type=None, _in_fields=None):
         """ parses fields for heliocentric hyperbolic orbits """
-        if not isinstance(_inl, list) or _inl is None or _inl is []:
-            raise Exception('Invalid input to hyperbolic sub-parser')
-        self._ret = None
+        if not isinstance(_in_name, str) or _in_name.strip() == '':
+            raise Exception(f'Invalid input _in_name={_in_name}')
+        if _in_type is None or not isinstance(_in_type, list) or _in_type == []:
+            raise Exception(f'Invalid input _in_type={_in_type}')
+        self.__ret = None
+        return self.__ret
 
     # +
     # (hidden) method: _parse_parabolic()
     # -
-    def _parse_parabolic(self, _inl=None):
+    def _parse_parabolic(self, _in_name='', _in_type=None, _in_fields=None):
         """ parses fields for heliocentric parabolic orbits """
-        if not isinstance(_inl, list) or _inl is None or _inl is []:
-            raise Exception('Invalid input to parabolic sub-parser')
-        self._ret = None
+        if not isinstance(_in_name, str) or _in_name.strip() == '':
+            raise Exception(f'Invalid input _in_name={_in_name}')
+        if _in_type is None or not isinstance(_in_type, list) or _in_type == []:
+            raise Exception(f'Invalid input _in_type={_in_type}')
+        self.__ret = None
+        return self.__ret
 
     # +
     # (hidden) method: _parse_geocentric()
     # -
-    def _parse_geocentric(self, _inl=None):
+    def _parse_geocentric(self, _in_name='', _in_type=None, _in_fields=None):
         """ parses fields for geocentric elliptical orbits """
-        if not isinstance(_inl, list) or _inl is None or _inl is []:
-            raise Exception('Invalid input to geocentric sub-parser')
-        self._ret = None
+        if not isinstance(_in_name, str) or _in_name.strip() == '':
+            raise Exception(f'Invalid input _in_name={_in_name}')
+        if _in_type is None or not isinstance(_in_type, list) or _in_type == []:
+            raise Exception(f'Invalid input _in_type={_in_type}')
+        self.__ret = None
+        return self.__ret
 
     # +
     # (hidden) method: _parse_planet()
     # -
-    def _parse_planet(self, _inl=None):
+    def _parse_planet(self, _in_name='', _in_type=None, _in_fields=None):
         """ parses fields for planet or natural satellite orbits """
-        if not isinstance(_inl, list) or _inl is None or _inl is []:
-            raise Exception('Invalid input to planet sub-parser')
-        self._ret = None
+        if not isinstance(_in_name, str) or _in_name.strip() == '':
+            raise Exception(f'Invalid input _in_name={_in_name}')
+        if _in_type is None or not isinstance(_in_type, list) or _in_type == []:
+            raise Exception(f'Invalid input _in_type={_in_type}')
+        self.__ret = None
+        return self.__ret
 
     # +
     # (hidden) method: _parse_binary()
     # -
-    def _parse_binary(self, _inl=None):
+    def _parse_binary(self, _in_name='', _in_type=None, _in_fields=None):
         """ parses fields for (true) binary pair orbits """
-        if not isinstance(_inl, list) or _inl is None or _inl is []:
-            raise Exception('Invalid input to binary sub-parser')
-        self._ret = None
+        if not isinstance(_in_name, str) or _in_name.strip() == '':
+            raise Exception(f'Invalid input _in_name={_in_name}')
+        if _in_type is None or not isinstance(_in_type, list) or _in_type == []:
+            raise Exception(f'Invalid input _in_type={_in_type}')
+        self.__ret = None
+        return self.__ret
 
     # +
     # method: catalog_exists()
@@ -244,7 +262,10 @@ class XephemCatalogParser(object):
                 _types = [_t.strip() for _t in _fields[1].split('|')]
                 if len(_types) == 0:
                     raise Exception('No types in catalog')
-                self._ret = self.XEPHEM_FIELD_2_METHODS.get(_types[0])(_names[0], _types[1:], _fields[2:])
+                _func = self.XEPHEM_FIELD_2_METHODS.get(_types[0], None)
+                if _func is not None:
+                    # noinspection PyArgumentList
+                    return _func(_in_name=_names[0], _in_type=_types[1:], _in_fields=_fields[2:])
 
 
 # +
@@ -279,6 +300,7 @@ def xephem_dump_catalog(_catalog=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description='Dump Catalog',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument('-c', '--catalog', default='', help="""Input EDB catalog""")

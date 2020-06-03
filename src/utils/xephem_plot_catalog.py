@@ -62,6 +62,7 @@ def xephem_plot_catalog(_file='', _catalog=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description='Plot Data and Catalog',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument('-f', '--file', default='', help="""Input CSV file""")
