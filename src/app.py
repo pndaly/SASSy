@@ -4,13 +4,7 @@
 # +
 # import(s)
 # -
-import glob
-import io
-# import math
-import pytz
-# import requests
-
-from astropy.time import Time
+# from astropy.time import Time
 from astropy.coordinates import Angle
 from astropy.coordinates import SkyCoord
 # from datetime import datetime
@@ -25,10 +19,8 @@ from flask import send_from_directory
 # from flask_paginate import get_page_args
 # from sqlalchemy import func
 from urllib.parse import urlencode
-
 # noinspection PyUnresolvedReferences
 from src.forms.Forms import CustomQueryForm
-
 # noinspection PyUnresolvedReferences
 from src.forms.Forms import AstronomicalRadialQueryForm
 from src.forms.Forms import AstronomicalEllipticalQueryForm
@@ -163,6 +155,12 @@ except:
 
 # get environmental variable(s)
 from src.common import *
+
+import glob
+import io
+# import math
+import pytz
+# import requests
 
 
 # +
@@ -2097,6 +2095,9 @@ def ztf_list_avros(idate=0):
 def ztf_alert_stamp(id=0, stamp=''):
     logger.debug(f'ztf_alert_stamp> entry, id={id}, stamp={stamp}')
 
+    # why does this route get the following sample argument?
+    #   ?r=0.9228713425306879
+
     # check input(s)
     details = [
         # integer id
@@ -2125,7 +2126,6 @@ def ztf_alert_stamp(id=0, stamp=''):
     # return data
     if hasattr(alert, f'cutout{stamp}'):
         _sf = getattr(alert, f'cutout{stamp}')
-        # logger.debug(f'/ztf/{id}/cutout/{stamp}/ _sf={_sf}')
         return send_file(
             io.BytesIO(_sf['stampData']),
             mimetype='image/fits',
@@ -2144,7 +2144,7 @@ def ztf_alert_stamp(id=0, stamp=''):
 # route(s): /ztf/<int:id>/cutout/<stamp>/, /sassy/ztf/<int:id>/cutout/<stamp>/
 # -
 # noinspection PyShadowingBuiltins
-@app.route('/sassy/ztf/<int:id>/photometry//')
+@app.route('/sassy/ztf/<int:id>/photometry/')
 @app.route('/ztf/<int:id>/photometry/')
 def ztf_photometry(id=0):
     logger.debug(f'ztf_photometry> entry, id={id}')
