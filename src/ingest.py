@@ -91,7 +91,7 @@ def do_ingest(encoded_packet=None):
     except Exception as e:
         raise Exception(f'Packet read error, unable to ingest data, error={e}')
 
-    # get data
+    # if using AWS, upload the file to the S3 bucket
     if AWS_USE_S3:
         try:
             freader = fastavro.reader(io.BytesIO(f_data))
@@ -145,13 +145,13 @@ def ingest_avro(packet=None):
             **packet['candidate']
             )
         try:
-            logger.info('Inserting object database', extra={'tags': {'candid': alert.alert_candid}})
-            db.session.add(alert)
+            logger.info('Updating object database', extra={'tags': {'candid': alert.alert_candid}})
+            db.session.update(alert)
             db.session.commit()
-            logger.info('Inserted object into database', extra={'tags': {'candid': alert.alert_candid}})
+            logger.info('Updated object into database', extra={'tags': {'candid': alert.alert_candid}})
         except exc.SQLAlchemyError:
             db.session.rollback()
-            logger.warn('Failed to insert object into database', extra={'tags': {'candid': alert.alert_candid}})
+            logger.warn('Failed to update object into database', extra={'tags': {'candid': alert.alert_candid}})
 
 
 # +
