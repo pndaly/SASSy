@@ -62,6 +62,7 @@ def read_avro_file(infile=''):
 if __name__ == '__main__':
 
     # get command line argument(s)
+    # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description='Ingest AVRO file manually',
                                       formatter_class=argparse.RawTextHelpFormatter)
     _parser.add_argument('-f', '--file', default='', help="""Input file""")
