@@ -11,11 +11,11 @@ MAILTO=""
 # +
 # 08:00 am every day, scrape ligo data
 # -
-0 8 * * * (cd /var/www/SASSy/cron; bash ligo.scrape.sh >> /var/www/SASSy/logs/ligo.scrape.log 2>&1)
+0 8 * * * (cd /var/www/SASSy/cron; bash ligo.scrape.sh >> /dev/null 2>&1)
 # +
 # 08:15 am every day, scrape ligo data (using q3c indexing)
 # -
-15 8 * * * (cd /var/www/SASSy/cron; bash ligo_q3c.scrape.sh >> /var/www/SASSy/logs/ligo_q3c.scrape.log 2>&1)
+15 8 * * * (cd /var/www/SASSy/cron; bash ligo_q3c.scrape.sh >> /dev/null 2>&1)
 # +
 # 12:00 pm every day, get latest ZTF file
 # -
@@ -31,11 +31,15 @@ MAILTO=""
 # +
 # every hour, scrape tns data (using q3c indexing)
 # -
-0 * * * * (cd /var/www/SASSy/cron; bash tns_q3c.scrape.sh >> /var/www/SASSy/logs/tns_q3c.scrape.log 2>&1)
+0 * * * * (cd /var/www/SASSy/cron; bash tns_q3c.scrape.sh >> /dev/null 2>&1)
 # +
 # every half hour, scrape tns data
 # -
-30 * * * * (cd /var/www/SASSy/cron; bash tns.scrape.sh >> /var/www/SASSy/logs/tns.scrape.log 2>&1)
+30 * * * * (cd /var/www/SASSy/cron; bash tns.scrape.sh >> /dev/null 2>&1)
+# +
+# at 5 minutes past every hour, re-create the SassyCron view in the database
+# -
+5 * * * * (cd /var/www/SASSy/cron; bash sassy_cron.sh >> /dev/null 2>&1)
 ~~~
 
 ------------------------------------------------------------------------------------------------------------------------
