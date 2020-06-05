@@ -4,147 +4,9 @@
 # +
 # import(s)
 # -
-# from astropy.time import Time
-from astropy.coordinates import Angle
-from astropy.coordinates import SkyCoord
-# from datetime import datetime
-# from datetime import timedelta
-from flask import Flask
-from flask import jsonify
-from flask import request
-from flask import render_template
-from flask import send_file
-from flask import send_from_directory
-# from flask_paginate import Pagination
-# from flask_paginate import get_page_args
-# from sqlalchemy import func
-from urllib.parse import urlencode
 # noinspection PyUnresolvedReferences
-from src.forms.Forms import CustomQueryForm
-# noinspection PyUnresolvedReferences
-from src.forms.Forms import AstronomicalRadialQueryForm
-from src.forms.Forms import AstronomicalEllipticalQueryForm
-from src.forms.Forms import DigitalRadialQueryForm
-from src.forms.Forms import DigitalEllipticalQueryForm
-from src.forms.Forms import SexagisimalRadialQueryForm
-from src.forms.Forms import SexagisimalEllipticalQueryForm
-from src.forms.Forms import SassyBotForm
-
-# noinspection PyUnresolvedReferences
-from src.forms.Forms import PsqlQueryForm
-
-# noinspection PyUnresolvedReferences
-from src.models.ztf import ZtfAlert
-
-# noinspection PyUnresolvedReferences
-from src.models.ztf import db as db_ztf
-
-# noinspection PyUnresolvedReferences
-from src.models.ztf import ztf_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.ztf import ztf_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc import GwgcRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc import db as db_gwgc
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc import gwgc_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc import gwgc_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc_q3c import GwgcQ3cRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc_q3c import db as db_gwgc_q3c
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc_q3c import gwgc_q3c_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.gwgc_q3c import gwgc_q3c_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.glade import GladeRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.glade import db as db_glade
-
-# noinspection PyUnresolvedReferences
-from src.models.glade import glade_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.glade import glade_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.glade_q3c import GladeQ3cRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.glade_q3c import db as db_glade_q3c
-
-# noinspection PyUnresolvedReferences
-from src.models.glade_q3c import glade_q3c_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.glade_q3c import glade_q3c_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo import LigoRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo import db as db_ligo
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo import ligo_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo import ligo_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo_q3c import LigoQ3cRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo_q3c import db as db_ligo_q3c
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo_q3c import ligo_q3c_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.ligo_q3c import ligo_q3c_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.psql import Psql
-
-# noinspection PyUnresolvedReferences
-from src.models.tns import TnsRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.tns import db as db_tns
-
-# noinspection PyUnresolvedReferences
-from src.models.tns import tns_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.tns import tns_get_text
-
-# noinspection PyUnresolvedReferences
-from src.models.tns_q3c import TnsQ3cRecord
-
-# noinspection PyUnresolvedReferences
-from src.models.tns_q3c import db as db_tns_q3c
-
-# noinspection PyUnresolvedReferences
-from src.models.tns_q3c import tns_q3c_filters
-
-# noinspection PyUnresolvedReferences
-from src.models.tns_q3c import tns_q3c_get_text
-
-# noinspection PyUnresolvedReferences
+from src import *
+from src.common import *
 from src.utils.utils import *
 
 # noinspection PyBroadException
@@ -153,14 +15,86 @@ try:
 except:
     sassy_bot_read = None
 
-# get environmental variable(s)
-from src.common import *
+# from astropy.time import Time
+# from datetime import datetime
+# from datetime import timedelta
+# from flask_paginate import Pagination
+# from flask_paginate import get_page_args
+# from sqlalchemy import func
+# from src.forms.Forms import CustomQueryForm
+# from astropy.coordinates import Angle
+# from astropy.coordinates import SkyCoord
+
+from flask import Flask
+from flask import jsonify
+from flask import request
+from flask import render_template
+from flask import send_file
+from flask import send_from_directory
+from urllib.parse import urlencode
+
+# noinspection PyUnresolvedReferences
+from src.forms.Forms import AstronomicalRadialQueryForm
+from src.forms.Forms import AstronomicalEllipticalQueryForm
+from src.forms.Forms import DigitalRadialQueryForm
+from src.forms.Forms import DigitalEllipticalQueryForm
+from src.forms.Forms import PsqlQueryForm
+from src.forms.Forms import SexagisimalRadialQueryForm
+from src.forms.Forms import SexagisimalEllipticalQueryForm
+from src.forms.Forms import SassyBotForm
+
+# noinspection PyUnresolvedReferences
+from src.models.glade import GladeRecord
+from src.models.glade import db as db_glade
+from src.models.glade import glade_filters
+from src.models.glade import glade_get_text
+from src.models.glade_q3c import GladeQ3cRecord
+from src.models.glade_q3c import db as db_glade_q3c
+from src.models.glade_q3c import glade_q3c_filters
+from src.models.glade_q3c import glade_q3c_get_text
+
+# noinspection PyUnresolvedReferences
+from src.models.gwgc import GwgcRecord
+from src.models.gwgc import db as db_gwgc
+from src.models.gwgc import gwgc_filters
+from src.models.gwgc import gwgc_get_text
+from src.models.gwgc_q3c import GwgcQ3cRecord
+from src.models.gwgc_q3c import db as db_gwgc_q3c
+from src.models.gwgc_q3c import gwgc_q3c_filters
+from src.models.gwgc_q3c import gwgc_q3c_get_text
+
+# noinspection PyUnresolvedReferences
+from src.models.ligo import LigoRecord
+from src.models.ligo import db as db_ligo
+from src.models.ligo import ligo_filters
+from src.models.ligo import ligo_get_text
+from src.models.ligo_q3c import LigoQ3cRecord
+from src.models.ligo_q3c import db as db_ligo_q3c
+from src.models.ligo_q3c import ligo_q3c_filters
+from src.models.ligo_q3c import ligo_q3c_get_text
+
+# noinspection PyUnresolvedReferences
+from src.models.psql import Psql
+
+# noinspection PyUnresolvedReferences
+from src.models.tns import TnsRecord
+from src.models.tns import db as db_tns
+from src.models.tns import tns_filters
+from src.models.tns import tns_get_text
+from src.models.tns_q3c import TnsQ3cRecord
+from src.models.tns_q3c import db as db_tns_q3c
+from src.models.tns_q3c import tns_q3c_filters
+from src.models.tns_q3c import tns_q3c_get_text
+
+# noinspection PyUnresolvedReferences
+from src.models.ztf import ZtfAlert
+from src.models.ztf import db as db_ztf
+from src.models.ztf import ztf_filters
+from src.models.ztf import ztf_get_text
 
 import glob
 import io
-# import math
 import pytz
-# import requests
 
 
 # +
@@ -175,101 +109,85 @@ PSQL_CONNECT_MSG = f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME} using {SASS
 # +
 # function: get_iso()
 # -
-def get_iso():
-    return Time.now().to_datetime(ARIZONA).isoformat()
-
-
+# def get_iso():
+#     return Time.now().to_datetime(ARIZONA).isoformat()
 # +
 # function: get_mjd()
 # -
-def get_mjd():
-    _iso = get_iso()[:23]
-    return Time(_iso).mjd
-
-
+# def get_mjd():
+#     _iso = get_iso()[:23]
+#     return Time(_iso).mjd
 # +
 # function: get_jd()
 # -
-def get_jd():
-    _iso = get_iso()[:23]
-    return Time(_iso).jd
-
-
+# def get_jd():
+#     _iso = get_iso()[:23]
+#     return Time(_iso).jd
 # +
 # (hidden) function: _iso_to_jd()
 # -
 # noinspection PyBroadException
-def _iso_to_jd(_iso=''):
-    try:
-        return float(Time(_iso).mjd)+2400000.5
-    except Exception:
-        return float(math.nan)
-
-
+# def _iso_to_jd(_iso=''):
+#     try:
+#         return float(Time(_iso).mjd)+2400000.5
+#     except Exception:
+#         return float(math.nan)
 # +
 # (hidden) function: _jd_to_iso()
 # -
 # noinspection PyBroadException
-def _jd_to_iso(_jd=0.0):
-    try:
-        return Time(_jd, format='jd', precision=6).isot
-    except Exception:
-        return None
-
-
+# def _jd_to_iso(_jd=0.0):
+#     try:
+#         return Time(_jd, format='jd', precision=6).isot
+#     except Exception:
+#         return None
 # +
 # function: sassy_bot_page()
 # -
-def sassy_bot_page(_results=None, _offset=0, _per_page=BOT_RESULTS_PER_PAGE):
-    return _results[_offset: _offset + _per_page]
-
-
+# def sassy_bot_page(_results=None, _offset=0, _per_page=BOT_RESULTS_PER_PAGE):
+#     return _results[_offset: _offset + _per_page]
 # +
 # function: ra_to_decimal()
 # -
 # noinspection PyBroadException
-def ra_to_decimal(_ra=''):
-
-    # check input(s)
-    if not isinstance(_ra, str) or _ra.strip() == '':
-        return float('nan')
-
-    try:
-        if 'hours' not in _ra.lower():
-            _ra = f'{_ra} hours'
-        return float(Angle(_ra).degree)
-    except Exception:
-        return float('nan')
-
-
+# def ra_to_decimal(_ra=''):
+#
+#     # check input(s)
+#     if not isinstance(_ra, str) or _ra.strip() == '':
+#         return float('nan')
+#
+#     try:
+#         if 'hours' not in _ra.lower():
+#             _ra = f'{_ra} hours'
+#         return float(Angle(_ra).degree)
+#     except Exception:
+#         return float('nan')
 # +
 # function: dec_to_decimal()
 # -
 # noinspection PyBroadException
-def dec_to_decimal(_dec=''):
-
-    # check input(s)
-    if not isinstance(_dec, str) or _dec.strip() == '':
-        return float('nan')
-
-    try:
-        if 'degrees' not in _dec.lower():
-            _dec = f'{_dec} degrees'
-        return float(Angle(_dec).degree)
-    except Exception:
-        return float('nan')
-
-
+# def dec_to_decimal(_dec=''):
+#
+#     # check input(s)
+#     if not isinstance(_dec, str) or _dec.strip() == '':
+#         return float('nan')
+#
+#     try:
+#         if 'degrees' not in _dec.lower():
+#             _dec = f'{_dec} degrees'
+#         return float(Angle(_dec).degree)
+#     except Exception:
+#         return float('nan')
 # +
 # function: get_astropy_coords()
 # -
 # noinspection PyBroadException
-def get_astropy_coords(_oname=''):
-    try:
-        _obj = SkyCoord.from_name(_oname)
-        return _obj.ra.value, _obj.dec.value
-    except Exception:
-        return math.nan, math.nan
+# def get_astropy_coords(_oname=''):
+#     try:
+#         _obj = SkyCoord.from_name(_oname)
+#         return _obj.ra.value, _obj.dec.value
+#     except Exception:
+#         return math.nan, math.nan
 
 
 # +
@@ -353,6 +271,7 @@ def sassy_api():
 # +
 # route(s): /astronomical_elliptical/, /sassy/astronomical_elliptical/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/astronomical_elliptical/', methods=['GET', 'POST'])
 @app.route('/astronomical_elliptical/', methods=['GET', 'POST'])
 def sassy_astronomical_elliptical():
@@ -421,7 +340,7 @@ def sassy_astronomical_elliptical():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -434,6 +353,7 @@ def sassy_astronomical_elliptical():
 # +
 # route(s): /astronomical_radial/, /sassy/astronomical_radial/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/astronomical_radial/', methods=['GET', 'POST'])
 @app.route('/astronomical_radial/', methods=['GET', 'POST'])
 def sassy_astronomical_radial():
@@ -498,7 +418,7 @@ def sassy_astronomical_radial():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -511,6 +431,7 @@ def sassy_astronomical_radial():
 # +
 # route(s): /bot/, /sassy/bot/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/bot/', methods=['GET', 'POST'])
 @app.route('/bot/', methods=['GET', 'POST'])
 def sassy_bot():
@@ -561,6 +482,7 @@ def sassy_bot():
 # +
 # route(s): /digital_elliptical/, /sassy/digital_elliptical/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/digital_elliptical/', methods=['GET', 'POST'])
 @app.route('/digital_elliptical/', methods=['GET', 'POST'])
 def sassy_digital_elliptical():
@@ -629,7 +551,7 @@ def sassy_digital_elliptical():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -642,6 +564,7 @@ def sassy_digital_elliptical():
 # +
 # route(s): /digital_radial/, /sassy/digital_radial/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/digital_radial/', methods=['GET', 'POST'])
 @app.route('/digital_radial/', methods=['GET', 'POST'])
 def sassy_digital_radial():
@@ -707,7 +630,7 @@ def sassy_digital_radial():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -720,6 +643,7 @@ def sassy_digital_radial():
 # +
 # route(s): /sexagisimal_elliptical/, /sassy/sexagisimal_elliptical/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/sexagisimal_elliptical/', methods=['GET', 'POST'])
 @app.route('/sexagisimal_elliptical/', methods=['GET', 'POST'])
 def sassy_sexagisimal_elliptical():
@@ -790,7 +714,7 @@ def sassy_sexagisimal_elliptical():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -803,6 +727,7 @@ def sassy_sexagisimal_elliptical():
 # +
 # route(s): /sexagisimal_radial/, /sassy/sexagisimal_radial/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/sexagisimal_radial/', methods=['GET', 'POST'])
 @app.route('/sexagisimal_radial/', methods=['GET', 'POST'])
 def sassy_sexagisimal_radial():
@@ -871,7 +796,7 @@ def sassy_sexagisimal_radial():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template(f'{_cat}.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -884,6 +809,7 @@ def sassy_sexagisimal_radial():
 # +
 # route(s): /glade/, /sassy/glade/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/glade/', methods=['GET', 'POST'])
 @app.route('/glade/', methods=['GET', 'POST'])
 def glade_records():
@@ -967,7 +893,7 @@ def glade_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('glade.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1012,6 +938,7 @@ def glade_text():
 # +
 # route(s): /glade_q3c/, /sassy/glade_q3c/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/glade_q3c/', methods=['GET', 'POST'])
 @app.route('/glade_q3c/', methods=['GET', 'POST'])
 def glade_q3c_records():
@@ -1095,7 +1022,7 @@ def glade_q3c_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('glade_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1140,6 +1067,7 @@ def glade_q3c_text():
 # +
 # route(s): /gwgc/, /sassy/gwgc/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/gwgc/', methods=['GET', 'POST'])
 @app.route('/gwgc/', methods=['GET', 'POST'])
 def gwgc_records():
@@ -1223,7 +1151,7 @@ def gwgc_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('gwgc.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1268,6 +1196,7 @@ def gwgc_text():
 # +
 # route(s): /gwgc_q3c/, /sassy/gwgc_q3c/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/gwgc_q3c/', methods=['GET', 'POST'])
 @app.route('/gwgc_q3c/', methods=['GET', 'POST'])
 def gwgc_q3c_records():
@@ -1351,7 +1280,7 @@ def gwgc_q3c_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('gwgc_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1406,6 +1335,7 @@ def sassy_help():
 # +
 # route(s): /ligo/, /sassy/ligo/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/ligo/', methods=['GET', 'POST'])
 @app.route('/ligo/', methods=['GET', 'POST'])
 def ligo_records():
@@ -1490,7 +1420,7 @@ def ligo_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('ligo.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1534,6 +1464,7 @@ def ligo_text():
 # +
 # route(s): /ligo_q3c/, /sassy/ligo_q3c/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/ligo_q3c/', methods=['GET', 'POST'])
 @app.route('/ligo_q3c/', methods=['GET', 'POST'])
 def ligo_q3c_records():
@@ -1618,7 +1549,7 @@ def ligo_q3c_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('ligo_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1707,6 +1638,7 @@ def psql_query():
 # +
 # route(s): /tns/, /sassy/tns/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/tns/', methods=['GET', 'POST'])
 @app.route('/tns/', methods=['GET', 'POST'])
 def tns_records():
@@ -1791,7 +1723,7 @@ def tns_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('tns.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1837,6 +1769,7 @@ def tns_text():
 # +
 # route(s): /tns_q3c/, /sassy/tns_q3c/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/tns_q3c/', methods=['GET', 'POST'])
 @app.route('/tns_q3c/', methods=['GET', 'POST'])
 def tns_q3c_records():
@@ -1922,7 +1855,7 @@ def tns_q3c_records():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('tns_q3c.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
@@ -1968,7 +1901,7 @@ def tns_q3c_text():
 # +
 # route(s): /ztf/<int:id>/, /sassy/ztf/<int:id>/
 # -
-# noinspection PyShadowingBuiltins
+# noinspection PyShadowingBuiltins,PyBroadException
 @app.route('/sassy/ztf/<int:id>/')
 @app.route('/ztf/<int:id>/')
 def ztf_detail(id=0):
@@ -1983,12 +1916,12 @@ def ztf_detail(id=0):
         details[0]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
-    # noinspection PyBroadException
+    # get data
+    alert = None
     try:
-        # get data
         alert = db_ztf.session.query(ZtfAlert).get(id)
-    except Exception:
-        logger.warning(f'route /sassy/ztf/{id}/ not found')
+    except Exception as _e:
+        logger.warning(f'route /sassy/ztf/{id}/ not found, alert={alert}, error={_e}')
         details[0]['line'] = 'at db.session.query()'
         return render_template('error.html', details=details)
     else:
@@ -2089,7 +2022,7 @@ def ztf_list_avros(idate=0):
 # +
 # route(s): /ztf/<int:id>/cutout/<stamp>/, /sassy/ztf/<int:id>/cutout/<stamp>/
 # -
-# noinspection PyShadowingBuiltins
+# noinspection PyShadowingBuiltins,PyBroadException
 @app.route('/sassy/ztf/<int:id>/cutout/<stamp>/')
 @app.route('/ztf/<int:id>/cutout/<stamp>/')
 def ztf_alert_stamp(id=0, stamp=''):
@@ -2114,10 +2047,12 @@ def ztf_alert_stamp(id=0, stamp=''):
         details[1]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
-    # noinspection PyBroadException, PyPep8
+    # get data
+    alert = None
     try:
         alert = db_ztf.session.query(ZtfAlert).get(id)
     except Exception as _e:
+        logger.error(f'/ztf/{id}/cutout/{stamp}/ alert={alert}, error={_e}')
         details[0]['line'] = 'at db.session.query()'
         details[1]['line'] = 'at db.session.query()'
         return render_template('error.html', details=details)
@@ -2143,7 +2078,7 @@ def ztf_alert_stamp(id=0, stamp=''):
 # +
 # route(s): /ztf/<int:id>/cutout/<stamp>/, /sassy/ztf/<int:id>/cutout/<stamp>/
 # -
-# noinspection PyShadowingBuiltins
+# noinspection PyShadowingBuiltins,PyBroadException
 @app.route('/sassy/ztf/<int:id>/photometry/')
 @app.route('/ztf/<int:id>/photometry/')
 def ztf_photometry(id=0):
@@ -2158,12 +2093,12 @@ def ztf_photometry(id=0):
         details[0]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
-    # noinspection PyBroadException
+    # get data
+    alert = None
     try:
-        # get data
         alert = db_ztf.session.query(ZtfAlert).get(id)
-    except Exception:
-        logger.warning(f'route /sassy/ztf/{id}/photometry not found')
+    except Exception as _e:
+        logger.error(f'route /sassy/ztf/{id}/photometry not found, alert={alert}, error={_e}')
         details[0]['line'] = 'at db.session.query()'
         return render_template('error.html', details=details)
     else:
@@ -2176,6 +2111,7 @@ def ztf_photometry(id=0):
 # +
 # route(s): /ztf/, /sassy/ztf/
 # -
+# noinspection PyBroadException
 @app.route('/sassy/ztf/', methods=['GET', 'POST'])
 @app.route('/ztf/', methods=['GET', 'POST'])
 def ztf_alerts():
@@ -2260,7 +2196,7 @@ def ztf_alerts():
         _args = request.args.copy()
         try:
             _args.pop('page')
-        except KeyError:
+        except:
             pass
         arg_str = urlencode(_args)
         return render_template('ztf.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
