@@ -8,10 +8,11 @@
 from src import *
 from src.common import *
 from src.utils.utils import *
+
+# noinspection PyUnresolvedReferences
 from pg import DB
 
 import argparse
-import os
 import math
 import re
 import sys
@@ -76,7 +77,7 @@ def sassy_cron(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _
             _logger.info(f"connected to database OK")
 
     # drop any existing view
-    _cmd_drop = 'DROP VIEW IF EXISTS sassy_cron;'
+    _cmd_drop = 'DROP VIEW IF EXISTS SassyCron;'
     if _logger:
         _logger.info(f'executing {_cmd_drop}')
     try:
@@ -92,7 +93,7 @@ def sassy_cron(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _
             _logger.info(f'executed {_cmd_drop} OK')
 
     # create new view
-    _cmd_view = f'CREATE OR REPLACE VIEW sassy_cron ("objectId", jd, drb, rb, sid, candid, ssnamenr, ra, dec) ' \
+    _cmd_view = f'CREATE OR REPLACE VIEW SassyCron ("objectId", jd, drb, rb, sid, candid, ssnamenr, ra, dec) ' \
                 f'AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, ssnamenr, ' \
                 f'(CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ' \
                 f'ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE ' \
@@ -139,7 +140,7 @@ if __name__ == '__main__':
     # execute
     if args:
         sassy_cron(_radius=float(args.radius), _begin=args.begin, _end=args.end,
-                            _rb_min=float(args.rb_min), _rb_max=float(args.rb_max), 
-                            _logger= UtilsLogger('SassyCron').logger if bool(args.verbose) else None)
+                   _rb_min=float(args.rb_min), _rb_max=float(args.rb_max),
+                   _logger=UtilsLogger('SassyCron').logger if bool(args.verbose) else None)
     else:
         print(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help')
