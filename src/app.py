@@ -12,18 +12,10 @@ from src.utils.utils import *
 # noinspection PyBroadException
 try:
     from src.utils.sassy_bot import *
+    from src.utils.sassy_cron import *
 except:
     sassy_bot_read = None
-
-# from astropy.time import Time
-# from datetime import datetime
-# from datetime import timedelta
-# from flask_paginate import Pagination
-# from flask_paginate import get_page_args
-# from sqlalchemy import func
-# from src.forms.Forms import CustomQueryForm
-# from astropy.coordinates import Angle
-# from astropy.coordinates import SkyCoord
+    sassy_cron_read = None
 
 from flask import Flask
 from flask import jsonify
@@ -107,94 +99,9 @@ PSQL_CONNECT_MSG = f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME} using {SASS
 
 
 # +
-# function: get_iso()
-# -
-# def get_iso():
-#     return Time.now().to_datetime(ARIZONA).isoformat()
-# +
-# function: get_mjd()
-# -
-# def get_mjd():
-#     _iso = get_iso()[:23]
-#     return Time(_iso).mjd
-# +
-# function: get_jd()
-# -
-# def get_jd():
-#     _iso = get_iso()[:23]
-#     return Time(_iso).jd
-# +
-# (hidden) function: _iso_to_jd()
-# -
-# noinspection PyBroadException
-# def _iso_to_jd(_iso=''):
-#     try:
-#         return float(Time(_iso).mjd)+2400000.5
-#     except Exception:
-#         return float(math.nan)
-# +
-# (hidden) function: _jd_to_iso()
-# -
-# noinspection PyBroadException
-# def _jd_to_iso(_jd=0.0):
-#     try:
-#         return Time(_jd, format='jd', precision=6).isot
-#     except Exception:
-#         return None
-# +
-# function: sassy_bot_page()
-# -
-# def sassy_bot_page(_results=None, _offset=0, _per_page=BOT_RESULTS_PER_PAGE):
-#     return _results[_offset: _offset + _per_page]
-# +
-# function: ra_to_decimal()
-# -
-# noinspection PyBroadException
-# def ra_to_decimal(_ra=''):
-#
-#     # check input(s)
-#     if not isinstance(_ra, str) or _ra.strip() == '':
-#         return float('nan')
-#
-#     try:
-#         if 'hours' not in _ra.lower():
-#             _ra = f'{_ra} hours'
-#         return float(Angle(_ra).degree)
-#     except Exception:
-#         return float('nan')
-# +
-# function: dec_to_decimal()
-# -
-# noinspection PyBroadException
-# def dec_to_decimal(_dec=''):
-#
-#     # check input(s)
-#     if not isinstance(_dec, str) or _dec.strip() == '':
-#         return float('nan')
-#
-#     try:
-#         if 'degrees' not in _dec.lower():
-#             _dec = f'{_dec} degrees'
-#         return float(Angle(_dec).degree)
-#     except Exception:
-#         return float('nan')
-# +
-# function: get_astropy_coords()
-# -
-# noinspection PyBroadException
-# def get_astropy_coords(_oname=''):
-#     try:
-#         _obj = SkyCoord.from_name(_oname)
-#         return _obj.ra.value, _obj.dec.value
-#     except Exception:
-#         return math.nan, math.nan
-
-
-# +
 # logging
 # -
 logger = UtilsLogger('SassyFlaskAppLogger').logger
-logger.info(f'SassyFlaskAppLogger')
 logger.debug('SASSY_APP_HOST = {}'.format(SASSY_APP_HOST))
 logger.debug('SASSY_APP_PORT = {}'.format(SASSY_APP_PORT))
 logger.debug('SASSY_APP_URL = {}'.format(SASSY_APP_URL))
@@ -254,7 +161,7 @@ def _request_wants_json():
 @app.route('/sassy/')
 @app.route('/')
 def sassy_home():
-    logger.debug(f'sassy_home> entry')
+    logger.debug(f'route /sassy/ entry')
     return render_template('sassy.html', url={'url': f'{SASSY_APP_URL}', 'page': ''})
 
 
@@ -264,7 +171,7 @@ def sassy_home():
 @app.route('/sassy/api/')
 @app.route('/api/')
 def sassy_api():
-    logger.debug(f'sassy_api> entry')
+    logger.debug(f'route /sassy/api/ entry')
     return render_template('api.html', url={'url': f'{SASSY_APP_URL}'})
 
 
@@ -275,12 +182,12 @@ def sassy_api():
 @app.route('/sassy/astronomical_elliptical/', methods=['GET', 'POST'])
 @app.route('/astronomical_elliptical/', methods=['GET', 'POST'])
 def sassy_astronomical_elliptical():
-    logger.debug(f'sassy_astronomical_elliptical> entry')
+    logger.debug(f'route /sassy/astronomical_elliptical/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # build form
@@ -296,7 +203,7 @@ def sassy_astronomical_elliptical():
         _rat = float(form.ratio.data)
         _pos = float(form.posang.data)
         _cat = form.catalog.data.lower()
-        logger.debug(f'Called AstronomicalEllipticalQueryForm(), '
+        logger.debug(f'AstronomicalEllipticalQueryForm(), '
                      f'_nam={_nam}, _ra={_ra}, _dec={_dec}, _rat={_rat}, _pos={_pos}, _cat={_cat}')
 
         _dbh = None
@@ -357,12 +264,12 @@ def sassy_astronomical_elliptical():
 @app.route('/sassy/astronomical_radial/', methods=['GET', 'POST'])
 @app.route('/astronomical_radial/', methods=['GET', 'POST'])
 def sassy_astronomical_radial():
-    logger.debug(f'sassy_astronomical_radial> entry')
+    logger.debug(f'route /sassy/astronomical_radial/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # build form
@@ -375,7 +282,7 @@ def sassy_astronomical_radial():
         _nam = form.obj_name.data
         _rad = float(form.radius.data)
         _cat = form.catalog.data.lower()
-        logger.debug(f'Called AstronomicalRadialQueryForm(), _nam={_nam}, _rad={_rad}, _cat={_cat}')
+        logger.debug(f'AstronomicalRadialQueryForm(), _nam={_nam}, _rad={_rad}, _cat={_cat}')
 
         _dbh = None
         _fil = None
@@ -435,12 +342,12 @@ def sassy_astronomical_radial():
 @app.route('/sassy/bot/', methods=['GET', 'POST'])
 @app.route('/bot/', methods=['GET', 'POST'])
 def sassy_bot():
-    logger.debug(f'sassy_bot> entry')
+    logger.debug(f'route /sassy/bot/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     # page = request.args.get('page', 1, type=int)
 
     # build form
@@ -455,7 +362,7 @@ def sassy_bot():
         _end_iso = form.end_date.data.strip()
         _rb_min = float(form.rb_min.data)
         _rb_max = float(form.rb_max.data)
-        logger.debug(f'sassy_bot> _radius={_radius}, _begin_iso={_begin_iso}, _end_iso={_end_iso}, '
+        logger.debug(f'_radius={_radius}, _begin_iso={_begin_iso}, _end_iso={_end_iso}, '
                      f'_rb_min={_rb_min}, _rb_max={_rb_max}')
 
         # paginate
@@ -464,19 +371,32 @@ def sassy_bot():
         if sassy_bot_read is not None:
             _history = sassy_bot_read(_radius, _begin_iso, _end_iso, _rb_min, _rb_max, logger)
             _total = len(_history)
-        # page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
-        # per_page = BOT_RESULTS_PER_PAGE
-        # offset = (page - 1) * BOT_RESULTS_PER_PAGE
-        # pagination_history = sassy_bot_page(_history, offset, per_page)
-        # pagination = Pagination(page=page, per_page=per_page, offset=offset, total=_total, css_framework='bootstrap4')
 
         # return result(s)
-        # return render_template('sassy_bot_results.html', history=pagination_history, total=_total,
-        # page=page, per_page=per_page, pagination=pagination,)
         return render_template('sassy_bot_results.html', history=_history, total=_total)
 
     # return for GET
     return render_template('sassy_bot.html', form=form)
+
+
+# +
+# route(s): /cron/, /sassy/cron/
+# -
+@app.route('/sassy/cron/<float:radius>', methods=['GET', 'POST'])
+@app.route('/cron/<float:radius>', methods=['GET', 'POST'])
+def sassy_cron_query(radius=0.0):
+    logger.debug(f'route /sassy/cron/{radius}/ entry')
+
+    # connect to database
+    _cron = None
+    try:
+        _cron = sassy_cron_read(radius, logger)
+    except Exception as e:
+        logger.error(f'failed reading SassyCron, error={e}')
+
+    # return
+    response = {'total': len(_cron), 'results': _cron}
+    return render_template('sassy_cron_results.html', context=response)
 
 
 # +
@@ -486,12 +406,12 @@ def sassy_bot():
 @app.route('/sassy/digital_elliptical/', methods=['GET', 'POST'])
 @app.route('/digital_elliptical/', methods=['GET', 'POST'])
 def sassy_digital_elliptical():
-    logger.debug(f'sassy_digital_elliptical> entry')
+    logger.debug(f'route /sassy/digital_elliptical/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # build form
@@ -507,7 +427,7 @@ def sassy_digital_elliptical():
         _rat = float(form.ratio.data)
         _pos = float(form.posang.data)
         _cat = form.catalog.data.lower()
-        logger.debug(f'Called DigitalEllipticalQueryForm(), _ra={_ra}, _dec={_dec}, '
+        logger.debug(f'DigitalEllipticalQueryForm(), _ra={_ra}, _dec={_dec}, '
                      f'_rat={_rat}, _pos={_pos}, _cat={_cat}')
 
         _dbh = None
@@ -568,12 +488,12 @@ def sassy_digital_elliptical():
 @app.route('/sassy/digital_radial/', methods=['GET', 'POST'])
 @app.route('/digital_radial/', methods=['GET', 'POST'])
 def sassy_digital_radial():
-    logger.debug(f'sassy_digital_radial> entry')
+    logger.debug(f'route /sassy/digital_radial/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # build form
@@ -587,7 +507,7 @@ def sassy_digital_radial():
         _dec = float(form.dec.data)
         _rad = float(form.radius.data)
         _cat = form.catalog.data.lower()
-        logger.debug(f'Called DigitalRadialQueryForm(), _ra={_ra}, _dec={_dec}, _rad={_rad}, _cat={_cat}')
+        logger.debug(f'DigitalRadialQueryForm(), _ra={_ra}, _dec={_dec}, _rad={_rad}, _cat={_cat}')
 
         _dbh = None
         _fil = None
@@ -647,12 +567,12 @@ def sassy_digital_radial():
 @app.route('/sassy/sexagisimal_elliptical/', methods=['GET', 'POST'])
 @app.route('/sexagisimal_elliptical/', methods=['GET', 'POST'])
 def sassy_sexagisimal_elliptical():
-    logger.debug(f'sassy_sexagisimal_elliptical> entry')
+    logger.debug(f'route /sassy/sexagisimal_elliptical/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # build form
@@ -670,7 +590,7 @@ def sassy_sexagisimal_elliptical():
         _rat = float(form.ratio.data)
         _pos = float(form.posang.data)
         _cat = form.catalog.data.lower()
-        logger.debug(f'Called SexagisimalEllipticalQueryForm(), _ra={_ra} ({_dra}), _dec={_dec} ({_ddec}), '
+        logger.debug(f'SexagisimalEllipticalQueryForm(), _ra={_ra} ({_dra}), _dec={_dec} ({_ddec}), '
                      f'_rat={_rat}, _pos={_pos}, _cat={_cat}')
 
         _dbh = None
@@ -731,12 +651,12 @@ def sassy_sexagisimal_elliptical():
 @app.route('/sassy/sexagisimal_radial/', methods=['GET', 'POST'])
 @app.route('/sexagisimal_radial/', methods=['GET', 'POST'])
 def sassy_sexagisimal_radial():
-    logger.debug(f'sassy_sexagisimal_radial> entry')
+    logger.debug(f'route /sassy/sexagisimal_radial/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # build form
@@ -752,7 +672,7 @@ def sassy_sexagisimal_radial():
         _ddec = dec_to_decimal(_dec)
         _rad = float(form.radius.data)
         _cat = form.catalog.data.lower()
-        logger.debug(f'Called SexagisimalRadialQueryForm(), _ra={_ra} ({_dra}), _dec={_dec} ({_ddec}), '
+        logger.debug(f'SexagisimalRadialQueryForm(), _ra={_ra} ({_dra}), _dec={_dec} ({_ddec}), '
                      f'_rad={_rad}, _cat={_cat}')
 
         _dbh = None
@@ -813,12 +733,12 @@ def sassy_sexagisimal_radial():
 @app.route('/sassy/glade/', methods=['GET', 'POST'])
 @app.route('/glade/', methods=['GET', 'POST'])
 def glade_records():
-    logger.debug(f'glade_records> entry')
+    logger.debug(f'route /sassy/glade/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
 
     # set default(s)
@@ -907,9 +827,9 @@ def glade_records():
 @app.route('/sassy/glade/<int:dbid>/')
 @app.route('/glade/<int:dbid>/')
 def glade_detail(dbid=0):
-    logger.debug(f'glade_detail> entry, dbid={dbid}')
-    # get observation request
+    logger.debug(f'route /sassy/glade/{dbid}/ entry')
 
+    # get observation request
     _record = GladeRecord.query.filter_by(id=dbid).first_or_404()
 
     # show record
@@ -932,6 +852,7 @@ def glade_detail(dbid=0):
 @app.route('/sassy/glade/text/')
 @app.route('/glade/text/')
 def glade_text():
+    logger.debug(f'route /sassy/glade/text/ entry')
     return render_template('glade_text.html', text=glade_get_text())
 
 
@@ -942,12 +863,12 @@ def glade_text():
 @app.route('/sassy/glade_q3c/', methods=['GET', 'POST'])
 @app.route('/glade_q3c/', methods=['GET', 'POST'])
 def glade_q3c_records():
-    logger.debug(f'glade_q3c_records> entry')
+    logger.debug(f'route /sassy/glade_q3c/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1036,7 +957,7 @@ def glade_q3c_records():
 @app.route('/sassy/glade_q3c/<int:dbid>/')
 @app.route('/glade_q3c/<int:dbid>/')
 def glade_q3c_detail(dbid=0):
-    logger.debug(f'glade_q3c_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/glade_q3c/{dbid}/ entry')
 
     # get observation request
     _record = GladeQ3cRecord.query.filter_by(id=dbid).first_or_404()
@@ -1061,6 +982,7 @@ def glade_q3c_detail(dbid=0):
 @app.route('/sassy/glade_q3c/text/')
 @app.route('/glade_q3c/text/')
 def glade_q3c_text():
+    logger.debug(f'route /sassy/glade_q3c/text/ entry')
     return render_template('glade_q3c_text.html', text=glade_q3c_get_text())
 
 
@@ -1071,12 +993,12 @@ def glade_q3c_text():
 @app.route('/sassy/gwgc/', methods=['GET', 'POST'])
 @app.route('/gwgc/', methods=['GET', 'POST'])
 def gwgc_records():
-    logger.debug(f'gwgc_records> entry')
+    logger.debug(f'route /sassy/gwgc/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1165,7 +1087,7 @@ def gwgc_records():
 @app.route('/sassy/gwgc/<int:dbid>/')
 @app.route('/gwgc/<int:dbid>/')
 def gwgc_detail(dbid=0):
-    logger.debug(f'gwgc_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/gwgc/{dbid}/ entry')
 
     # get observation request
     _record = GwgcRecord.query.filter_by(id=dbid).first_or_404()
@@ -1190,6 +1112,7 @@ def gwgc_detail(dbid=0):
 @app.route('/sassy/gwgc/text/')
 @app.route('/gwgc/text/')
 def gwgc_text():
+    logger.debug(f'route /sassy/gwgc/text/ entry')
     return render_template('gwgc_text.html', text=gwgc_get_text())
 
 
@@ -1200,12 +1123,12 @@ def gwgc_text():
 @app.route('/sassy/gwgc_q3c/', methods=['GET', 'POST'])
 @app.route('/gwgc_q3c/', methods=['GET', 'POST'])
 def gwgc_q3c_records():
-    logger.debug(f'gwgc_q3c_records> entry')
+    logger.debug(f'route /sassy/gwgc_q3c/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1294,7 +1217,7 @@ def gwgc_q3c_records():
 @app.route('/sassy/gwgc_q3c/<int:dbid>/')
 @app.route('/gwgc_q3c/<int:dbid>/')
 def gwgc_q3c_detail(dbid=0):
-    logger.debug(f'gwgc_q3c_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/gwgc_q3c/{dbid}/ entry')
 
     # get observation request
     _record = GwgcQ3cRecord.query.filter_by(id=dbid).first_or_404()
@@ -1319,6 +1242,7 @@ def gwgc_q3c_detail(dbid=0):
 @app.route('/sassy/gwgc_q3c/text/')
 @app.route('/gwgc_q3c/text/')
 def gwgc_q3c_text():
+    logger.debug(f'route /sassy/gwgc_q3c/text/ entry')
     return render_template('gwgc_q3c_text.html', text=gwgc_q3c_get_text())
 
 
@@ -1328,7 +1252,7 @@ def gwgc_q3c_text():
 @app.route('/sassy/help/')
 @app.route('/help/')
 def sassy_help():
-    logger.debug(f'sassy_help> entry')
+    logger.debug(f'route /sassy/help/ entry')
     return render_template('help.html', url={'url': f'{SASSY_APP_URL}'})
 
 
@@ -1339,12 +1263,12 @@ def sassy_help():
 @app.route('/sassy/ligo/', methods=['GET', 'POST'])
 @app.route('/ligo/', methods=['GET', 'POST'])
 def ligo_records():
-    logger.debug(f'ligo_records> entry')
+    logger.debug(f'route /sassy/ligo/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1378,7 +1302,7 @@ def ligo_records():
             'has_prev': paginator.has_prev,
             'results': LigoRecord.serialize_list(paginator.items)
         }
-        logger.debug(f'ligo_records> response={response}')
+        logger.debug(f'response={response}')
 
     # POST request
     if request.method == 'POST':
@@ -1434,7 +1358,7 @@ def ligo_records():
 @app.route('/sassy/ligo/<int:dbid>/')
 @app.route('/ligo/<int:dbid>/')
 def ligo_detail(dbid=0):
-    logger.debug(f'ligo_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/ligo/{dbid}/ entry')
 
     # get observation request
     _record = LigoRecord.query.filter_by(id=dbid).first_or_404()
@@ -1458,6 +1382,7 @@ def ligo_detail(dbid=0):
 @app.route('/sassy/ligo/text/')
 @app.route('/ligo/text/')
 def ligo_text():
+    logger.debug(f'route /sassy/ligo/text/ entry')
     return render_template('ligo_text.html', text=ligo_get_text())
 
 
@@ -1468,12 +1393,12 @@ def ligo_text():
 @app.route('/sassy/ligo_q3c/', methods=['GET', 'POST'])
 @app.route('/ligo_q3c/', methods=['GET', 'POST'])
 def ligo_q3c_records():
-    logger.debug(f'ligo_q3c_records> entry')
+    logger.debug(f'route /sassy/ligo_q3c/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1507,7 +1432,7 @@ def ligo_q3c_records():
             'has_prev': paginator.has_prev,
             'results': LigoQ3cRecord.serialize_list(paginator.items)
         }
-        logger.debug(f'ligo_q3c_records> response={response}')
+        logger.debug(f'response={response}')
 
     # POST request
     if request.method == 'POST':
@@ -1563,7 +1488,7 @@ def ligo_q3c_records():
 @app.route('/sassy/ligo_q3c/<int:dbid>/')
 @app.route('/ligo_q3c/<int:dbid>/')
 def ligo_q3c_detail(dbid=0):
-    logger.debug(f'ligo_q3c_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/ligo_q3c/{dbid}/ entry')
 
     # get observation request
     _record = LigoQ3cRecord.query.filter_by(id=dbid).first_or_404()
@@ -1587,6 +1512,7 @@ def ligo_q3c_detail(dbid=0):
 @app.route('/sassy/ligo_q3c/text/')
 @app.route('/ligo_q3c/text/')
 def ligo_q3c_text():
+    logger.debug(f'route /sassy/ligo_q3c/text/ entry')
     return render_template('ligo_q3c_text.html', text=ligo_q3c_get_text())
 
 
@@ -1596,7 +1522,7 @@ def ligo_q3c_text():
 @app.route('/sassy/psql/', methods=['GET', 'POST'])
 @app.route('/psql/', methods=['GET', 'POST'])
 def psql_query():
-    logger.debug(f'psql_query> entry')
+    logger.debug(f'route /sassy/psql/ entry')
 
     # connect to database
     db_psql = None
@@ -1605,7 +1531,7 @@ def psql_query():
                        int(f'{SASSY_DB_PORT}'), f'{SASSY_DB_HOST}', logger)
         db_psql.connect()
     except Exception as e:
-        logger.error(f'Failed connecting via Psql({PSQL_CONNECT_MSG}), error={e}')
+        logger.error(f'failed connecting via Psql({PSQL_CONNECT_MSG}), error={e}')
 
     # build form
     form = PsqlQueryForm()
@@ -1616,7 +1542,7 @@ def psql_query():
 
         # get data
         _sql_query = form.sql_query.data
-        logger.debug(f'psql_query> query=\"{_sql_query}\"')
+        logger.debug(f'query=\"{_sql_query}\"')
 
         # execute query
         if db_psql and hasattr(db_psql, 'fetchall'):
@@ -1642,12 +1568,12 @@ def psql_query():
 @app.route('/sassy/tns/', methods=['GET', 'POST'])
 @app.route('/tns/', methods=['GET', 'POST'])
 def tns_records():
-    logger.debug(f'tns_records> entry')
+    logger.debug(f'route /sassy/tns/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1681,7 +1607,7 @@ def tns_records():
             'has_prev': paginator.has_prev,
             'results': TnsRecord.serialize_list(paginator.items)
         }
-        logger.debug(f'tns_records> response={response}')
+        logger.debug(f'response={response}')
 
     # POST request
     if request.method == 'POST':
@@ -1737,7 +1663,7 @@ def tns_records():
 @app.route('/sassy/tns/<int:dbid>/')
 @app.route('/tns/<int:dbid>/')
 def tns_detail(dbid=0):
-    logger.debug(f'tns_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/tns/{dbid}/ entry')
 
     # get observation request
     _record = TnsRecord.query.filter_by(id=dbid).first_or_404()
@@ -1754,7 +1680,7 @@ def tns_detail(dbid=0):
             else:
                 return render_template('tns_record.html', record=_record)
     else:
-        logger.debug(f'tns_detail> no record found')
+        logger.debug(f'no record found')
 
 
 # +
@@ -1763,6 +1689,7 @@ def tns_detail(dbid=0):
 @app.route('/sassy/tns/text/')
 @app.route('/tns/text/')
 def tns_text():
+    logger.debug(f'route /sassy/tns/text/ entry')
     return render_template('tns_text.html', text=tns_get_text())
 
 
@@ -1773,13 +1700,12 @@ def tns_text():
 @app.route('/sassy/tns_q3c/', methods=['GET', 'POST'])
 @app.route('/tns_q3c/', methods=['GET', 'POST'])
 def tns_q3c_records():
-    logger.debug(f'tns_q3c_records> entry')
-    # return render_template('tns_q3c_tmp.html')
+    logger.debug(f'route /sassy/tns_q3c/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -1813,7 +1739,7 @@ def tns_q3c_records():
             'has_prev': paginator.has_prev,
             'results': TnsQ3cRecord.serialize_list(paginator.items)
         }
-        logger.debug(f'tns_q3c_records> response={response}')
+        logger.debug(f'response={response}')
 
     # POST request
     if request.method == 'POST':
@@ -1869,7 +1795,7 @@ def tns_q3c_records():
 @app.route('/sassy/tns_q3c/<int:dbid>/')
 @app.route('/tns_q3c/<int:dbid>/')
 def tns_q3c_detail(dbid=0):
-    logger.debug(f'tns_q3c_detail> entry, dbid={dbid}')
+    logger.debug(f'route /sassy/tns_q3c/{dbid}/ entry')
 
     # get observation request
     _record = TnsQ3cRecord.query.filter_by(id=dbid).first_or_404()
@@ -1886,7 +1812,7 @@ def tns_q3c_detail(dbid=0):
             else:
                 return render_template('tns_q3c_record.html', record=_record)
     else:
-        logger.debug(f'tns_q3c_detail> no record found')
+        logger.debug(f'no record found')
 
 
 # +
@@ -1895,6 +1821,7 @@ def tns_q3c_detail(dbid=0):
 @app.route('/sassy/tns_q3c/text/')
 @app.route('/tns_q3c/text/')
 def tns_q3c_text():
+    logger.debug(f'route /sassy/tns_q3c/text/ entry')
     return render_template('tns_q3c_text.html', text=tns_q3c_get_text())
 
 
@@ -1905,14 +1832,13 @@ def tns_q3c_text():
 @app.route('/sassy/ztf/<int:id>/')
 @app.route('/ztf/<int:id>/')
 def ztf_detail(id=0):
-    logger.debug(f'ztf_detail> entry, id={id}')
+    logger.debug(f'route /sassy/ztf/{id}/ entry')
 
     # check input(s)
     details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
                 'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/', 'value': f'{id}'}]
-    logger.info(f'route /sassy/ztf/{id}/ on entry')
     if not isinstance(id, int) or id <= 0:
-        logger.warning(f'route /sassy/ztf/{id}/ input(s) are invalid')
+        logger.warning(f'input(s) are invalid')
         details[0]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
@@ -1921,11 +1847,11 @@ def ztf_detail(id=0):
     try:
         alert = db_ztf.session.query(ZtfAlert).get(id)
     except Exception as _e:
-        logger.warning(f'route /sassy/ztf/{id}/ not found, alert={alert}, error={_e}')
+        logger.warning(f'alert not found, alert={alert}, error={_e}')
         details[0]['line'] = 'at db.session.query()'
         return render_template('error.html', details=details)
     else:
-        logger.info(f'route /sassy/ztf/{id}/ alert={alert} is OK, type={type(alert)}')
+        logger.info(f'alert={alert} is OK, type={type(alert)}')
 
     # return data
     if alert is not None:
@@ -1949,33 +1875,32 @@ def ztf_detail(id=0):
 @app.route('/sassy/ztf/files/<path:filename>')
 @app.route('/ztf/files/<path:filename>')
 def ztf_get_file(filename=''):
-    logger.debug(f'ztf_get_file> entry, filename={filename}')
+    logger.debug(f'route /sassy/ztf/files/{filename}/ entry')
 
     # record incoming IP
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
 
     # check input(s)
     details = [{'format': '<path>', 'line': '', 'name': 'filename', 'route': f'/ztf/files/{filename}',
                 'type': 'path', 'url': f'{SASSY_APP_URL}/ztf/files/{filename}/', 'value': f'{filename}'}]
-    logger.info(f'route /sassy/ztf/files/{filename}/ on entry')
     if not isinstance(filename, str) or filename.strip() == '':
-        logger.warning(f'route /sassy/ztf/files/{filename}/ input(s) are invalid')
+        logger.warning(f'input(s) are invalid')
         details[0]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
     # return data
     for _d in SASSY_ZTF_AVRO.split(':'):
-        logger.info(f'route /sassy/ztf/files/{filename}/ _d={_d}')
+        logger.info(f'_d={_d}')
         _f = os.path.join(_d, filename)
-        logger.info(f'route /sassy/ztf/files/{filename}/ _f={_f}')
+        logger.info(f'_f={_f}')
         if os.path.isfile(_f):
-            logger.info(f'route /sassy/ztf/files/{filename}/ {_f} exists')
+            logger.info(f'{_f} exists')
             return send_from_directory(_d, filename, as_attachment=True)
 
     # return error
-    logger.info(f'route /sassy/ztf/files/{filename}/ not found in {SASSY_ZTF_AVRO}')
+    logger.error(f'{filename} not found in {SASSY_ZTF_AVRO}')
     details[0]['line'] = 'at exit'
     return render_template('error.html', details=details)
 
@@ -1986,28 +1911,27 @@ def ztf_get_file(filename=''):
 @app.route('/sassy/ztf/avros/<int:idate>/')
 @app.route('/ztf/avros/<int:idate>/')
 def ztf_list_avros(idate=0):
-    logger.debug(f'ztf_list_avros> entry, idate={idate}')
+    logger.debug(f'route /sassy/ztf/avros/{idate}/ entry')
 
     # check input(s)
     details = [{'format': '<yyyymmdd>', 'line': '', 'name': 'idate', 'route': f'/sassy/ztf/avros/{idate}',
                 'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/avros/{idate}/', 'value': f'{idate}'}]
-    logger.info(f'route /sassy/ztf/avros/{idate}/ on entry')
     if not isinstance(idate, int) or idate <= 0 or len(f'{idate}') != 8:
-        logger.warning(f'route /sassy/ztf/avros/{idate}/ input(s) are invalid')
+        logger.warning(f'input(s) are invalid')
         details[0]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
     # parse input(s)
     _y, _m, _d = f'{idate}'[:4], f'{idate}'[4:6], f'{idate}'[6:]
-    logger.info(f'route /sassy/ztf/avros/{idate}/ y={_y} m={_m} d={_d}')
+    logger.info(f'y={_y} m={_m} d={_d}')
 
     # return data
     if int(_y) > 0 and (0 < int(_m) < 13) and (0 < int(_d) < 32):
         _files = []
         for _d in SASSY_ZTF_AVRO.split(':'):
-            logger.info(f'route /sassy/ztf/avros/{idate}/ _d={_d}')
+            logger.info(f'_d={_d}')
             _f = os.path.join(_d, _y, _m, _d)
-            logger.info(f'route /sassy/ztf/avros/{idate}/ _f={_f}')
+            logger.info(f'_f={_f}')
             for _glob in glob.glob(f'{_f}/*.avro'):
                 if os.path.isfile(_glob):
                     _files.append(_glob)
@@ -2026,7 +1950,7 @@ def ztf_list_avros(idate=0):
 @app.route('/sassy/ztf/<int:id>/cutout/<stamp>/')
 @app.route('/ztf/<int:id>/cutout/<stamp>/')
 def ztf_alert_stamp(id=0, stamp=''):
-    logger.debug(f'ztf_alert_stamp> entry, id={id}, stamp={stamp}')
+    logger.debug(f'route /sassy/ztf/{id}/cutout/{stamp}/ entry')
 
     # why does this route get the following sample argument?
     #   ?r=0.9228713425306879
@@ -2042,7 +1966,7 @@ def ztf_alert_stamp(id=0, stamp=''):
     ]
     if not isinstance(id, int) or id < 0 or not isinstance(stamp, str) or stamp.strip() == '' or \
             stamp.strip() not in ['Difference', 'Science', 'Template']:
-        logger.warning(f'/ztf/{id}/cutout/{stamp}/ input(s) are invalid')
+        logger.warning(f'input(s) are invalid')
         details[0]['line'] = 'at entry'
         details[1]['line'] = 'at entry'
         return render_template('error.html', details=details)
@@ -2052,11 +1976,11 @@ def ztf_alert_stamp(id=0, stamp=''):
     try:
         alert = db_ztf.session.query(ZtfAlert).get(id)
     except Exception as _e:
-        logger.error(f'/ztf/{id}/cutout/{stamp}/ alert={alert}, error={_e}')
+        logger.error(f'alert={alert} not found, error={_e}')
         details[0]['line'] = 'at db.session.query()'
         details[1]['line'] = 'at db.session.query()'
         return render_template('error.html', details=details)
-    logger.debug(f'/ztf/{id}/cutout/{stamp}/ alert={alert}')
+    logger.debug(f'alert={alert}')
 
     # return data
     if hasattr(alert, f'cutout{stamp}'):
@@ -2082,14 +2006,13 @@ def ztf_alert_stamp(id=0, stamp=''):
 @app.route('/sassy/ztf/<int:id>/photometry/')
 @app.route('/ztf/<int:id>/photometry/')
 def ztf_photometry(id=0):
-    logger.debug(f'ztf_photometry> entry, id={id}')
+    logger.debug(f'route /sassy/ztf/{id}/photometry/ entry')
 
     # check input(s)
     details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
                 'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/photometry', 'value': f'{id}'}]
-    logger.info(f'route /sassy/ztf/{id}/photometry on entry')
     if not isinstance(id, int) or id <= 0:
-        logger.warning(f'route /sassy/ztf/{id}/photometry input(s) are invalid')
+        logger.warning(f'input(s) are invalid')
         details[0]['line'] = 'at entry'
         return render_template('error.html', details=details)
 
@@ -2098,11 +2021,11 @@ def ztf_photometry(id=0):
     try:
         alert = db_ztf.session.query(ZtfAlert).get(id)
     except Exception as _e:
-        logger.error(f'route /sassy/ztf/{id}/photometry not found, alert={alert}, error={_e}')
+        logger.error(f'alert not found, alert={alert}, error={_e}')
         details[0]['line'] = 'at db.session.query()'
         return render_template('error.html', details=details)
     else:
-        logger.info(f'route /sassy/ztf/{id}/photometry alert={alert} is OK, type={type(alert)}')
+        logger.info(f'alert={alert} is OK, type={type(alert)}')
 
     # return
     return jsonify(alert.get_photometry())
@@ -2115,12 +2038,12 @@ def ztf_photometry(id=0):
 @app.route('/sassy/ztf/', methods=['GET', 'POST'])
 @app.route('/ztf/', methods=['GET', 'POST'])
 def ztf_alerts():
-    logger.debug(f'ztf_alerts> entry')
+    logger.debug(f'route /sassy/ztf/ entry')
 
     # report where request is coming from
     forwarded_ips = request.headers.getlist('X-Forwarded-For')
     client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
-    logger.info('Incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
     page = request.args.get('page', 1, type=int)
     response = {}
 
@@ -2128,7 +2051,7 @@ def ztf_alerts():
     latest = None
     paginator = None
 
-    logger.debug(f'ztf_alerts> requests.args={request.args}')
+    logger.debug(f'requests.args={request.args}')
 
     # GET request
     if request.method == 'GET':
@@ -2160,7 +2083,7 @@ def ztf_alerts():
 
         # get search criteria
         searches = request.get_json().get('queries')
-        logger.debug(f'ztf_alerts> searches={searches}')
+        logger.debug(f'searches={searches}')
 
         # initialize output(s)
         search_results = []
@@ -2210,6 +2133,7 @@ def ztf_alerts():
 @app.route('/sassy/ztf/text/')
 @app.route('/ztf/text/')
 def ztf_text():
+    logger.debug(f'route /sassy/ztf/text/ entry')
     return render_template('ztf_text.html', text=ztf_get_text())
 
 
@@ -2219,6 +2143,7 @@ def ztf_text():
 @app.route('/sassy/ztf_q3c/')
 @app.route('/ztf_q3c/')
 def ztf_q3c():
+    logger.debug(f'route /sassy/ztf_q3c/ entry')
     return render_template('ztf_q3c.html')
 
 
