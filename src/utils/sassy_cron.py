@@ -180,8 +180,6 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
             continue
 
     # close and exit
-    if db is not None:
-        db.close()
     return _results
 
 
