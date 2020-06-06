@@ -8,6 +8,7 @@
 from src import *
 from src.common import *
 from src.utils.utils import *
+from src.utils.avro_plot import *
 
 # noinspection PyUnresolvedReferences
 from pg import DB
@@ -30,6 +31,158 @@ END_ISO = jd_to_isot(END_JD)
 RB_MIN = 0.50
 RB_MAX = 1.00
 RADIUS = 60.0
+
+
+# +
+# function: get_avro_filename()
+# -
+# noinspection PyBroadException
+def get_avro_filename(_jd=0.0, _avro=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/dataraid0/ztf")):
+    try:
+        _ts = jd_to_isot(_jd).split('T')[0].split('-')
+        for _h in _dirs.split(':'):
+            _f = os.path.join(f'{_h}', f'{_ts[0]}', f'{_ts[1]}', f'{_ts[2]}', f'{_avro}.avro')
+            if os.path.exists(_f):
+                return f"{_f}"
+    except Exception:
+        pass
+    return f""
+
+
+# +
+# function: sassy_cron_read()
+# -
+# noinspection PyBroadException
+def sassy_cron_read(_radius=RADIUS, _logger=None):
+
+    # check input(s)
+    _radius = _radius if (isinstance(_radius, float) and _radius >= 0.0) else RADIUS/3600.0
+
+    # connect to database
+    if _logger:
+        _logger.info(f"connecting to database")
+    try:
+        db = DB(dbname=SASSY_DB_NAME, host=SASSY_DB_HOST, port=int(SASSY_DB_PORT),
+                user=SASSY_DB_USER, passwd=SASSY_DB_PASS)
+    except Exception as e:
+        if _logger:
+            _logger.error(f"failed connecting to database, error={e}")
+        return
+    else:
+        if _logger:
+            _logger.info(f"connected to database OK")
+
+    # select
+    _res = None
+    _results = []
+    _cmd_select = f"WITH x AS (SELECT * FROM sassy_bot), y AS (SELECT x.*, " \
+                  f"(g.id, g.ra, g.dec, g.z, g.dist, q3c_dist(x.ra, x.dec, g.ra, g.dec)) " \
+                  f"FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {_radius:.5f})), z AS " \
+                  f"(SELECT * FROM y LEFT OUTER JOIN tns_q3c AS t ON " \
+                  f"q3c_join(y.ra, y.dec, t.ra, t.dec, {_radius:.5f})) SELECT * FROM z WHERE tns_id IS null;"
+    if _logger:
+        _logger.info(f'Executing {_cmd_select}')
+    try:
+        _res = db.query(_cmd_select)
+    except Exception as e:
+        if _logger:
+            _logger.error(f'Failed to execute {_cmd_select}, e={e}')
+    if _logger:
+        _logger.info(f'Executed {_cmd_select} OK')
+
+    # close database connection
+    if db is not None:
+        db.close()
+
+    # create output(s)
+    for _e in _res:
+        if _logger:
+            _logger.info(f'_e={_e}')
+        _gid, _gra, _gdec, _gz, _gdist, _gdelta = _e[9][1:-1].split(",")
+        _d = {"objectId": f"{_e[0]}"}
+        try:
+            _d["jd"] = float(f"{_e[1]}")
+        except Exception:
+            _d["jd"] = float(math.nan)
+        try:
+            _d["drb"] = float(f"{_e[2]}")
+        except Exception:
+            _d["drb"] = float(math.nan)
+        try:
+            _d["rb"] = float(f"{_e[3]}")
+        except Exception:
+            _d["rb"] = float(math.nan)
+        try:
+            _d["sid"] = int(f"{_e[4]}")
+        except Exception:
+            _d["sid"] = -1
+        try:
+            _d["candid"] = int(f"{_e[5]}")
+        except Exception:
+            _d["candid"] = -1
+        try:
+            _d["ssnamenr"] = '' if f"{_e[6]}".lower() == 'null' else f"{_e[6]}"
+        except Exception:
+            _d["ssnamenr"] = ''
+        try:
+            _d["RA"] = float(f"{_e[7]}")
+        except Exception:
+            _d["RA"] = float(math.nan)
+        try:
+            _d["Dec"] = float(f"{_e[8]}")
+        except Exception:
+            _d["Dec"] = float(math.nan)
+        try:
+            _d["gid"] = int(f"{_gid}")
+        except Exception:
+            _d["gid"] = -1
+        try:
+            _d["gRA"] = float(f"{_gra}")
+        except Exception:
+            _d["gRA"] = float(math.nan)
+        try:
+            _d["gDec"] = float(f"{_gdec}")
+        except Exception:
+            _d["gDec"] = float(math.nan)
+        try:
+            _d["gDist"] = float(f"{_gdist}")
+        except Exception:
+            _d["gDist"] = float(math.nan)
+        try:
+            _d["gRedshift"] = float(f"{_gz}")
+        except Exception:
+            _d["gRedshift"] = float(math.nan)
+        try:
+            _d["gDelta"] = float(f"{_gdelta}")*3600.0
+        except Exception:
+            _d["gDelta"] = float(math.nan)
+
+        try:
+            _d["file"] = get_avro_filename(_d["jd"], _d["candid"])
+        except Exception:
+            _d["file"] = ""
+
+        try:
+            _d["png"] = avro_plot(_d["file"], True)[0]
+        except Exception:
+            _d["png"] = ""
+
+        if _logger:
+            _logger.info(f'_d={_d}')
+
+        try:
+            if _d["ssnamenr"] != '':
+                if _logger:
+                    _logger.debug(f'ignoring solar system object, _d={_d}')
+            else:
+                _results.append(_d)
+        except Exception:
+            continue
+
+    # close and exit
+    if db is not None:
+        db.close()
+    return _results
 
 
 # +
