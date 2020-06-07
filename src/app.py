@@ -1872,6 +1872,38 @@ def ztf_detail(id=0):
 
 
 # +
+# route(s): /ztf/<int:id>/csvhtml/, /sassy/<int:id>/csvhtml/
+# -
+# noinspection PyShadowingBuiltins
+@app.route('/sassy/ztf/<int:id>/csvhtml/')
+@app.route('/ztf/<int:id>/csvhtml/')
+def ztf_get_csvhtml(id=0):
+    logger.debug(f'route /sassy/ztf/{id}/csvhtml/ entry')
+
+    # check input(s)
+    details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
+                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/csvhtml/', 'value': f'{id}'}]
+    if not isinstance(id, int) or id <= 0:
+        logger.warning(f'input(s) are invalid')
+        details[0]['line'] = 'at entry'
+        return render_template('error.html', details=details)
+
+    # get data
+    alert = None
+    try:
+        alert = db_ztf.session.query(ZtfAlert).get(id)
+    except Exception as _e:
+        logger.error(f'alert not found, alert={alert}, error={_e}')
+        details[0]['line'] = 'at db.session.query()'
+        return render_template('error.html', details=details)
+    else:
+        logger.info(f'alert={alert} is OK, type={type(alert)}')
+
+    # write file
+    return alert.get_csv().to_html()
+
+
+# +
 # route(s): /ztf/<int:id>/csv/, /sassy/<int:id>/csv/
 # -
 # noinspection PyShadowingBuiltins
@@ -1903,7 +1935,12 @@ def ztf_get_csv(id=0):
     _csv = alert.get_csv()
     _header = ['jd', 'isot', 'filter', 'magpsf', 'sigmapsf', 'diffmaglim']
     _of = f'/tmp/{id}.csv'
-    _csv.to_csv(f'{_of}', index=False, columns=_header, header=_header)
+    try:
+        _csv.to_csv(f'{_of}', index=False, columns=_header, header=_header)
+    except Exception as _f:
+        logger.error(f'alert={alert}, error={_e}')
+        details[0]['line'] = 'at _csv.to_csv()'
+        return render_template('error.html', details=details)
 
     # serve file
     if os.path.isfile(_of):

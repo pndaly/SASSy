@@ -173,17 +173,17 @@ case $(echo ${sassy_command} | tr '[A-Z]' '[a-z]') in
   start*)
     if [[ ${dry_run} -eq 1 ]]; then
       if [[ "${sassy_type}" == "development" ]]; then
-        write_yellow "Dry-Run> FLASK_DEBUG=True  FLASK_ENV=Development FLASK_APP=${sassy_source}/source/app.py flask run"
+        write_yellow "Dry-Run> FLASK_DEBUG=True  FLASK_ENV=Development FLASK_APP=${sassy_source}/src/app.py flask run"
       elif [[ "${sassy_type}" == "production" ]]; then
-        write_yellow "Dry-Run> FLASK_DEBUG=False FLASK_ENV=Production  FLASK_APP=${sassy_source}/source/app.py flask run -h ${sassy_host} -p ${sassy_port}"
+        write_yellow "Dry-Run> FLASK_DEBUG=False FLASK_ENV=Production  FLASK_APP=${sassy_source}/src/app.py flask run -h ${sassy_host} -p ${sassy_port}"
       fi
     else
       if [[ "${sassy_type}" == "development" ]]; then
-        write_green "Executing> FLASK_DEBUG=True  FLASK_ENV=Development FLASK_APP=${sassy_source}/source/app.py flask run"
-        FLASK_DEBUG=True  FLASK_ENV=Development FLASK_APP=${sassy_source}/source/app.py flask run
+        write_green "Executing> FLASK_DEBUG=True  FLASK_ENV=Development FLASK_APP=${sassy_source}/src/app.py flask run"
+        FLASK_DEBUG=True  FLASK_ENV=Development FLASK_APP=${sassy_source}/src/app.py flask run
       elif [[ "${sassy_type}" == "production" ]]; then
-        write_green "Executing> FLASK_DEBUG=False FLASK_ENV=Production  FLASK_APP=${sassy_source}/source/app.py flask run -h ${sassy_host} -p ${sassy_port}"
-        FLASK_DEBUG=False FLASK_ENV=Production  FLASK_APP=${sassy_source}/source/app.py flask run -h ${sassy_host} -p ${sassy_port}
+        write_green "Executing> FLASK_DEBUG=False FLASK_ENV=Production  FLASK_APP=${sassy_source}/src/app.py flask run -h ${sassy_host} -p ${sassy_port}"
+        FLASK_DEBUG=False FLASK_ENV=Production  FLASK_APP=${sassy_source}/src/app.py flask run -h ${sassy_host} -p ${sassy_port}
       fi
     fi
     ;;
