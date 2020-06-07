@@ -20,6 +20,7 @@ import io
 import json
 import math
 import os
+import pandas as pd
 import requests
 import sys
 
@@ -416,6 +417,23 @@ class ZtfAlert(db.Model):
                 'drbversion': self.drbversion,
             }
         }
+
+    def get_csv(self):
+        _keys = ['jd', 'fid', 'magpsf', 'sigmapsf', 'diffmaglim']
+        _filters = ['x', 'g', 'r', 'i']
+        _previous = ZtfAlert.serialize_list(self.prv_candidate)
+        _csv = []
+        for _c in _previous:
+            if 'candidate' in _c and all(_k in _c['candidate'] for _k in _keys):
+                _csv.append({
+                    'jd': _c['candidate']['jd'],
+                    'isot': Time(_c['candidate']['jd'], format='jd').isot,
+                    'filter': _filters[_c['candidate']['fid']],
+                    'magpsf': _c['candidate']['magpsf'],
+                    'sigmapsf': _c['candidate']['sigmapsf'],
+                    'diffmaglim': _c['candidate']['diffmaglim']
+                })
+        return pd.DataFrame(_csv)
 
     def get_photometry(self):
         filter_mapping = ['x', 'g', 'r', 'i']

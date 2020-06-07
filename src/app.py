@@ -86,16 +86,19 @@ from src.models.ztf import ztf_get_text
 
 import glob
 import io
+import json
 import pytz
 
 
 # +
 # constant(s)
 # -
-BOT_RESULTS_PER_PAGE = 25
-RESULTS_PER_PAGE = 50
 ARIZONA = pytz.timezone('America/Phoenix')
+BOT_RESULTS_PER_PAGE = 25
+COLUMNS = ['jd', 'filter', 'magpsf', 'sigmapsf', 'diffmaglim']
+HEADERS = ['jd', 'filter', 'magpsf', 'sigmapsf', 'diffmaglim']
 PSQL_CONNECT_MSG = f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME} using {SASSY_DB_USER}:{SASSY_DB_PASS}'
+RESULTS_PER_PAGE = 50
 
 
 # +
@@ -1870,6 +1873,50 @@ def ztf_detail(id=0):
 
 
 # +
+# route(s): /ztf/<int:id>/csv/, /sassy/<int:id>/csv/
+# -
+@app.route('/sassy/ztf/<int:id>/csv/')
+@app.route('/ztf/<int:id>/csv/')
+def ztf_get_csv(id=0):
+    logger.debug(f'route /sassy/ztf/{id}/csv/ entry')
+
+    # check input(s)
+    details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
+                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/csv/', 'value': f'{id}'}]
+    if not isinstance(id, int) or id <= 0:
+        logger.warning(f'input(s) are invalid')
+        details[0]['line'] = 'at entry'
+        return render_template('error.html', details=details)
+
+    # get data
+    alert = None
+    try:
+        alert = db_ztf.session.query(ZtfAlert).get(id)
+    except Exception as _e:
+        logger.error(f'alert not found, alert={alert}, error={_e}')
+        details[0]['line'] = 'at db.session.query()'
+        return render_template('error.html', details=details)
+    else:
+        logger.info(f'alert={alert} is OK, type={type(alert)}')
+
+    # write file
+    _csv = alert.get_csv()
+    _header = ['jd', 'isot', 'filter', 'magpsf', 'sigmapsf', 'diffmaglim']
+    _of = f'/tmp/{id}.csv'
+    _csv.to_csv(f'{_of}', index=False, columns=_header, header=_header)
+
+    # serve file
+    if os.path.isfile(_of):
+        logger.info(f'{_of} exists')
+        return send_from_directory(os.path.dirname(_of), os.path.basename(_of), as_attachment=True)
+
+    # return error
+    logger.error(f'{_of} not found')
+    details[0]['line'] = 'at exit'
+    return render_template('error.html', details=details)
+
+
+# +
 # route(s): /ztf/files/<path:filename>, /sassy/ztf/files/<path:filename>
 # -
 @app.route('/sassy/ztf/files/<path:filename>')
@@ -1892,7 +1939,6 @@ def ztf_get_file(filename=''):
 
     # return data
     for _d in SASSY_ZTF_AVRO.split(':'):
-        logger.info(f'_d={_d}')
         _f = os.path.join(_d, filename)
         logger.info(f'_f={_f}')
         if os.path.isfile(_f):
@@ -2000,7 +2046,7 @@ def ztf_alert_stamp(id=0, stamp=''):
 
 
 # +
-# route(s): /ztf/<int:id>/cutout/<stamp>/, /sassy/ztf/<int:id>/cutout/<stamp>/
+# route(s): /ztf/<int:id>/photometry/, /sassy/ztf/<int:id>/photometry/
 # -
 # noinspection PyShadowingBuiltins,PyBroadException
 @app.route('/sassy/ztf/<int:id>/photometry/')
@@ -2010,7 +2056,7 @@ def ztf_photometry(id=0):
 
     # check input(s)
     details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
-                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/photometry', 'value': f'{id}'}]
+                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/photometry/', 'value': f'{id}'}]
     if not isinstance(id, int) or id <= 0:
         logger.warning(f'input(s) are invalid')
         details[0]['line'] = 'at entry'

@@ -75,7 +75,7 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
     # select
     _res = None
     _results = []
-    _cmd_select = f"WITH x AS (SELECT * FROM sassy_bot), y AS (SELECT x.*, " \
+    _cmd_select = f"WITH x AS (SELECT * FROM SassyCron), y AS (SELECT x.*, " \
                   f"(g.id, g.ra, g.dec, g.z, g.dist, q3c_dist(x.ra, x.dec, g.ra, g.dec)) " \
                   f"FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {_radius:.5f})), z AS " \
                   f"(SELECT * FROM y LEFT OUTER JOIN tns_q3c AS t ON " \
