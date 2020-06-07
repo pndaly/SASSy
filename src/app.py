@@ -86,7 +86,6 @@ from src.models.ztf import ztf_get_text
 
 import glob
 import io
-import json
 import pytz
 
 
@@ -1875,6 +1874,7 @@ def ztf_detail(id=0):
 # +
 # route(s): /ztf/<int:id>/csv/, /sassy/<int:id>/csv/
 # -
+# noinspection PyShadowingBuiltins
 @app.route('/sassy/ztf/<int:id>/csv/')
 @app.route('/ztf/<int:id>/csv/')
 def ztf_get_csv(id=0):
