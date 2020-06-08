@@ -46,11 +46,14 @@ src/common.py
 # +
 # other repositories
 # -
-src/static/js9*
-src/static/js*
+src/static/js9/
+src/static/js9.*
+src/static/js/
+src/static/js.*
 src/static/css/bootstrap*
-*.css.20*
-css.20*
-*.html.20*
-*.py.20*
+
+# +
+# miscellaneous
+# -
+*.20*
 00_TO_DO_00

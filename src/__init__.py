@@ -21,6 +21,12 @@ import random
 # -
 ISO_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 ISO_PATTERN = '[0-9]{4}-[0-9]{2}-[0-9]{2}[ T?][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}'
+ZTF_ZERO_NID = '2017-01-01T00:00:00.000000'
+ZTF_ZERO_POINTS = {1: 26.325, 2: 26.275, 3: 25.660}
+ZTF_FILTERS = {1: 'green', 2: 'red', 3: 'indigo'}
+
+TRUE_VALUES = [1, True, '1', 'true', 't', 'TRUE', 'T']
+FALSE_VALUES = [0, False, '0', 'false', 'f', 'FALSE', 'F']
 
 
 # +
@@ -63,6 +69,30 @@ def isot_to_jd(isot=''):
         return Time(isot).jd
     except:
         return math.nan
+
+
+# +
+# function: isot_to_nid()
+# -
+# noinspection PyBroadException
+def isot_to_nid(isot=''):
+    """ returns ZTF night id from isot date string """
+    try:
+        return int(isot_to_jd(isot) - isot_to_jd(ZTF_ZERO_NID))
+    except:
+        return None
+
+
+# +
+# function: nid_to_isot()
+# -
+# noinspection PyBroadException
+def nid_to_isot(nid=0):
+    """ returns date string from ZTF night id """
+    try:
+        return jd_to_isot(isot_to_jd(ZTF_ZERO_NID) + nid)
+    except:
+        return None
 
 
 # +
@@ -143,3 +173,65 @@ def get_astropy_coords(_name=''):
         return _obj.ra.value, _obj.dec.value
     except Exception:
         return math.nan, math.nan
+
+
+# +
+# function: dc_mag()
+# -
+def dc_mag(fid=-1, magpsf=math.nan, sigmapsf=math.nan, magnr=math.nan,
+           sigmagnr=math.nan, magzpsci=math.nan, isdiffpos=None):
+    """ compute apparent magnitude from difference magnitude supplied by ZTF """
+
+    # check input(s)
+    if not isinstance(fid, int) or fid not in ZTF_FILTERS.keys():
+        return {'dc_mag': math.nan, 'dc_sigmag': math.nan}
+    if not isinstance(magpsf, float) or magpsf is math.nan:
+        return {'dc_mag': math.nan, 'dc_sigmag': math.nan}
+    if not isinstance(sigmapsf, float) or sigmapsf is math.nan:
+        return {'dc_mag': math.nan, 'dc_sigmag': math.nan}
+    if not isinstance(magnr, float) or magnr is math.nan:
+        return {'dc_mag': math.nan, 'dc_sigmag': math.nan}
+    if not isinstance(sigmagnr, float) or sigmagnr is math.nan:
+        return {'dc_mag': math.nan, 'dc_sigmag': math.nan}
+    if not isinstance(magzpsci, float) or magzpsci is math.nan:
+        return {'dc_mag': math.nan, 'dc_sigmag': math.nan}
+    isdiffpos = isdiffpos in TRUE_VALUES
+
+    # set default(s)
+    magzpref = ZTF_ZERO_POINTS[fid]
+    magdiff = magzpref - magnr
+    if magdiff > 12.0:
+        magdiff = 12.0
+
+    # calculate reference flux
+    ref_flux = 10**(0.4*magdiff)
+    ref_sigflux = (sigmagnr/1.0857)*ref_flux
+
+    # calculate difference flux and its error
+    if magzpsci == 0.0:
+        magzpsci = magzpref
+    magdiff = magzpsci - magpsf
+    if magdiff > 12.0:
+        magdiff = 12.0
+    difference_flux = 10**(0.4*magdiff)
+    difference_sigflux = (sigmapsf/1.0857)*difference_flux
+
+    # add or subtract difference flux based on isdiffpos
+    if isdiffpos:
+        dc_flux = ref_flux + difference_flux
+    else:
+        dc_flux = ref_flux - difference_flux
+
+    # assumes errors are independent (maybe too conservative)
+    dc_sigflux = math.sqrt(difference_sigflux**2 + ref_sigflux**2)
+
+    # apparent mag and its error from fluxes
+    if dc_flux > 0.0:
+        _dc_mag = magzpsci - 2.5 * math.log10(dc_flux)
+        _dc_sigmag = dc_sigflux/dc_flux*1.0857
+    else:
+        _dc_mag = magzpsci
+        _dc_sigmag = sigmapsf
+
+    # return result
+    return {'dc_mag': _dc_mag, 'dc_sigmag': _dc_sigmag}
