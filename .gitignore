@@ -3,6 +3,7 @@
 # -
 *.pyc
 __pycache__
+.pytest_cache
 
 # +
 # Packages
@@ -13,6 +14,8 @@ __pycache__
 *.tar
 *.tgz
 *.zip
+*.js
+*.json
 
 # +
 # Logs
@@ -46,14 +49,9 @@ src/common.py
 # +
 # other repositories
 # -
-src/static/js9/
-src/static/js9.*
-src/static/js/
-src/static/js.*
 src/static/css/bootstrap*
 
 # +
 # miscellaneous
 # -
-*.20*
 00_TO_DO_00
