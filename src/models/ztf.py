@@ -266,7 +266,13 @@ class ZtfAlert(db.Model):
 
     @property
     def avro(self):
-        return f'{SASSY_APP_ZTF_FILES_URL}/{self.wall_time_format}/{self.alert_candid}.avro'
+        """ http://localhost/sassy/ztf/files/2020/05/22/1237486751415010006.avro """
+        if SASSY_APP_HOST.lower() == 'localhost' and int(SASSY_APP_PORT) == 5000:
+            _old_str = f'{SASSY_APP_HOST.lower()}'
+            _new_str = f'{SASSY_APP_HOST.lower()}:{SASSY_APP_PORT}'
+            return f'{SASSY_APP_ZTF_FILES_URL}/{self.wall_time_format}/{self.alert_candid}.avro'.replace(_old_str, _new_str)
+        else:
+            return f'{SASSY_APP_ZTF_FILES_URL}/{self.wall_time_format}/{self.alert_candid}.avro'
 
     @property
     def avro_packet(self):

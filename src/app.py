@@ -1938,7 +1938,7 @@ def ztf_get_csv(id=0):
     try:
         _csv.to_csv(f'{_of}', index=False, columns=_header, header=_header)
     except Exception as _f:
-        logger.error(f'alert={alert}, error={_e}')
+        logger.error(f'alert={alert}, error={_f}')
         details[0]['line'] = 'at _csv.to_csv()'
         return render_template('error.html', details=details)
 

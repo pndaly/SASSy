@@ -76,32 +76,52 @@
       <p><a href="{{ alert.avro }}" class="btn btn-outline-primary btn-sm btn-block">{{ alert.avro }}</a></p>
       <p><a href="#" onclick="toggleMenus()" class="btn btn-outline-warning btn-sm btn-block">Toggle JS9 Menus</a></p>
       <div class="row">
+        <div class="col-md-4"> <center><strong>Science</strong></center> </div>
+        <div class="col-md-4"> <center><strong>Template</strong></center> </div>
+        <div class="col-md-4"> <center><strong>Difference</strong></center> </div>
+      </div>
+      <div class="row">
         <div class="col-md-4">
-          <strong>Science</strong>
-	  <a href="{{ url_for('ztf_alert_stamp', id=alert.id, stamp='Science') }}" class="btn btn-outline-info btn-sm">Download Cutout</a>
-          <div class="JS9Menubar d-none" id="JS9SciMenubar" data-displays="JS9Sci" data-width="180px"></div>
-          <div class="JS9" id="JS9Sci" data-width="180px" data-height="180px"></div>
-          <div style="margin-top: 2px;">
-            <div class="JS9Colorbar" id="JS9SciColorbar" data-displays="JS9Sci" data-width="180px"></div>
-          </div>
+          <a href="{{ url_for('ztf_alert_stamp', id=alert.id, stamp='Science') }}" 
+            class="btn btn-outline-info btn-sm btn-block"><small>Download Science Cutout</small></a>
         </div>
         <div class="col-md-4">
-          <strong>Template</strong>
-	  <a href="{{ url_for('ztf_alert_stamp', id=alert.id, stamp='Template') }}" class="btn btn-outline-info btn-sm">Download Cutout</a>
-          <div class="JS9Menubar d-none" id="JS9TmpMenubar" data-displays="JS9Tmp" data-width="180px"></div>
-          <div class="JS9" id="JS9Tmp" data-width="180px" data-height="180px"></div>
-          <div style="margin-top: 2px;">
-            <div class="JS9Colorbar" id="JS9TmpColorbar" data-displays="JS9Tmp" data-width="180px"></div>
-          </div>
+	  <a href="{{ url_for('ztf_alert_stamp', id=alert.id, stamp='Template') }}" 
+            class="btn btn-outline-info btn-sm btn-block"><small>Download Template Cutout</small></a>
         </div>
         <div class="col-md-4">
-          <strong>Difference</strong>
-	  <a href="{{ url_for('ztf_alert_stamp', id=alert.id, stamp='Difference') }}" class="btn btn-outline-info btn-sm">Download Cutout</a>
-          <div class="JS9Menubar d-none" id="JS9DifMenubar" data-displays="JS9Dif" data-width="180px"></div>
-          <div class="JS9" id="JS9Dif" data-width="180px" data-height="180px"></div>
-          <div style="margin-top: 2px;">
-            <div class="JS9Colorbar" id="JS9DifColorbar" data-displays="JS9Dif" data-width="180px"></div>
-          </div>
+	  <a href="{{ url_for('ztf_alert_stamp', id=alert.id, stamp='Difference') }}" 
+            class="btn btn-outline-info btn-sm btn-block"><small>Download Difference Cutout</small></a>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-md-4 border border-dark rounded mt-2 mb-2 pt-2 pb-2">
+          <center>
+            <div class="JS9Menubar d-none" id="JS9SciMenubar" data-displays="JS9Sci" data-width="180px"></div>
+            <div class="JS9" id="JS9Sci" data-width="180px" data-height="180px"></div>
+            <div style="margin-top: 2px;">
+              <div class="JS9Colorbar" id="JS9SciColorbar" data-displays="JS9Sci" data-width="180px"></div>
+            </div>
+          </center>
+        </div>
+        <div class="col-md-4 border border-dark rounded mt-2 mb-2 pt-2 pb-2">
+          <center>
+            <div class="JS9Menubar d-none" id="JS9TmpMenubar" data-displays="JS9Tmp" data-width="180px"></div>
+            <div class="JS9" id="JS9Tmp" data-width="180px" data-height="180px"></div>
+            <div style="margin-top: 2px;">
+              <div class="JS9Colorbar" id="JS9TmpColorbar" data-displays="JS9Tmp" data-width="180px"></div>
+            </div>
+          </center>
+        </div>
+        <div class="col-md-4 border border-dark rounded mt-2 mb-2 pt-2 pb-2">
+          <center>
+            <div class="JS9Menubar d-none" id="JS9DifMenubar" data-displays="JS9Dif" data-width="180px"></div>
+            <div class="JS9" id="JS9Dif" data-width="180px" data-height="180px"></div>
+            <div style="margin-top: 2px;">
+              <div class="JS9Colorbar" id="JS9DifColorbar" data-displays="JS9Dif" data-width="180px"></div>
+            </div>
+          </center>
         </div>
       </div>
       <div id="lightcurve"></div>
@@ -117,54 +137,75 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js9/js9.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js9/js9plugins.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/plotly-latest.min.js') }}"></script>
-
 <script type="text/javascript">
-  var here = document.domain;
+
   var filters = ['g', 'r', 'i'];
-  var filter_colors = ['green', 'red', 'black'];
+  var filter_colorscale = [[0, 'rgb(0, 255, 0)'],[0.5, 'rgb(255, 0, 0)'],[1, 'rgb(0, 0, 255)']]
   var unix_epoch_julian_day = 2440587;
   var day = 86400000;
 
   document.addEventListener('DOMContentLoaded', function() {
-    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Science',    {scale: 'log', colormap: 'heat', onload: setZoom}, {display: 'JS9Sci'});
-    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Template',   {scale: 'log', colormap: 'heat', onload: setZoom}, {display: 'JS9Tmp'});
-    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Difference', {scale: 'log', colormap: 'heat', onload: setZoom}, {display: 'JS9Dif'});
+    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Science/', {scale: 'log', colormap: 'viridis', onload: setZoom},  {display: 'JS9Sci'});
+    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Template/', {scale: 'log', colormap: 'viridis', onload: setZoom}, {display: 'JS9Tmp'});
+    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Difference/', {scale: 'log', colormap: 'viridis', onload: setZoom}, {display: 'JS9Dif'});
     plotLightCurve();
   });
 
   function toggleMenus() {
     menus = document.getElementsByClassName('JS9Menubar');
-    for(var i=0; i < menus.length; i++) {
+    for(var i=0; i < menus.length; i++){
       menus[i].classList.toggle('d-none');
     }
   }
 
-  function setZoom(display){
+  function setZoom(display) {
     JS9.SetZoom('ToFit', {display: display});
   }
 
-  function jdToDate(jd){
+  function jdToDate(jd) {
     return new Date((Number(jd) - unix_epoch_julian_day) * day);
   }
 
-  function buildSeries(data, fid){
-    var matches = data.prv_candidate.filter(function(match){
-      return match.candidate.fid === fid;
-    })
+  function buildMagPsf(data, fid) {
 
+    // finds all previous candidates of this object with the same filter
+    var matches = data.prv_candidate.filter(function(match){
+      return match.candidate.fid === fid && "magpsf" in match.candidate;
+    });
+    console.log({'buildMagPsf> matches': matches});
+
+    // gets the magnitude values of all matching previous candidates
     var mags = matches.map(function(match){
       return match.candidate.magpsf.toFixed(2);
     });
+    console.log({'buildMagPsf> mags': mags});
 
+    // gets the error of the magnitude values of all matching previous candidates
     var mag_err = matches.map(function(match){
       return match.candidate.sigmapsf.toFixed(2);
     });
+    console.log({'buildMagPsf> mag_err': mag_err});
 
+    // gets the timestamp of all matching previous candidates
     var jds = matches.map(function(match){
       return match.candidate.jd;
     });
+    console.log({'buildMagPsf> jds': jds});
 
-    if(data.candidate.fid === fid){
+    // builds an array of the correct symbol for each matching previous candidate
+    //  - an isDiffPos value of t or 1 indicates a positive subtraction, represented by a full circle
+    //  - an isDiffPos value of f or 0 indicates a negative subtraction, represented by an empty circle
+    var symbols = matches.map(function(match){
+      if (['t', '1'].includes(match.candidate.isDiffPos)) {
+        return 'circle';
+      } else {
+        return 'circle-open';
+      }
+    });
+    console.log({'buildMagPsf> symbols': symbols});
+
+    // adds the current candidate data for that filter to the previously constructed arrays
+    if (data.candidate.fid === fid) {
       mags.push(data.candidate.magpsf.toFixed(2));
       mag_err.push(data.candidate.sigmapsf.toFixed(2));
       jds.push(data.candidate.jd);
@@ -178,18 +219,96 @@
         type: 'data',
         array: mag_err,
         visible: true,
-        color: filter_colors[fid - 1]
+        color: filter_colorscale[fid - 1][1]
       },
       mode: 'markers',
       type: 'scatter',
-      name: filters[fid - 1],
+      name: filters[fid - 1] + ' (magpsf)',
       marker:{
-        color: filter_colors[fid - 1]
+        symbol: symbols,
+        color: filter_colorscale[fid - 1][1],
+        size: 9
       }
     }
   }
 
-  function buildPlot(data){
+  function buildDiffMagLim(data, fid) {
+
+    // finds all previous candidates of this object with the same filter
+    var matches = data.prv_candidate.filter(function(match){
+      return match.candidate.fid === fid && "diffmaglim" in match.candidate;
+    });
+    console.log({'buildDiffMagLim> matches': matches});
+
+    // gets the (difference) magnitude values of all matching previous candidates
+    var diffmags = matches.map(function(match){
+      return match.candidate.diffmaglim.toFixed(2);
+    });
+    console.log({'buildDiffMagLim> diffmags': diffmags});
+
+    // gets the timestamp of all matching previous candidates
+    var jds = matches.map(function(match){
+      return match.candidate.jd;
+    });
+    console.log({'buildDiffMagLim> jds': jds});
+
+    // builds an array of the correct symbol for each matching previous candidate
+    //  - an isDiffPos value of t or 1 indicates a positive subtraction, represented by a full circle
+    //  - an isDiffPos value of f or 0 indicates a negative subtraction, represented by an empty circle
+    var symbols = matches.map(function(match){
+      if (['t', '1'].includes(match.candidate.isDiffPos)) {
+        return 'diamond-open';
+      } else {
+        return 'diamond-open-dot';
+      }
+    });
+    console.log({'buildDiffMagLim> symbols': symbols});
+
+    // adds the current candidate data for that filter to the previously constructed arrays
+    if (data.candidate.fid === fid) {
+      diffmags.push(data.candidate.diffmaglim.toFixed(2));
+      jds.push(data.candidate.jd);
+    }
+
+    return {
+      y: diffmags,
+      x: jds.map(function(jd){return jdToDate(jd)}),
+      text: jds.map(function(jd){return 'jd: ' + jd}),
+      mode: 'markers',
+      type: 'scatter',
+      name: filters[fid - 1] + ' (diffmaglim)',
+      marker:{
+        symbol: symbols,
+        color: filter_colorscale[fid - 1][1],
+        size: 7
+      }
+    }
+  }
+
+  function buildNonDetections(data, fid) {
+    // non-detections are the diffmaglim for everything but the candidate
+    var non_detections = data.prv_candidate.filter(function(match){
+      return !("candid" in match.candidate);
+    });
+    console.log({'buildNonDetections> non_detections': non_detections});
+
+    return {
+      x: non_detections.map(function(nd){return jdToDate(nd.candidate.jd);}),
+      y: non_detections.map(function(nd){return nd.candidate.diffmaglim;}),
+      mode: 'markers',
+      type: 'scatter',
+      name: 'non-detections',
+      marker: {
+        symbol: 'triangle-down',
+        color: non_detections.map(function(nd){return (nd.candidate.fid - 1)/2}),
+        colorscale: filter_colorscale,
+        cmin: -0.5,
+        cmax: 2.5
+      }
+    }
+  }
+
+  function buildPlot(data) {
     var fids = data.prv_candidate.map(function(prv_candidate){
       return prv_candidate.candidate.fid;
     })
@@ -202,8 +321,14 @@
 
     var plot_data  = [];
     for(var i=0; i<fids.length; i++){
-      plot_data.push(buildSeries(data, fids[i]));
+      plot_data.push(buildMagPsf(data, fids[i]));
     }
+
+    for(var i=0; i<fids.length; i++){
+      plot_data.push(buildDiffMagLim(data, fids[i]));
+    }
+
+    plot_data.push(buildNonDetections(data));
 
     var layout = {
       title: 'Light Curve',
@@ -218,7 +343,7 @@
     Plotly.newPlot('lightcurve', plot_data, layout);
   }
 
-  function plotLightCurve(){
+  function plotLightCurve() {
     var request = new XMLHttpRequest();
     request.open('GET', '/sassy/ztf/{{ alert.id }}/?format=json', true);
 
@@ -232,6 +357,5 @@
     }
     request.send();
   }
-
 </script>
 {% endblock %}

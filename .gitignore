@@ -16,6 +16,8 @@ __pycache__
 *.zip
 *.js
 *.json
+*.map
+*.obsolete
 
 # +
 # Logs
@@ -50,6 +52,7 @@ src/common.py
 # other repositories
 # -
 src/static/css/bootstrap*
+src/static/js9
 
 # +
 # miscellaneous
