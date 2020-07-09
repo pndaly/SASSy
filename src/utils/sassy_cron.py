@@ -74,8 +74,7 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
             _logger.info(f"connected to database OK")
 
     # select
-    _res = None
-    _results = []
+    _res, _solsys, _non_solsys = None, [], []
     _cmd_select = f"WITH x AS (SELECT * FROM sassy_cron), y AS (SELECT x.*, " \
                   f"(g.id, g.ra, g.dec, g.z, g.dist, q3c_dist(x.ra, x.dec, g.ra, g.dec)) " \
                   f"FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {_radius:.5f})), z AS " \
@@ -105,54 +104,67 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
             _d["jd"] = float(f"{_e[1]}")
         except Exception:
             _d["jd"] = float(math.nan)
+
         try:
             _d["drb"] = float(f"{_e[2]}")
         except Exception:
             _d["drb"] = float(math.nan)
+
         try:
             _d["rb"] = float(f"{_e[3]}")
         except Exception:
             _d["rb"] = float(math.nan)
+
         try:
             _d["sid"] = int(f"{_e[4]}")
         except Exception:
             _d["sid"] = -1
+
         try:
             _d["candid"] = int(f"{_e[5]}")
         except Exception:
             _d["candid"] = -1
+
         try:
             _d["ssnamenr"] = '' if f"{_e[6]}".lower() == 'null' else f"{_e[6]}"
         except Exception:
             _d["ssnamenr"] = ''
+
         try:
             _d["RA"] = float(f"{_e[7]}")
         except Exception:
             _d["RA"] = float(math.nan)
+
         try:
             _d["Dec"] = float(f"{_e[8]}")
         except Exception:
             _d["Dec"] = float(math.nan)
+
         try:
             _d["gid"] = int(f"{_gid}")
         except Exception:
             _d["gid"] = -1
+
         try:
             _d["gRA"] = float(f"{_gra}")
         except Exception:
             _d["gRA"] = float(math.nan)
+
         try:
             _d["gDec"] = float(f"{_gdec}")
         except Exception:
             _d["gDec"] = float(math.nan)
+
         try:
             _d["gDist"] = float(f"{_gdist}")
         except Exception:
             _d["gDist"] = float(math.nan)
+
         try:
             _d["gRedshift"] = float(f"{_gz}")
         except Exception:
             _d["gRedshift"] = float(math.nan)
+
         try:
             _d["gDelta"] = float(f"{_gdelta}")*3600.0
         except Exception:
@@ -164,7 +176,7 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
             _d["file"] = ""
 
         try:
-            _d["png"] = avro_plot(_d["file"], True)[0]
+            _d["file"] = avro_plot(_d["file"], True)[0]
         except Exception:
             _d["png"] = ""
 
@@ -173,26 +185,26 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
 
         try:
             if _d["ssnamenr"] != '':
-                if _logger:
-                    _logger.debug(f'ignoring solar system object, _d={_d}')
+                _solsys.append(_d)
             else:
-                _results.append(_d)
+                _non_solsys.append(_d)
         except Exception:
             continue
 
     # close and exit
-    return _results
+    if _logger:
+        _logger.info(f"found {len(_solsys)} solar system objects")
+        _logger.info(f"found {len(_non_solsys)} non-solar system objects")
+    return _solsys, _non_solsys
 
 
 # +
 # function: sassy_cron()
 # -
 # noinspection PyBroadException
-# def sassy_cron(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _rb_max=RB_MAX, _logger=None):
 def sassy_cron(_begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _rb_max=RB_MAX, _logger=None):
 
     # check input(s)
-    # _radius = _radius*ASEC_TO_DEGREE if (isinstance(_radius, float) and _radius >= 0.0) else RADIUS*ASEC_TO_DEGREE
     _begin_iso = _begin if (re.match(ISO_PATTERN, _begin) is not None and
                             isot_to_jd(_begin) is not math.nan) else BEGIN_ISO
     _end_iso = _end if (re.match(ISO_PATTERN, _end) is not None and isot_to_jd(_end) is not math.nan) else END_ISO
@@ -207,7 +219,6 @@ def sassy_cron(_begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _rb_max=RB_MAX, _
 
     # message
     if _logger:
-        # _logger.info(f"_radius = {_radius}")
         _logger.info(f"_begin_iso = {_begin_iso}")
         _logger.info(f"_begin_jd = {_begin_jd}")
         _logger.info(f"_end_iso = {_end_iso}")
@@ -276,8 +287,6 @@ if __name__ == '__main__':
                     help=f"""Begin date, defaults to %(default)s""")
     _p.add_argument(f'--end', default=END_ISO,
                     help=f"""End date, defaults to %(default)s""")
-    #_p.add_argument(f'--radius', default=RADIUS,
-    #                help=f"""Search radius, defaults to %(default)s\u2033""")
     _p.add_argument(f'--rb-max', default=RB_MAX,
                     help=f"""Deep-Learning real-bogus score maximum, defaults to %(default)s""")
     _p.add_argument(f'--rb-min', default=RB_MIN,
