@@ -20,6 +20,9 @@ Code modified in this system originated from the following sources:
  * Linux (we use Ubuntu 18.04.2 LTS)
  * Python 3.6.6 (it will not work with Python < 3.6.5)
  * PostGreSQL 12.x (but will probably work with earlier versions)
+ * JS9
+ * Bootstrap 4.5.x
+ * jQuery 3.5.1
  * An account at TNS (optional)
  * A *Memorandum of Understanding (MoU)* with ZTF to ingest alerts in real-time.
    - If you don't have a *MoU*, daily alerts are available at the 
@@ -186,6 +189,11 @@ and `${SASSY_SRC}/common.template.py` and edit the copies to suit your site and 
 % vi ${SASSY_SRC}/common.py
 ```
 
+## JS9, JavaScript and Bootstrap
+
+We do not ship these items. Please refer to the README.md files in the static sub-directories
+for getting and installing these products. The web-site will not work without them!
+
 ## Quick Start Guide
 
 If you carried out the above, and assuming the codebase is in /home/sassy/SASSy, you can start the application:
@@ -223,4 +231,4 @@ If you carried out the above, and assuming the codebase is in /home/sassy/SASSy,
 
 -----------------------------------------------------------------------------------------------------------------
 
-Last Updated: 20191219
+Last Updated: 20200702
