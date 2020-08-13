@@ -5,6 +5,8 @@
 # import(s)
 # -
 from src.utils.utils import *
+from astropy.io.fits import open as fits_open
+from PIL import Image
 
 import json
 import math
@@ -29,6 +31,7 @@ class Alerce(object):
         self.__answer = None
         self.__answer_l = None
         self.__answer_r = None
+        self.__candid = None
         self.__catalog = None
         self.__classifier = None
         self.__classifier_key = None
@@ -37,11 +40,13 @@ class Alerce(object):
         self.__dec = math.nan
         self.__detections = None
         self.__features = None
+        self.__image = None
         self.__json = None
         self.__match = None
         self.__match_all = None
         self.__non_detections = None
         self.__oid = None
+        self.__output = None
         self.__probabilities = None
         self.__payload = None
         self.__query = None
@@ -50,6 +55,8 @@ class Alerce(object):
         self.__response = None
         self.__sql = None
         self.__stats = None
+        self.__stamp = None
+        self.__table = None
         self.__url = None
 
         # structure(s)
@@ -111,6 +118,8 @@ class Alerce(object):
             "LPV_prob", "Periodic-Other_prob", "QSO-I_prob", "RRL_prob", "RS-CVn_prob", "SLSN_prob", "SNII_prob",
             "SNIa_prob", "SNIbc_prob", "oid")
         self.__alerce_non_detection_keys = ("diffmaglim", "fid", "mjd", "oid")
+        self.__alerce_stamps = ['difference', 'science', 'template']
+        self.__alerce_outputs = ['fits', 'jpg', 'png']
         self.__alerce_stat_keys = (
             "catalogid", "classearly", "classrf", "classxmatch", "deltajd", "first_magap_g", "first_magap_r",
             "first_magpsf_g", "first_magpsf_r", "firstmjd", "last_magap_g", "last_magap_r", "last_magpsf_g",
@@ -224,8 +233,16 @@ class Alerce(object):
         return self.__alerce_catalogs
 
     @property
+    def alerce_outputs(self):
+        return self.__alerce_outputs
+
+    @property
     def alerce_payload(self):
         return self.__alerce_payload
+
+    @property
+    def alerce_stamps(self):
+        return self.__alerce_stamps
 
     @property
     def answer(self):
@@ -238,6 +255,10 @@ class Alerce(object):
     @property
     def answer_r(self):
         return self.__answer_r
+
+    @property
+    def candid(self):
+        return self.__candid
 
     @property
     def catalog(self):
@@ -272,6 +293,10 @@ class Alerce(object):
         return self.__features
 
     @property
+    def image(self):
+        return self.__image
+
+    @property
     def json(self):
         return self.__json
 
@@ -286,6 +311,10 @@ class Alerce(object):
     @property
     def non_detections(self):
         return self.__non_detections
+
+    @property
+    def output(self):
+        return self.__output
 
     @property
     def oid(self):
@@ -320,8 +349,16 @@ class Alerce(object):
         return self.__sql
 
     @property
+    def stamp(self):
+        return self.__stamp
+
+    @property
     def stats(self):
         return self.__stats
+
+    @property
+    def table(self):
+        return self.__table
 
     @property
     def url(self):
@@ -351,7 +388,10 @@ class Alerce(object):
                 get_query(payload=None)
                 get_sql(payload=None)
                 get_stats(oid='')
-        
+                get_stamp(oid='', candid=0, stamp='science', output='fits')
+                oidmatch(catalog='', ra=math.nan, dec=math.nan, radius=math.nan)
+                oidmatch_all(ra=math.nan, dec=math.nan, radius=math.nan)
+
             Documentation:
                 print(Alerce().__doc__())
                 print(Alerce().crossmatch.__doc__)
@@ -364,7 +404,10 @@ class Alerce(object):
                 print(Alerce().get_query.__doc__)
                 print(Alerce().get_sql.__doc__)
                 print(Alerce().get_stats.__doc__)
-        
+                print(Alerce().get_stamp.__doc__)
+                print(Alerce().oidmatch.__doc__)
+                print(Alerce().oidmatch_all.__doc__)
+
             Example(s):
                 _a.crossmatch(catalog='GAIADR2', ra=13.5, dec=47.2, radius=60.0)
                 _a.crossmatch_all(ra=13.5, dec=47.2, radius=60.0)
@@ -377,7 +420,12 @@ class Alerce(object):
                 _a.get_query(payload={"query_parameters": {"dates": {"firstmjd": {"min": 58682}}}})
                 _a.get_sql(payload={"query_parameters": {"dates": {"firstmjd": {"min": 58682}}}})
                 _a.get_stats(oid='ZTF20aaccyfe')
-        
+                _a.get_stamp(oid='ZTF20aaccyfe', candid=0, stamp='difference', output='fits')
+                _a.get_stamp(oid='ZTF20aaccyfe', candid=0, stamp='science', output='jpg')
+                _a.get_stamp(oid='ZTF20aaccyfe', candid=0, stamp='template', output='png')
+                _a.oidmatch(catalog='GAIADR2', oid='ZTF20aaccyfe', radius=60.0)
+                _a.oidmatch_all(oid='ZTF20aaccyfe', radius=60.0)
+
         """
 
     # +
@@ -446,6 +494,7 @@ class Alerce(object):
         self.__answer = None
         self.__answer_l = None
         self.__answer_r = None
+        self.__candid = None
         self.__catalog = None
         self.__classifier = None
         self.__classifier_key = None
@@ -454,11 +503,13 @@ class Alerce(object):
         self.__dec = math.nan
         self.__detections = None
         self.__features = None
+        self.__image = None
         self.__json = None
         self.__match = None
         self.__match_all = None
         self.__non_detections = None
         self.__oid = None
+        self.__output = None
         self.__payload = None
         self.__probabilities = None
         self.__query = None
@@ -466,7 +517,9 @@ class Alerce(object):
         self.__radius = math.nan
         self.__response = None
         self.__stats = None
+        self.__stamp = None
         self.__sql = None
+        self.__table = None
         self.__url = None
 
     # +
@@ -743,6 +796,71 @@ class Alerce(object):
         return self.__sql
 
     # +
+    # method: get_stamp()
+    # -
+    def get_stamp(self, oid='', candid=0, stamp='science', output='png'):
+        """
+            :param oid: str, case-sensitive, ZTF identifier
+            :param candid: int, candidate identifier (0 for earliest)
+            :param stamp: str, stamp from ['science', 'difference', 'template']
+            :param output: str, output format from ['fits', 'jpg', 'png']
+            :return: thumbnail in given format or None
+        """
+
+        # check input(s)
+        if not isinstance(oid, str) or oid.strip() == '':
+            return
+        if not isinstance(candid, int) or candid < 0:
+            return
+        if not isinstance(stamp, str) or stamp.strip().lower() not in self.__alerce_stamps:
+            return
+        if not isinstance(output, str) or output.strip().lower() not in self.__alerce_outputs:
+            return
+        if self.__log:
+            self.__log.debug(f"get_stamp(oid='{oid}', candid={candid}, stamp='{stamp}', output='{output}')")
+
+        # execute
+        self.__reinit__()
+        self.__oid = oid
+        self.__stamp = stamp.strip().lower()
+        self.__output = output.strip().lower()
+
+        if candid > 0:
+            self.__candid = candid
+        else:
+            self.__url = 'https://ztf.alerce.online/get_detections'
+            self.__json = {'oid': f'{self.__oid}'}
+            self.__detections = self.__http_post__()
+            if self.__detections is None:
+                return
+            _tmp = {_i['mjd']: _i['candid'] for _i in self.__detections['result']['detections']}
+            _min = min(_tmp.keys())
+            self.__candid = _tmp[_min]
+        self.__url = f'https://avro.alerce.online/get_stamp?' \
+                     f'oid={self.__oid}&candid={self.__candid}&type={self.__stamp}&format=fits'
+
+        # get data
+        try:
+            self.__image = fits_open(self.__url)[0]
+            self.__image.header['STAMP'] = self.__stamp
+        except Exception as _e:
+            if self.__log:
+                self.__log.error(f"failed to get_stamp(oid='{oid}', candid={candid}, stamp='{stamp}'), error={_e}")
+            return
+
+        # create output file
+        self.__output = os.path.join(os.getcwd(), f'{self.__oid}_{self.__candid}_{self.__stamp}.{self.__output}')
+        try:
+            if 'fits' in self.__output:
+                self.__image.writeto(self.__output)
+            else:
+                self.__image = Image.fromarray(self.__image.data)
+                self.__image.convert('RGB').save(self.__output)
+        except:
+            pass
+        return self.__output
+
+    # +
     # method: get_stats()
     # -
     def get_stats(self, oid=''):
@@ -764,3 +882,81 @@ class Alerce(object):
         self.__json = {'oid': f'{self.__oid}'}
         self.__stats = self.__http_post__()
         return self.__stats
+
+    # +
+    # method: oidmatch()
+    # -
+    def oidmatch(self, catalog='GAIADR2', oid='', radius=math.nan):
+        """
+            :param catalog: str, case-sensitive, supported catalogs from Alerce().alerce_catalogs
+            :param oid: str, case-sensitive, ZTF identifier
+            :param radius: float, search radius in digital arc-seconds
+            :return: dictionary cone search match against catalog or {}
+        """
+
+        # check input(s)
+        if not isinstance(catalog, str) or catalog.strip() not in self.__alerce_catalogs:
+            return
+        if not isinstance(oid, str) or oid.strip() == '':
+            return
+        if not isinstance(radius, float) or radius is math.nan or (radius <= 0.0):
+            return
+        if self.__log:
+            self.__log.debug(f"oidmatch(catalog='{catalog}', oid={oid}, radius={radius})")
+
+        # execute
+        self.__reinit__()
+        self.__catalog = catalog
+        self.__oid = oid
+        self.__radius = radius
+        self.__url = 'https://ztf.alerce.online/get_stats'
+        self.__json = {'oid': f'{self.__oid}'}
+        self.__stats = self.__http_post__()
+
+        try:
+            self.__ra = self.__stats['result']['stats']['meanra']
+            self.__dec = self.__stats['result']['stats']['meandec']
+        except:
+            self.__ra = math.nan
+            self.__dec = math.nan
+        self.__url = f"https://catshtm.alerce.online/crossmatch?" \
+                     f"catalog={self.__catalog}&ra={self.__ra}&dec={self.__dec}&radius={self.__radius}"
+        self.__match = self.__http_get__()
+        return self.__match
+
+    # +
+    # method: oidmatch_all()
+    # -
+    def oidmatch_all(self, oid='', radius=math.nan):
+        """
+            :param oid: str, case-sensitive, ZTF identifier
+            :param radius: float, search radius in digital arc-seconds
+            :return: dictionary cone search match against catalog or {}
+        """
+
+        # check input(s)
+        if not isinstance(oid, str) or oid.strip() == '':
+            return
+        if not isinstance(radius, float) or radius is math.nan or (radius <= 0.0):
+            return
+        if self.__log:
+            self.__log.debug(f"oidmatch_all(oid={oid}, radius={radius})")
+
+        # execute
+        self.__reinit__()
+        self.__oid = oid
+        self.__radius = radius
+        self.__url = 'https://ztf.alerce.online/get_stats'
+        self.__json = {'oid': f'{self.__oid}'}
+        self.__stats = self.__http_post__()
+
+        try:
+            self.__ra = self.__stats['result']['stats']['meanra']
+            self.__dec = self.__stats['result']['stats']['meandec']
+        except:
+            self.__ra = math.nan
+            self.__dec = math.nan
+        self.__url = f"https://catshtm.alerce.online/crossmatch_all?" \
+                     f"ra={self.__ra}&dec={self.__dec}&radius={self.__radius}"
+        self.__match = self.__http_get__()
+        return self.__match

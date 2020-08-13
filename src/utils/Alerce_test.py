@@ -48,9 +48,9 @@ def get_hash():
 # constant(s)
 # -
 TEST_API = ['crossmatch', 'crossmatch_all', 'get_classifier', 'get_detections', 'get_features', 'get_non_detections',
-            'get_probabilities', 'get_query', 'get_sql', 'get_stats']
+            'get_probabilities', 'get_query', 'get_sql', 'get_stamp', 'get_stats', 'oidmatch', 'oidmatch_all']
 TEST_BYTES = 9223372036854775807
-TEST_INVALID_INPUTS = [get_hash(), {get_hash(): TEST_BYTES}, [TEST_BYTES], (TEST_BYTES,), math.nan, TEST_BYTES, None]
+TEST_INVALID_INPUTS = [get_hash(), {get_hash(): TEST_BYTES}, [TEST_BYTES], (TEST_BYTES,), math.nan, -TEST_BYTES, None]
 
 
 # +
@@ -422,3 +422,98 @@ def test_alerce_122():
 
 def test_alerce_123():
     assert all(getattr(_alerce, _k).__doc__ != '' for _k in TEST_API)
+
+
+# +
+# Alerce().oidmatch(self, catalog='GAIADR2', oid='', radius=math.nan)
+# -
+def test_alerce_130():
+    """ test oidmatch() for invalid input(s) """
+    assert all(_alerce.oidmatch(catalog=_k) is None for _k in TEST_INVALID_INPUTS)
+
+
+def test_alerce_131():
+    """ test oidmatch() for invalid input(s) """
+    _cat = random.choice(_alerce.alerce_catalogs)
+    assert all(_alerce.oidmatch(catalog=_cat, oid=_k) is None for _k in TEST_INVALID_INPUTS[1:])
+
+
+def test_alerce_132():
+    """ test oidmatch() for invalid input(s) """
+    _cat = random.choice(_alerce.alerce_catalogs)
+    assert all(_alerce.oidmatch(catalog=_cat, oid=get_hash(), radius=_k) is None for _k in TEST_INVALID_INPUTS)
+
+
+def test_alerce_133():
+    """ test oidmatch() for valid input(s) """
+    _cat = random.choice(_alerce.alerce_catalogs)
+    _radius = random.uniform(0.0, 360.0)
+    assert _alerce.oidmatch(catalog=_cat, oid='ZTF20aaccyfe', radius=_radius) is not None
+
+
+# +
+# Alerce().oidmatch_all(self, oid='', radius=math.nan)
+# -
+def test_alerce_140():
+    """ test oidmatch_all() for invalid input(s) """
+    assert all(_alerce.oidmatch_all(oid=_k) is None for _k in TEST_INVALID_INPUTS[1:])
+
+
+def test_alerce_141():
+    """ test oidmatch_all() for invalid input(s) """
+    assert all(_alerce.oidmatch_all(oid=get_hash(), radius=_k) is None for _k in TEST_INVALID_INPUTS)
+
+
+def test_alerce_142():
+    """ test oidmatch_all() for valid input(s) """
+    _radius = random.uniform(0.0, 60.0)
+    assert _alerce.oidmatch_all(oid='ZTF20aaccyfe', radius=_radius) is not None
+
+
+# +
+# Alerce().get_stamp(self, oid='', candid=0, stamp='science', output='png')
+# -
+def test_alerce_150():
+    """ test get_stamp() for invalid input(s) """
+    assert all(_alerce.get_stamp(oid=_k) is None for _k in TEST_INVALID_INPUTS[1:])
+
+
+def test_alerce_151():
+    """ test get_stamp() for invalid input(s) """
+    assert all(_alerce.get_stamp(oid=get_hash(), candid=_k) is None for _k in TEST_INVALID_INPUTS)
+
+
+def test_alerce_152():
+    """ test get_stamp() for invalid input(s) """
+    assert all(_alerce.get_stamp(oid=get_hash(), candid=random.randint(0, 1000), stamp=_k) is None
+               for _k in TEST_INVALID_INPUTS[1:])
+
+
+def test_alerce_153():
+    """ test get_stamp() for invalid input(s) """
+    _oid = get_hash()
+    _stp = random.choice(_alerce.alerce_stamps)
+    assert all(_alerce.get_stamp(oid=_oid, candid=random.randint(0, 1000), stamp=_stp, output=_k) is None
+               for _k in TEST_INVALID_INPUTS)
+
+
+def test_alerce_154():
+    """ test get_stamp() for valid input(s) """
+    assert _alerce.get_stamp(oid='ZTF20aaccyfe', candid=0, stamp='science', output='fits') is not None
+
+
+def test_alerce_155():
+    """ test get_stamp() for valid input(s) """
+    _stamp = random.choice(_alerce.alerce_stamps)
+    _output = random.choice(_alerce.alerce_outputs)
+    assert _alerce.get_stamp(oid='ZTF20aaccyfe', candid=1098447070015010011, stamp=_stamp, output=_output) is not None
+
+
+def test_alerce_156():
+    """ test get_stamp() for valid input(s) """
+    _oid = 'ZTF20aaccyfe'
+    _candid = 1098447070015010011
+    _stamp = random.choice(_alerce.alerce_stamps)
+    _output = random.choice(_alerce.alerce_outputs)
+    _file = _alerce.get_stamp(oid=_oid, candid=_candid, stamp=_stamp, output=_output)
+    assert _file is not None and os.path.exists(_alerce.output)
