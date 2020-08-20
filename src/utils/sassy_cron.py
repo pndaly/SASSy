@@ -82,6 +82,7 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
                   f"q3c_join(y.ra, y.dec, t.ra, t.dec, {_radius:.5f})) SELECT * FROM z WHERE tns_id IS null;"
     if _logger:
         _logger.info(f'Executing {_cmd_select}')
+
     try:
         _res = db.query(_cmd_select)
     except Exception as e:

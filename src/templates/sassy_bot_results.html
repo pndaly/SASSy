@@ -5,148 +5,175 @@
 
 {% block content %}
 <!--suppress ALL -->
-<!-- globl container -->
+<!-- global container -->
 <div class="container">
  <div class="col-md-12">
   <h4>SASSyBot Records ({{ total }} found)</h4>
   <br>
   <br>
-  <h5><font color="grey">How many alerts within the given timeframe, and between the real/bogus score limits, have
-a host
-     in the GLADE catalog within the search radius that are <i>not</i> in the TNS database and are <i>not</i> known
-solar system objects?</font></h5>
-   <br>
-   <br>
+  <h5><font color="grey">How many alerts within the given timeframe, and between the real/bogus score limits,
+   have a host in the GLADE catalog within the search radius that are <i>not</i> in the TNS database and
+   are <i>not</i> known solar system objects?</font></h5>
+  <br>
+  <br>
   <div class="table-responsive">
    <table class="table table-striped table-sm">
     <thead>
       <th colspan="9" style="border: 1px solid black; background-color: #ffffcc;"><center>ZTF</center></th>
+      <th colspan="4" style="border: 1px solid black; background-color: #ffffcc;"><center>Alerce</center></th>
       <th colspan="5" style="border: 1px solid black; background-color: #ffffcc;"><center>GLADE</center></th>
       <th colspan="4" style="border: 1px solid black; background-color: #ffffcc;"><center>Other</center></th>
     </thead>
     <thead>
       <tr>
-       <!-- Thumbnail(s) -->
+       <!-- ZTF: Thumbnail(s) -->
        <th>Thumbnail(s)</th>
-       <!-- ObjectId -->
+       <!-- ZTF: ObjectId -->
        <th>ObjectId</th>
-       <!-- sid -->
+       <!-- ZTF: sid -->
        <th>sid</th>
-       <!-- RA -->
+       <!-- ZTF: RA -->
        <th>RA</th>
-       <!-- Dec -->
+       <!-- ZTF: Dec -->
        <th>Dec</th>
-       <!-- JD -->
+       <!-- ZTF: JD -->
        <th>JD</th>
-       <!-- CandId -->
+       <!-- ZTF: CandId -->
        <th>CandId</th>
-       <!-- rb -->
+       <!-- ZTF: rb -->
        <th>rb</th>
-       <!-- drb -->
+       <!-- ZTF: drb -->
        <th>drb</th>
-       <!-- dbid -->
+       <!-- Alerce: early classifier -->
+       <th>Early</th>
+       <!-- Alerce: early percent -->
+       <th>P(Early)</th>
+       <!-- Alerce: late classifier -->
+       <th>Late</th>
+       <!-- Alerce: late percent -->
+       <th>P(Late)</th>
+       <!-- Glade_q3c: dbid -->
        <th>dbid</th>
-       <!-- RA -->
+       <!-- Glade_q3c: RA -->
        <th>RA</th>
-       <!-- Dec -->
+       <!-- Glade_q3c: Dec -->
        <th>Dec</th>
-       <!-- Mpc -->
+       <!-- Glade_q3c: Mpc -->
        <th>Distance</th>
-       <!-- z -->
+       <!-- Glade_q3c: z -->
        <th>z</th>
-       <!-- Separation -->
+       <!-- Other: Separation -->
        <th>Separation</th>
-       <!-- Sci -->
+       <!-- Other: Sci -->
        <th>Science</th>
-       <!-- Tmp -->
+       <!-- Other: Tmp -->
        <th>Template</th>
-       <!-- Dif -->
+       <!-- Other: Dif -->
        <th>Difference</th>
       </tr>
       <tr>
-       <!-- Thumbnail(s) -->
+       <!-- ZTF: Thumbnail(s) -->
        <th><font color="grey">png</font></th>
-       <!-- ObjectId -->
+       <!-- ZTF: ObjectId -->
        <th><font color="grey"> </font></th>
-       <!-- sid -->
+       <!-- ZTF: sid -->
        <th><font color="grey"> </font></th>
-       <!-- RA -->
+       <!-- ZTF: RA -->
        <th><font color="grey">J2k&deg;</font></th>
-       <!-- Dec -->
+       <!-- ZTF: Dec -->
        <th><font color="grey">J2k&deg;</font></th>
-       <!-- JD -->
+       <!-- ZTF: JD -->
        <th><font color="grey"> </font></th>
-       <!-- CandId -->
+       <!-- ZTF: CandId -->
        <th><font color="grey"> </font></th>
-       <!-- rb -->
+       <!-- ZTF: rb -->
        <th><font color="grey">0.0&mdash;1.0</font></th>
-       <!-- drb -->
+       <!-- ZTF: drb -->
        <th><font color="grey">0.0&mdash;1.0</font></th>
-       <!-- dbid -->
+       <!-- Alerce: early classifier -->
+       <th><font color="grey">Class</font></th>
+       <!-- Alerce: early percent -->
+       <th><font color="grey"><center>%</center></font></th>
+       <!-- Alerce: late classifier -->
+       <th><font color="grey">Class</font></th>
+       <!-- Alerce: late percent -->
+       <th><font color="grey"><center>%</center></font></th>
+       <!-- Glade_q3c: dbid -->
        <th><font color="grey"> </font></th>
-       <!-- RA -->
+       <!-- Glade_q3c: RA -->
        <th><font color="grey">J2k&deg;</font></th>
-       <!-- Dec -->
+       <!-- Glade_q3c: Dec -->
        <th><font color="grey">J2k&deg;</font></th>
-       <!-- Mpc -->
+       <!-- Glade_q3c: Mpc -->
        <th><font color="grey">Mpc</font></th>
-       <!-- z -->
+       <!-- Glade_q3c: z -->
        <th><font color="grey"> </font></th>
-       <!-- Separation -->
+       <!-- Other: Separation -->
        <th><font color="grey">&Prime;</font></th>
-       <!-- Sci -->
+       <!-- Other: Sci -->
        <th><font color="grey">.fits.gz</font></th>
-       <!-- Tmp -->
+       <!-- Other: Tmp -->
        <th><font color="grey">.fits.gz</font></th>
-       <!-- Dif -->
+       <!-- Other: Dif -->
        <th><font color="grey">.fits.gz</font></th>
       </tr>
     </thead>
     <tbody>
      {% for _history in history %}
       <tr>
-       <!-- Thumbnail(s) -->
+       <!-- ZTF: Thumbnail(s) -->
        {% if _history.png %}
         <td><img src="{{ _history.png }}" alt="Unknown" height="75" width="225"></td>
        {% else %}
         <td>Not available</td>
        {% endif %}
-       <!-- ObjectId -->
+       <!-- ZTF: ObjectId -->
        <td>{{ _history.objectId }}</td>
-       <!-- sid -->
+       <!-- ZTF: sid -->
        <td><a href="{{ url_for('ztf_detail', id=_history.sid) }}">{{ _history.sid }}</a></td>
-       <!-- RA -->
+       <!-- ZTF: RA -->
        <td>{{ "%.4f"|format(_history.RA) }}</td>
-       <!-- Dec -->
+       <!-- ZTF: Dec -->
        <td>{{ "%.4f"|format(_history.Dec) }}</td>
-       <!-- JD -->
-       <td>{{ _history.jd }}</td>
-       <!-- CandId -->
+       <!-- ZTF: JD -->
+       <td>{{ "%.4f"|format(_history.jd) }}</td>
+       <!-- ZTF: CandId -->
        <td>{{ _history.candid }}</td>
-       <!-- rb -->
+       <!-- ZTF: rb -->
        <td>{{ "%.3f"|format(_history.rb) }}</td>
-       <!-- drb -->
+       <!-- ZTF: drb -->
        <td>{{ "%.3f"|format(_history.drb) }}</td>
-       <!-- dbid -->
+       <!-- Alerce: early classifier -->
+       <td>{{ _history.early_classifier }}</td>
+       <!-- Alerce: early percent -->
+       <td>{{ "%.3f"|format(_history.early_percent) }}</td>
+       <!-- Alerce: late classifier -->
+       <td>{{ _history.late_classifier }}</td>
+       <!-- Alerce: late percent -->
+       <td>{{ "%.3f"|format(_history.late_percent) }}</td>
+       <!-- Glade_q3c: dbid -->
        <td><a href="{{ url_for('glade_q3c_detail', dbid=_history.gid) }}">{{ _history.gid }}</a></td>
-       <!-- RA -->
+       <!-- Glade_q3c: RA -->
        <td>{{ "%.4f"|format(_history.gRA) }}</td>
-       <!-- Dec -->
+       <!-- Glade_q3c: Dec -->
        <td>{{ "%.4f"|format(_history.gDec) }}</td>
-       <!-- Mpc -->
-       <td>{{ "%.4f"|format(_history.gDist) }}</td>
-       <!-- z -->
-       <td>{{ "%.4f"|format(_history.gRedshift) }}</td>
-       <!-- Separation -->
+       <!-- Glade_q3c: Mpc -->
+       <td>{{ "%.1f"|format(_history.gDist) }}</td>
+       <!-- Glade_q3c: z -->
+       <td>{{ "%.3f"|format(_history.gRedshift) }}</td>
+       <!-- Other: Separation -->
        <td>{{ "%.2f"|format(_history.gDelta) }}</td>
+       <!-- Other: Sci -->
        <td>
-	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Science') }}" class="btn btn-outline-success btn-sm">img</a>
+	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Science') }}" class="btn btn-outline-success btn-sm">sci</a>
        </td>
+       <!-- Other: Tmp -->
        <td>
-	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Template') }}" class="btn btn-outline-info btn-sm">img</a>
+	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Template') }}" class="btn btn-outline-info btn-sm">tmp</a>
        </td>
+       <!-- Other: Dif -->
        <td>
-	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Difference') }}" class="btn btn-outline-warning btn-sm">img</a>
+	  <a href="{{ url_for('ztf_alert_stamp', id=_history.sid, stamp='Difference') }}" class="btn btn-outline-warning btn-sm">dif</a>
        </td>
       </tr>
      {% endfor %}
@@ -155,6 +182,7 @@ solar system objects?</font></h5>
   </div>
   <br>
   <div class="col-md-2"><a href="{{ url_for('sassy_home') }}" class="btn btn-md btn-info"><i class="fas fa-backward"></i></a></div>
+ </div>
 </div>
 {% endblock %}
 

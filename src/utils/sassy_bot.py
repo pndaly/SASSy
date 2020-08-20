@@ -12,6 +12,7 @@ from datetime import timedelta
 from pg import DB
 
 from src.common import *
+from src.utils.Alerce import *
 from src.utils.utils import *
 from src.utils.avro_plot import avro_plot
 
@@ -91,7 +92,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
     _rb_min = _rb_min if (isinstance(_rb_min, float) and 0.0 <= _rb_min <= 1.0) else RB_MIN
     _rb_max = _rb_max if (isinstance(_rb_max, float) and 0.0 <= _rb_max <= 1.0) else RB_MAX
 
-    # create logger (if required)
+    # entry
     if _logger:
         _logger.info(f"_radius = {_radius}")
         _logger.info(f"_begin_iso = {_begin_iso}")
@@ -100,6 +101,7 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
         _logger.info(f"_rb_max = {_rb_max}")
 
     # set default(s)
+    _alerce = Alerce(_logger)
     _res = None
     _results = []
     _begin_jd = iso_to_jd(_begin_iso)
@@ -179,6 +181,23 @@ def sassy_bot_read(_radius=RADIUS, _begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MI
             _logger.info(f'_e={_e}')
         _gid, _gra, _gdec, _gz, _gdist, _gdelta = _e[9][1:-1].split(",")
         _d = {"objectId": f"{_e[0]}"}
+
+        try:
+            _classifier = _alerce.get_classifier(oid=_d['objectId'], classifier='early')
+            _d['early_classifier'] = _classifier[1]
+            _d['early_percent'] = _classifier[2] * 100.0
+        except Exception:
+            _d['early_classifier'] = 'n/a'
+            _d['early_percent'] = math.nan
+
+        try:
+            _classifier = _alerce.get_classifier(oid=_d['objectId'], classifier='late')
+            _d['late_classifier'] = _classifier[1]
+            _d['late_percent'] = _classifier[2] * 100.0
+        except Exception:
+            _d['late_classifier'] = 'n/a'
+            _d['late_percent'] = math.nan
+
         try:
             _d["jd"] = float(f"{_e[1]}")
         except Exception:

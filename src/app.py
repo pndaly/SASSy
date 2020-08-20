@@ -390,14 +390,14 @@ def sassy_cron_query(radius=0.0):
     logger.debug(f'route /sassy/cron/{radius}/ entry')
 
     # connect to database
-    _cron = None
+    _solsys, _non_solsys = [], []
     try:
-        _cron = sassy_cron_read(radius, logger)
+        _solsys, _non_solsys = sassy_cron_read(radius, UtilsLogger('SassyCron').logger)
     except Exception as e:
         logger.error(f'failed reading SassyCron, error={e}')
 
     # return
-    response = {'total': len(_cron), 'results': _cron}
+    response = {'total': len(_non_solsys), 'results': _non_solsys}
     return render_template('sassy_cron_results.html', context=response)
 
 
