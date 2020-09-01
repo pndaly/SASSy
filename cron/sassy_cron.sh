@@ -1,103 +1,121 @@
-#!/bin/sh
+#!/bin/bash
 
 
 # +
 #
 # Name:        sassy_cron.sh
-# Description: SASSYy cron
+# Description: SassyCron Control
 # Author:      Phil Daly (pndaly@arizona.edu)
-# Date:        20200605
+# Date:        20200901
 # Execute:     % bash sassy_cron.sh --help
 #
 # -
 
 
 # +
-# set defaults: edit as you see fit
+# default(s)
 # -
-HERE=${PWD}
-PARENT=$(dirname "${HERE}")
+source /var/www/SASSy/etc/Sassy.sh /var/www/SASSy
 
-def_begin=$(date --date="yesterday" +%Y-%m-%dT%H:%M:%S.000000)
-def_end=$(date --date="today" +%Y-%m-%dT%H:%M:%S.000000)
-def_rb_min=0.5
-def_rb_max=1.0
-
-
-# +
-# set defaults: do not edit
-# -
+authorization="sassy:db_secret"
+max_jd=$(python3 -c "from src import *; print(get_jd(0))")
+max_mpc=500.0
+max_rb=1.0
+min_jd=$(python3 -c "from src import *; print(get_jd(-1))")
+min_mpc=0.0
+min_rb=0.5
+radius=45.0
 dry_run=0
 
 
 # +
-# utility functions
+# auxiliary function(s)
 # -
-write_blue () {
-  printf "\033[0;34m${1}\033[0m\n"
-}
-
-write_red () {
+write_red () { 
   printf "\033[0;31m${1}\033[0m\n"
 }
 
-write_yellow () {
-  printf "\033[0;33m${1}\033[0m\n"
-}
-
-write_green () {
+write_green () { 
   printf "\033[0;32m${1}\033[0m\n"
 }
 
-write_cyan () {
-  printf "\033[0;36m${1}\033[0m\n"
+write_yellow () { 
+  printf "\033[0;33m${1}\033[0m\n"
 }
 
-write_magenta () {
+write_blue () { 
+  printf "\033[0;34m${1}\033[0m\n"
+}
+
+write_magenta () { 
   printf "\033[0;35m${1}\033[0m\n"
 }
 
+write_cyan () { 
+  printf "\033[0;36m${1}\033[0m\n"
+}
+
 usage () {
-  write_blue   ""                                                                                          2>&1
-  write_blue   "SASSy Cron Control"                                                                        2>&1
-  write_blue   ""                                                                                          2>&1
-  write_green  "Use:"                                                                                      2>&1
-  write_green  " %% bash $0 [--dry-run]"                                                                   2>&1
-  write_yellow ""                                                                                          2>&1
-  write_yellow "Input(s):"                                                                                 2>&1
-  write_yellow "  --begin=<str>,    where <str> is an ISOT time string,             default=${def_begin}"  2>&1
-  write_yellow "  --end=<str>,      where <str> is an ISOT time string,             default=${def_end}"    2>&1
-  write_yellow "  --rb-min=<float>, where <float> is the minimum real-bogus score,  default=${def_rb_min}" 2>&1
-  write_yellow "  --rb-max=<float>, where <float> is the maximum real-bogus score,  default=${def_rb_max}" 2>&1
-  write_yellow ""                                                                                          2>&1
-  write_cyan   "Flag(s):"                                                                                  2>&1
-  write_cyan   "  --dry-run        show (but do not execute) commands,    default=false"                   2>&1
-  write_cyan   ""                                                                                          2>&1
+  write_blue   ""                                                                                                                                   2>&1
+  write_blue   "SassyCron Control"                                                                                                                  2>&1
+  write_blue   ""                                                                                                                                   2>&1
+  write_green  "Use:"                                                                                                                               2>&1
+  write_green  "  %% bash ${0} --max_jd=<float> --max_mpc=<float> --max_rb=<float> --min_jd=<float> --min_mpc=<float> --min_rb=<float> [--dry-run]" 2>&1
+  write_yellow ""                                                                                                                                   2>&1
+  write_yellow "Input(s):"                                                                                                                          2>&1
+  write_yellow "  --authorization=<str>,  database credentials,                        default=${authorization}"                                    2>&1
+  write_yellow "  --max_jd=<float>,       Maximum julian day,                          default=${max_jd}"                                           2>&1
+  write_yellow "  --max_mpc=<float>,      Maximum distance (Mpc),                      default=${max_mpc}"                                          2>&1
+  write_yellow "  --max_rb=<float>,       Maximum real-bogus score,                    default=${max_rb}"                                           2>&1
+  write_yellow "  --min_jd=<float>,       Minimum julian day,                          default=${min_jd}"                                           2>&1
+  write_yellow "  --min_mpc=<float>,      Minimum distance (Mpc),                      default=${min_mpc}"                                          2>&1
+  write_yellow "  --min_rb=<float>,       Minimum real-bogus score,                    default=${min_rb}"                                           2>&1
+  write_yellow "  --radius=<float>,       search radius (arcsec),                      default=${radius}"                                           2>&1
+  write_yellow ""                                                                                                                                   2>&1
+  write_cyan   "Flag(s):"                                                                                                                           2>&1
+  write_cyan   "  --dry-run,         show (but do not execute) command(s),             default=false"                                               2>&1
+  write_cyan   ""                                                                                                                                   2>&1
 }
 
 
 # +
-# check command line argument(s) 
+# get command line argument(s) 
 # -
-while test $# -gt 0; do
+while [[ $# -gt 0 ]]; do
   case "${1}" in
-    --begin*)
-      begin=$(echo $1 | cut -d'=' -f2)
+    --authorization*)
+      _authorization=$(echo ${1} | cut -d'=' -f2)
       shift
       ;;
-    --end*)
-      end=$(echo $1 | cut -d'=' -f2)
+    --max_jd*)
+      _max_jd=$(echo ${1} | cut -d'=' -f2)
       shift
       ;;
-    --rb-min*)
-      rb_min=$(echo $1 | cut -d'=' -f2)
+    --max_mpc*)
+      _max_mpc=$(echo ${1} | cut -d'=' -f2)
       shift
       ;;
-    --rb-max*)
-      rb_max=$(echo $1 | cut -d'=' -f2)
+    --max_rb*)
+      _max_rb=$(echo ${1} | cut -d'=' -f2)
       shift
       ;;
-    --dry-run|--DRY-RUN)
+    --min_jd*)
+      _min_jd=$(echo ${1} | cut -d'=' -f2)
+      shift
+      ;;
+    --min_mpc*)
+      _min_mpc=$(echo ${1} | cut -d'=' -f2)
+      shift
+      ;;
+    --min_rb*)
+      _min_rb=$(echo ${1} | cut -d'=' -f2)
+      shift
+      ;;
+    --radius*)
+      _radius=$(echo ${1} | cut -d'=' -f2)
+      shift
+      ;;
+    --dry-run)
       dry_run=1
       shift
       ;;
@@ -110,36 +128,127 @@ done
 
 
 # +
-# check input(s)
+# check and (re)set command line argument(s)
 # -
-[[ -z ${begin} ]]   && begin=${def_begin}
-[[ -z ${end} ]]     && end=${def_end}
-[[ -z ${rb_min} ]]  && rb_min=${def_rb_min}
-[[ -z ${rb_max} ]]  && rb_max=${def_rb_max}
+[[ -z ${_authorization} ]] && _authorization=${authorization}
+[[ -z ${_max_jd} ]] && _max_jd=${max_jd}
+[[ -z ${_max_mpc} ]] && _max_mpc=${max_mpc}
+[[ -z ${_max_rb} ]] && _max_rb=${max_rb}
+[[ -z ${_min_jd} ]] && _min_jd=${min_jd}
+[[ -z ${_min_mpc} ]] && _min_mpc=${min_mpc}
+[[ -z ${_min_rb} ]] && _min_rb=${min_rb}
+[[ -z ${_radius} ]] && _radius=${radius}
 
-[[ ! ${rb_min} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> rb_min ${rb_min} is invalid!" && exit 0
-[[ ! ${rb_max} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> rb_max ${rb_max} is invalid!" && exit 0
+[[ ! ${_max_jd} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> max_jd=${_max_jd} is invalid!" && exit 0
+[[ ! ${_max_mpc} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> max_mpc=${_max_mpc} is invalid!" && exit 0
+[[ ! ${_max_rb} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> max_rb=${_max_rb} is invalid!" && exit 0
+[[ ! ${_min_jd} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> min_jd=${_min_jd} is invalid!" && exit 0
+[[ ! ${_min_mpc} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> min_mpc=${_min_mpc} is invalid!" && exit 0
+[[ ! ${_min_rb} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> min_rb=${_min_rb} is invalid!" && exit 0
+[[ ! ${_radius} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> radius=${_radius} is invalid!" && exit 0
+
+write_blue "%% bash ${0} --authorization=${_authorization} --max_jd=${_max_jd} --max_mpc=${_max_mpc} --max_rb=${_max_rb} --min_jd=${_min_jd} --min_mpc=${_min_mpc} --min_rb=${_min_rb} --radius=${_radius} --dry-run=${dry_run}" 2>&1
 
 
 # +
-# execute (dry-run)
+# variable(s)
 # -
-write_blue "%% bash $0 --begin=${begin} --end=${end} --rb-min=${rb_min} --rb-max=${rb_max} --dry-run=${dry_run}"
-_args="--begin=${begin} --end=${end} --rb-min=${rb_min} --rb-max=${rb_max} --verbose" 
-if [[ ${dry_run} -eq 1 ]]; then
-  write_yellow "Dry-Run>> source ${PARENT}/etc/Sassy.sh ${PARENT}"
-  write_yellow "Dry-Run>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/sassy_cron.py ${_args}"
+_user=$(echo ${_authorization} | cut -d':' -f1)
+_pass=$(echo ${_authorization} | cut -d':' -f2)
+
+
 
 
 # +
-# execute (for-real)
+# worker function(s)
 # -
-else
-  write_green "Executing>> source ${PARENT}/etc/Sassy.sh ${PARENT}"
-  source ${PARENT}/etc/Sassy.sh ${PARENT}
-  write_green "Executing>> PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/sassy_cron.py ${_args}"
-  PYTHONPATH=${PARENT}:${PARENT}/src python3 ${PARENT}/src/utils/sassy_cron.py ${_args}
-fi
+_create_sassy_cron_ztf () {
+  write_magenta "_create_sassy_cron_ztf(dry_run=${1}, user=${2}, pass=${3}, max_jd=${4}, max_rb=${5}, min_jd=${6}, min_rb=${7})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_ztf_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_ztf;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_ztf (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec) AS (SELECT DISTINCT \"objectId\", jd, magap, magpsf, magdiff, fid, drb, rb, id, alert_candid, ssnamenr, (CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE ((\"objectId\" LIKE 'ZTF2') AND ssnamenr LIKE 'null' AND (jd BETWEEN ${6} AND ${4}) AND ((rb BETWEEN ${7} AND ${5}) OR (drb BETWEEN ${7} AND ${5}))));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron_ztf (q3c_ang2ipix(zra, zdec));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_ztf_q3c_ang2ipix_idx ON sassy_cron_ztf;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron_ztf;\""
+
+  else
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_ztf_q3c_ang2ipix_idx;" 2> /dev/null
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_ztf;" 2> /dev/null
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_ztf (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec) AS (SELECT DISTINCT \"objectId\", jd, magap, magpsf, magdiff, fid, drb, rb, id, alert_candid, ssnamenr, (CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE ((\"objectId\" LIKE '%ZTF2%') AND ssnamenr LIKE '%null%' AND (jd BETWEEN ${6} AND ${4}) AND ((rb BETWEEN ${7} AND ${5}) OR (drb BETWEEN ${7} AND ${5}))));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron_ztf (q3c_ang2ipix(zra, zdec));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_ztf_q3c_ang2ipix_idx ON sassy_cron_ztf;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron_ztf;"
+  fi
+}
+
+
+_create_sassy_cron_glade () {
+  write_magenta "_create_sassy_cron_glade(dry_run=${1}, user=${2}, pass=${3}, max_mpc=${4}, min_mpc=${5})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_glade_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_glade;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_glade (gid, gra, gdec, gz, gdist) AS (SELECT DISTINCT id, ra, dec, z, dist FROM glade_q3c WHERE (dist BETWEEN ${5} AND ${4}));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron_glade (q3c_ang2ipix(gra, gdec));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_glade_q3c_ang2ipix_idx ON sassy_cron_glade;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron_glade;\""
+  else
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_glade_q3c_ang2ipix_idx;" 2> /dev/null
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_glade;" 2> /dev/null
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_glade (gid, gra, gdec, gz, gdist) AS (SELECT DISTINCT id, ra, dec, z, dist FROM glade_q3c WHERE (dist BETWEEN ${5} AND ${4}));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron_glade (q3c_ang2ipix(gra, gdec));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_glade_q3c_ang2ipix_idx ON sassy_cron_glade;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron_glade;"
+  fi
+}
+
+_create_sassy_cron_q3c () {
+  write_magenta "_create_sassy_cron_q3c(dry_run=${1}, user=${2}, pass=${3}, radius=${4})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_q3c_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_q3c;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_q3c (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec, gid, gra, gdec, gz, gdist, gsep) AS WITH x AS (SELECT z.zoid, z.zjd, z.zmagap, z.zmagpsf, z.zmagdiff, z.zfid, z.zdrb, z.zrb, z.zsid, z.zcandid, z.zssnamenr, z.zra, z.zdec, g.gid, g.gra, g.gdec, g.gz, g.gdist, q3c_dist(z.zra, z.zdec, g.gra, g.gdec) FROM sassy_cron_ztf as z, sassy_cron_glade as g WHERE q3c_join(z.zra, z.zdec, g.gra, g.gdec, ${4}/3600.0)) SELECT DISTINCT * FROM x;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron_q3c (q3c_ang2ipix(zra, zdec));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_q3c_q3c_ang2ipix_idx ON sassy_cron_q3c;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron_q3c;\""
+  else
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_q3c_q3c_ang2ipix_idx;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_q3c;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_q3c (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec, gid, gra, gdec, gz, gdist, gsep) AS WITH x AS (SELECT z.zoid, z.zjd, z.zmagap, z.zmagpsf, z.zmagdiff, z.zfid, z.zdrb, z.zrb, z.zsid, z.zcandid, z.zssnamenr, z.zra, z.zdec, g.gid, g.gra, g.gdec, g.gz, g.gdist, q3c_dist(z.zra, z.zdec, g.gra, g.gdec) FROM sassy_cron_ztf as z, sassy_cron_glade as g WHERE q3c_join(z.zra, z.zdec, g.gra, g.gdec, ${4}/3600.0)) SELECT DISTINCT * FROM x;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron_q3c (q3c_ang2ipix(zra, zdec));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_q3c_q3c_ang2ipix_idx ON sassy_cron_q3c;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron_q3c;"
+  fi
+}
+
+
+_create_sassy_cron () {
+  write_magenta "_create_sassy_cron(dry_run=${1}, user=${2}, pass=${3}, radius=${4})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron AS WITH q AS (SELECT * FROM sassy_cron_q3c), e AS (SELECT * FROM q LEFT OUTER JOIN tns_q3c AS t ON q3c_join(q.zra, q.zdec, t.ra, t.dec , ${4}/3600.0)) SELECT * FROM e WHERE tns_id IS null;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron (q3c_ang2ipix(zra, zdec));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_q3c_ang2ipix_idx ON sassy_cron;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron;\""
+  else
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_q3c_ang2ipix_idx;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron AS WITH q AS (SELECT * FROM sassy_cron_q3c), e AS (SELECT * FROM q LEFT OUTER JOIN tns_q3c AS t ON q3c_join(q.zra, q.zdec, t.ra, t.dec , ${4}/3600.0)) SELECT * FROM e WHERE tns_id IS null;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron (q3c_ang2ipix(zra, zdec));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_q3c_ang2ipix_idx ON sassy_cron;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron;"
+  fi
+}
+
+
+# +
+# execute
+# -
+_create_sassy_cron_ztf ${dry_run} ${_user} ${_pass} ${_max_jd} ${_max_rb} ${_min_jd} ${_min_rb}
+_create_sassy_cron_glade ${dry_run} ${_user} ${_pass} ${_max_mpc} ${_min_mpc}
+_create_sassy_cron_q3c ${dry_run} ${_user} ${_pass} ${_radius}
+_create_sassy_cron ${dry_run} ${_user} ${_pass} ${_radius}
 
 
 # +
