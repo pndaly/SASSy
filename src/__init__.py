@@ -26,7 +26,8 @@ ZTF_ZERO_POINTS = {1: 26.325, 2: 26.275, 3: 25.660}
 ZTF_ZERO_POINTS_R = {_v: _k for _k, _v in ZTF_ZERO_POINTS.items()}
 ZTF_FILTERS = {1: 'green', 2: 'red', 3: 'indigo'}
 ZTF_FILTERS_R = {_v: _k for _k, _v in ZTF_FILTERS.items()}
-ZTF_WAVELENGTH = {1: 4804.8, 2: 6436.9, 3: 7968.2}
+ZTF_WAVELENGTHS = {1: [4086.68, 4804.79, 5521.96], 2: [5600.40, 6436.92, 7316.69], 3: [7027.10, 7968.22, 8883.74]}
+ZTF_WAVELENGTH = {1: 4804.79, 2: 6436.92, 3: 7968.22}
 ZTF_WAVELENGTH_R = {_v: _k for _k, _v in ZTF_WAVELENGTH.items()}
 
 TRUE_VALUES = [1, True, '1', 'true', 't', 'TRUE', 'T']
