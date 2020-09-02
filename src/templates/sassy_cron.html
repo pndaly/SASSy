@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--suppress ALL -->
+<!-- global container -->
+<div class="container">
+
+  <!-- introduction -->
+  <div class="row">
+    <div class="col-md-12">
+      <h2>SassyCron</h2>
+      This page provides a default interface to the SassyCron database view indexed by Q3C. The table lists records in ascending
+      order by database <i>sid</i>. Use the filters on the right to narrow down the results to areas of interest.
+      When the results look good, add <code>?format=json</code> to the URL. You can then access the URL to
+      retrieve the full data and use it in your scripts. <p></p>
+    </div>
+  </div>
+  <!-- end of introduction -->
+
+  <div class="row">
+
+    <!-- sort section -->
+    <div class="col-md-2">
+      <form method="GET" action="/sassy/cron">
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/cron" class="btn btn-warning">Reset</a>
+        </div>
+
+        <div class="form-group">
+          <label for="sort_value">Sort By ...</label>
+          <select id="sort_value" name="sort_value" class="form-control form-control-sm" value="{{ request.args.sort_value }}">
+            <option value="zoid" {% if request.args.sort_value=='zoid' %} selected {% endif %}>Object ID</option>
+            <option value="zcandid" {% if request.args.sort_value=='zcandid' %} selected {% endif %}>Candidate ID</option>
+            <option value="zdec" {% if request.args.sort_value=='zdec' %} selected {% endif %}>Dec (J2000)</option>
+            <option value="zdrb" {% if request.args.sort_value=='zdrb' %} selected {% endif %}>drb score</option>
+            <option value="zfid" {% if request.args.sort_value=='zfid' %} selected {% endif %}>Filter ID</option>
+            <option value="zfilter" {% if request.args.sort_value=='zfilter' %} selected {% endif %}>Filter</option>
+            <option value="zjd" {% if request.args.sort_value=='zjd' %} selected {% endif %}>JD</option>
+            <option value="zmagap" {% if request.args.sort_value=='zmagap' %} selected {% endif %}>magap (mag)</option>
+            <option value="zmagdiff" {% if request.args.sort_value=='zmagdiff' %} selected {% endif %}>&#0948;mag (mag)</option>
+            <option value="zmagpsf" {% if request.args.sort_value=='zmagpsf' %} selected {% endif %}>magpsf (mag)</option>
+            <option value="zra" {% if request.args.sort_value=='zra' %} selected {% endif %}>RA (J2000)</option>
+            <option value="zrb" {% if request.args.sort_value=='zrb' %} selected {% endif %}>rb score</option>
+            <option value="zsid" {% if request.args.sort_value=='zsid' %} selected {% endif %}>SASSy Id</option>
+          </select>
+        </div>
+
+        <div>
+          <select id="sort_order" name="sort_order" class="form-control form-control-sm" value="{{ request.args.sort_order }}">
+            <option value="descending" {% if request.args.sort_order=='descending' %} selected {% endif %}>Descending</option>
+            <option value="ascending"  {% if request.args.sort_order=='ascending' %}  selected {% endif %}>Ascending</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sort_value">Using Control(s) ...</label>
+          <input type="text" class="form-control form-control-sm" id="zoid" name="zoid" value="{{ request.args.zoid }}" placeholder="ZTF20xxxxxxx">
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control form-control-sm" id="zcandid" name="zcandid" value="{{ request.args.zcandid }}" placeholder="candid">
+        </div>
+
+        <div class="form-group">
+          <label for="zfilter"><small>Filter</small></label>
+          <select id="zfilter" name="zfilter" class="form-control form-control-sm" value="{{ request.args.zfilter }}">
+            <option value="" {% if request.args.zfilter=='' %} selected {% endif %}>(any)</option>
+            <option value="green" {% if request.args.zfilter=='green' %} selected {% endif %}>green</option>
+            <option value="red" {% if request.args.zfilter=='red' %} selected {% endif %}>red</option>
+            <option value="indigo" {% if request.args.zfilter=='indigo' %} selected {% endif %}>indigo</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zdec__gte" name="zdec__gte" value="{{ request.args.zdec__gte }}" placeholder="-90.0">
+          </div>
+          <label for="dec__gte"><font color="grey">&le;</font><small>Dec</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zdec__lte" name="zdec__lte" value="{{ request.args.zdec__lte }}" placeholder="+90.0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zdrb__gte" name="zdrb__gte" value="{{ request.args.zdrb__gte }}" placeholder="0.0">
+          </div>
+          <label for="drb__gte"><font color="grey">&le;</font><small>drb</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zdrb__lte" name="zdrb__lte" value="{{ request.args.zdrb__lte }}" placeholder="1.0">
+          </div>
+        </div>
+
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zjd__gte" name="zjd__gte" value="{{ request.args.zjd__gte }}" placeholder={{ zjd_min }}>
+          </div>
+          <label for="jd__gte"><font color="grey">&le;</font><small>JD</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zjd__lte" name="zjd__lte" value="{{ request.args.zjd__lte }}" placeholder={{ zjd_max }}>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="zmagap__gte" name="zmagap__gte" value="{{ request.args.zmagap__gte }}" placeholder="-10">
+          </div>
+          <label for="magap__gte"><font color="grey">&le;</font><small>mag<sub>ap</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="zmagap__lte" name="zmagap__lte" value="{{ request.args.zmagap__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="zmagdiff__gte" name="zmagdiff__gte" value="{{ request.args.zmagdiff__gte }}" placeholder="-1.0">
+          </div>
+          <label for="sigmapsf__gte"><font color="grey">&le;</font><small>&#0948;mag<sub>ref</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="zmagdiff__lte" name="zmagdiff__lte" value="{{ request.args.zmagdiff__lte }}" placeholder="1.0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="zmagpsf__gte" name="zmagpsf__gte" value="{{ request.args.zmagpsf__gte }}" placeholder="-10">
+          </div>
+          <label for="magpsf__gte"><font color="grey">&le;</font><small>mag<sub>psf</sub></small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="any" class="form-control form-control-sm" id="zmagpsf__lte" name="zmagpsf__lte" value="{{ request.args.zmagpsf__lte }}" placeholder="20">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zra__gte" name="zra__gte" value="{{ request.args.zra__gte }}" placeholder="0.0">
+          </div>
+	      <label for="ra__gte"><font color="grey">&le;</font><small>RA</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zra__lte" name="zra__lte" value="{{ request.args.zra__lte }}" placeholder="360.0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zrb__gte" name="zrb__gte" value="{{ request.args.zrb__gte }}" placeholder="0.0">
+          </div>
+          <label for="rb__gte"><font color="grey">&le;</font><small>rb</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zrb__lte" name="zrb__lte" value="{{ request.args.zrb__lte }}" placeholder="1.0">
+          </div>
+        </div>
+
+        <div align="center">
+          <button type="submit" class="btn btn-success">Select</button>
+          <a href="/sassy/cron" class="btn btn-warning">Reset</a>
+        </div>
+      </form>
+    </div>
+    <!-- end of sort section -->
+
+    <!-- table section -->
+    <div class="col-md-10">
+      <div class="table-responsive">
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/cron?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found, showing page {{ page }} / {{ context.pages }}.
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/cron?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <table class="table table-striped table-sm">
+        <thead>
+          <th colspan="13" style="border: 1px solid black; background-color: #ffffcc;"><center>ZTF</center></th>
+          <th colspan="6" style="border: 1px solid black; background-color: #ffffcc;"><center>GLADE</center></th>
+        </thead>
+          <thead>
+            <tr>
+              <th><font color="blue">ObjectId</font></th>
+              <th><font color="blue">Candid</font></th>
+              <th><font color="blue">ID</font></th>
+              <th><font color="blue">Filter</font></th>
+              <th><font color="blue">&lambda;<sub>mean</sub></font></th>
+              <th><font color="blue">JD</font></th>
+              <th><font color="blue">mag<sub>ap</sub></font></th>
+              <th><font color="blue">mag<sub>psf</sub></font></th>
+              <th><font color="blue">&delta;mag<sub>ref</sub></font></th>
+              <th><font color="blue">RA</font></th>
+              <th><font color="blue">Dec</font></th>
+              <th><font color="blue">drb</font></th>
+              <th><font color="blue">rb</font></th>
+              <th><font color="blue">ID</font></th>
+              <th><font color="blue">RA</font></th>
+              <th><font color="blue">Dec</font></th>
+              <th><font color="blue">distance</font></th>
+              <th><font color="blue">separation</font></th>
+              <th><font color="blue">z</font></th>
+            </tr>
+            <tr>
+              <th><font color="grey">ZTF</font></th>
+              <th><font color="grey">ZTF</font></th>
+              <th><font color="grey">sid</font></th>
+              <th><font color="grey"><center>{g,r,i}</center></font></th>
+              <th><font color="grey">&#8491;</font></th>
+              <th><font color="grey"> </font></th>
+              <th><font color="grey">m</font></th>
+              <th><font color="grey">m</font></th>
+              <th><font color="grey">&delta;m</font></th>
+              <th><font color="grey">J2k&deg;</font></th>
+              <th><font color="grey">J2k&deg;</font></th>
+              <th><font color="grey">0-1</font></th>
+              <th><font color="grey">0-1</font></th>
+              <th><font color="grey">gid</font></th>
+              <th><font color="grey">J2k&deg;</font></th>
+              <th><font color="grey">J2k&deg;</font></th>
+              <th><font color="grey">Mpc</font></th>
+              <th><font color="grey"><center>&Prime;</center></font></th>
+              <th><font color="grey"></font></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for alert in context.results %}
+              <tr>
+               <td>{{ alert.zoid }}</td>
+               <td>{{ alert.zcandid }}</td>
+               <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
+               <td>{{ alert.zfilter }}</td>
+               {% if alert.zlambda|float("NaN") == "NaN" %}
+                 <td>{{ alert.zlambda }}</td>
+               {% else %}
+                 <td>{{ "%.1f"|format(alert.zlambda) }}</td>
+               {% endif %}
+               {% if alert.zjd|float("NaN") == "NaN" %}
+                 <td>{{ alert.zjd }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zjd) }}</td>
+               {% endif %}
+                {% if alert.zmagap|float("NaN") == "NaN" %}
+                 <td>{{ alert.zmagap }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zmagap) }}</td>
+               {% endif %}
+                {% if alert.zmagpsf|float("NaN") == "NaN" %}
+                 <td>{{ alert.zmagpsf }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zmagpsf) }}</td>
+               {% endif %}
+                {% if alert.zmagdiff|float("NaN") == "NaN" %}
+                 <td>{{ alert.zmagdiff }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zmagdiff) }}</td>
+               {% endif %}
+               {% if alert.zra|float("NaN") == "NaN" %}
+                 <td>{{ alert.zra }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zra) }}</td>
+               {% endif %}
+               {% if alert.zdec|float("NaN") == "NaN" %}
+                 <td>{{ alert.zdec }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zdec) }}</td>
+               {% endif %}
+               {% if alert.zdrb|float("NaN") == "NaN" %}
+                 <td>{{ alert.zdrb }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zdrb) }}</td>
+               {% endif %}
+               {% if alert.zrb|float("NaN") == "NaN" %}
+                 <td>{{ alert.zrb }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.zrb) }}</td>
+               {% endif %}
+                <td><a href="/sassy/glade_q3c/{{ alert.gid }}/" title="{{ alert.gid }}">{{ alert.gid }}</a></td>
+               {% if alert.gra|float("NaN") == "NaN" %}
+                 <td>{{ alert.gra }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.gra) }}</td>
+               {% endif %}
+               {% if alert.gdec|float("NaN") == "NaN" %}
+                 <td>{{ alert.gdec }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.gdec) }}</td>
+               {% endif %}
+               {% if alert.gdist|float("NaN") == "NaN" %}
+                 <td>{{ alert.gdist }}</td>
+               {% else %}
+                 <td>{{ "%.1f"|format(alert.gdist) }}</td>
+               {% endif %}
+               {% if alert.gsep|float("NaN") == "NaN" %}
+                 <td>{{ alert.gsep*3600.0 }}</td>
+               {% else %}
+                 <td>{{ "%.2f"|format(alert.gsep*3600.0) }}</td>
+               {% endif %}
+               {% if alert.gz|float("NaN") == "NaN" %}
+                 <td>{{ alert.gz }}</td>
+               {% else %}
+                 <td>{{ "%.3f"|format(alert.gz) }}</td>
+               {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="row">
+          <div class="col">
+            <div align="left">
+              {% if context.has_prev %}
+                <a href="/sassy/cron?{{ arg_str }}&page={{ page - 1 }}" class="btn btn-outline-secondary">Prev</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Prev</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div align="center">
+              {{ context.total }} record(s) found. Showing page {{ page }} / {{ context.pages }}.
+            </div>
+          </div>
+          <div class="col">
+            <div align="right">
+              {% if context.has_next %}
+                <a href="/sassy/cron?{{ arg_str }}&page={{ page + 1 }}" class="btn btn-outline-secondary">Next</a>
+              {% else %}
+                <a href="#" class="btn btn-outline-secondary disabled">Next</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end of table section -->
+  </div>
+
+<!-- end of global container -->
+</div>
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

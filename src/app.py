@@ -36,6 +36,11 @@ from src.forms.Forms import SexagisimalEllipticalQueryForm
 from src.forms.Forms import SassyBotForm
 
 # noinspection PyUnresolvedReferences
+from src.models.sassy_cron import SassyCron
+from src.models.sassy_cron import db as db_sassy
+from src.models.sassy_cron import sassy_cron_filters
+
+# noinspection PyUnresolvedReferences
 from src.models.glade import GladeRecord
 from src.models.glade import db as db_glade
 from src.models.glade import glade_filters
@@ -139,6 +144,7 @@ with app.app_context():
     db_gwgc_q3c.init_app(app)
     db_ligo.init_app(app)
     db_ligo_q3c.init_app(app)
+    db_sassy.init_app(app)
     db_tns.init_app(app)
     db_tns_q3c.init_app(app)
     db_ztf.init_app(app)
@@ -384,21 +390,101 @@ def sassy_bot():
 # +
 # route(s): /cron/, /sassy/cron/
 # -
-@app.route('/sassy/cron/<float:radius>', methods=['GET', 'POST'])
-@app.route('/cron/<float:radius>', methods=['GET', 'POST'])
-def sassy_cron_query(radius=0.0):
-    logger.debug(f'route /sassy/cron/{radius}/ entry')
+# noinspection PyBroadException
+@app.route('/sassy/cron/', methods=['GET', 'POST'])
+@app.route('/cron/', methods=['GET', 'POST'])
+def cron_records():
+    logger.debug(f'route /sassy/cron/ entry')
 
-    # connect to database
-    _solsys, _non_solsys = [], []
-    try:
-        _solsys, _non_solsys = sassy_cron_read(radius, UtilsLogger('SassyCron').logger)
-    except Exception as e:
-        logger.error(f'failed reading SassyCron, error={e}')
+    # report where request is coming from
+    forwarded_ips = request.headers.getlist('X-Forwarded-For')
+    client_ip = forwarded_ips[0].split(',')[0] if len(forwarded_ips) >= 1 else ''
+    logger.info('incoming request', extra={'tags': {'requesting_ip': client_ip, 'request_args': request.args}})
+    page = request.args.get('page', 1, type=int)
 
-    # return
-    response = {'total': len(_non_solsys), 'results': _non_solsys}
-    return render_template('sassy_cron_results.html', context=response)
+    # set default(s)
+    zjd_min, zjd_max = math.nan, -math.nan
+    paginator = None
+    latest = None
+    response = {}
+    _args = request.args.copy()
+    if 'sort_order' not in _args:
+        _args['sort_order'] = 'ascending'
+    if 'sort_value' not in _args:
+        _args['sort_value'] = 'zjd'
+
+    # GET request
+    if request.method == 'GET':
+
+        # query database
+        query = db_sassy.session.query(SassyCron)
+        query = sassy_cron_filters(query, _args)
+
+        # get latest alert
+        latest = db_sassy.session.query(SassyCron).order_by(SassyCron.zjd.desc()).first()
+
+        # paginate
+        paginator = query.paginate(page, RESULTS_PER_PAGE, True)
+
+        # set response dictionary
+        response = {
+            'total': paginator.total,
+            'pages': paginator.pages,
+            'has_next': paginator.has_next,
+            'has_prev': paginator.has_prev,
+            'results': SassyCron.serialize_list(paginator.items)
+        }
+        try:
+            zjd_min = min([_k['zjd'] for _k in response['results']])
+            zjd_max = max([_k['zjd'] for _k in response['results']])
+        except:
+            pass
+
+    # POST request
+    if request.method == 'POST':
+
+        # get search criteria
+        searches = request.get_json().get('queries')
+
+        # initialize output(s)
+        search_results = []
+        total = 0
+
+        # iterate over searches
+        for search_args in searches:
+
+            # initialize result(s)
+            search_result = {}
+
+            # query database
+            query = db_sassy.session.query(SassyCron)
+            query = sassy_cron_filters(query, search_args)
+
+            # extract, transform and load (ETL) into result(s)
+            search_result['query'] = search_args
+            search_result['num_alerts'] = query.count()
+            search_result['results'] = SassyCron.serialize_list(query.all())
+            search_results.append(search_result)
+            total += search_result['num_alerts']
+
+        # set response dictionary
+        response = {
+            'total': total,
+            'results': search_results
+        }
+
+    # return response in desired format
+    if _request_wants_json() or request.method == 'POST':
+        return jsonify(response)
+    else:
+        _args = request.args.copy()
+        try:
+            _args.pop('page')
+        except:
+            pass
+        arg_str = urlencode(_args)
+        return render_template('sassy_cron.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
+                               zjd_min=zjd_min, zjd_max=zjd_max, url={'url': f'{SASSY_APP_URL}', 'page': 'sassy_cron'})
 
 
 # +

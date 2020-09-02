@@ -23,8 +23,11 @@ ISO_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 ISO_PATTERN = '[0-9]{4}-[0-9]{2}-[0-9]{2}[ T?][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}'
 ZTF_ZERO_NID = '2017-01-01T00:00:00.000000'
 ZTF_ZERO_POINTS = {1: 26.325, 2: 26.275, 3: 25.660}
+ZTF_ZERO_POINTS_R = {_v: _k for _k, _v in ZTF_ZERO_POINTS.items()}
 ZTF_FILTERS = {1: 'green', 2: 'red', 3: 'indigo'}
+ZTF_FILTERS_R = {_v: _k for _k, _v in ZTF_FILTERS.items()}
 ZTF_WAVELENGTH = {1: 4804.8, 2: 6436.9, 3: 7968.2}
+ZTF_WAVELENGTH_R = {_v: _k for _k, _v in ZTF_WAVELENGTH.items()}
 
 TRUE_VALUES = [1, True, '1', 'true', 't', 'TRUE', 'T']
 FALSE_VALUES = [0, False, '0', 'false', 'f', 'FALSE', 'F']

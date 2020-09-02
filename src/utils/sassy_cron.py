@@ -29,9 +29,10 @@ BEGIN_JD = ASTRO_JD - 1.0
 BEGIN_ISO = jd_to_isot(BEGIN_JD)
 END_JD = ASTRO_JD
 END_ISO = jd_to_isot(END_JD)
+MPC = 250.0
 RB_MIN = 0.50
 RB_MAX = 1.00
-RADIUS = 60.0
+RADIUS = 120.0
 
 
 # +
@@ -54,10 +55,12 @@ def get_avro_filename(_jd=0.0, _avro=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/data
 # function: sassy_cron_read()
 # -
 # noinspection PyBroadException
-def sassy_cron_read(_radius=RADIUS, _logger=None):
+def sassy_cron_read(_radius=RADIUS, _mpc=MPC, _logger=None):
 
     # check input(s)
     _radius = _radius*ASEC_TO_DEGREE if (isinstance(_radius, float) and _radius >= 0.0) else RADIUS*ASEC_TO_DEGREE
+    _mpc = _mpc if (isinstance(_mpc, float) and _mpc >= 0.0) else MPC
+    _logger = _logger if isinstance(_logger, logging.Logger) else None
 
     # connect to database
     if _logger:
@@ -77,7 +80,7 @@ def sassy_cron_read(_radius=RADIUS, _logger=None):
     _res, _solsys, _non_solsys = None, [], []
     _cmd_select = f"WITH x AS (SELECT * FROM sassy_cron), y AS (SELECT x.*, " \
                   f"(g.id, g.ra, g.dec, g.z, g.dist, q3c_dist(x.ra, x.dec, g.ra, g.dec)) " \
-                  f"FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {_radius:.5f})), z AS " \
+                  f"FROM x, glade_q3c AS g WHERE q3c_join(x.ra, x.dec, g.ra, g.dec, {_radius:.5f}) AND g.dist <= {_mpc}), z AS " \
                   f"(SELECT * FROM y LEFT OUTER JOIN tns_q3c AS t ON " \
                   f"q3c_join(y.ra, y.dec, t.ra, t.dec, {_radius:.5f})) SELECT * FROM z WHERE tns_id IS null;"
     if _logger:
@@ -259,7 +262,8 @@ def sassy_cron(_begin=BEGIN_ISO, _end=END_ISO, _rb_min=RB_MIN, _rb_max=RB_MAX, _
                 f'AS WITH e AS (SELECT "objectId", jd, rb, drb, id, candid, ssnamenr, ' \
                 f'(CASE WHEN ST_X(ST_AsText(location)) < 0.0 THEN ST_X(ST_AsText(location))+360.0 ELSE ' \
                 f'ST_X(ST_AsText(location)) END), ST_Y(ST_AsText(location)) FROM alert WHERE ' \
-                f'(("objectId" LIKE \'%ZTF2%\') AND (jd BETWEEN {_begin_jd} AND {_end_jd}) AND ' \
+                f'(("objectId" LIKE \'%ZTF2%\') AND ssnamenr LIKE \'%null%\' AND ' \
+                f'(jd BETWEEN {_begin_jd} AND {_end_jd}) AND ' \
                 f'((rb BETWEEN {_rb_min} AND {_rb_max}) OR (drb BETWEEN {_rb_min} AND {_rb_max})))) SELECT * FROM e;'
     if _logger:
         _logger.info(f'executing {_cmd_view}')
