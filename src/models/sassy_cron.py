@@ -158,6 +158,9 @@ class SassyCron(db.Model):
     altype = db.Column(db.String(DB_VARCHAR_64))
     aeprob = db.Column(db.Float)
     alprob = db.Column(db.Float)
+    dpng = db.Column(db.String(DB_VARCHAR_200))
+    spng = db.Column(db.String(DB_VARCHAR_200))
+    tpng = db.Column(db.String(DB_VARCHAR_200))
 
     # +
     # method: serialized()
@@ -168,6 +171,9 @@ class SassyCron(db.Model):
             'alprob': float(self.alprob),
             'aetype': str(self.aetype),
             'altype': str(self.altype),
+            'dpng': str(self.dpng),
+            'spng': str(self.spng),
+            'tpng': str(self.tpng),
             'gdec': float(self.gdec),
             'gdist': float(self.gdist),
             'gid': int(self.gid),

@@ -231,6 +231,9 @@ _create_sassy_cron () {
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN altype VARCHAR(64) DEFAULT '';\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN aeprob FLOAT DEFAULT 'NaN';\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN alprob FLOAT DEFAULT 'NaN';\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN dpng VARCHAR(200) DEFAULT '';\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN spng VARCHAR(200) DEFAULT '';\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN tpng VARCHAR(200) DEFAULT '';\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron (q3c_ang2ipix(zra, zdec));\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_q3c_ang2ipix_idx ON sassy_cron;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron;\""
@@ -242,6 +245,9 @@ _create_sassy_cron () {
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN altype VARCHAR(64) DEFAULT '';"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN aeprob FLOAT DEFAULT 'NaN';"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN alprob FLOAT DEFAULT 'NaN';"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN dpng VARCHAR(200) DEFAULT '';"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN spng VARCHAR(200) DEFAULT '';"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN tpng VARCHAR(200) DEFAULT '';"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron (q3c_ang2ipix(zra, zdec));"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_q3c_ang2ipix_idx ON sassy_cron;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron;"
@@ -269,6 +275,27 @@ _drop_interim () {
 }
 
 
+_add_classifier_and_plot () {
+  write_magenta "_add_classifier_and_plot(dry_run=${1})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> . ~/.bashrc"
+    write_yellow "DryRun> conda activate"
+    write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
+    write_yellow "DryRun> rm -f ZTF20*.png >> /dev/null 2>&1"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron.py"
+    write_yellow "DryRun> chown www-data:www-data ZTF20*.png >> /dev/null 2>&1"
+  else
+    . ~/.bashrc
+    conda activate
+    cd ${SASSY_SRC}/static/img
+    rm -f ZTF20*.png >> /dev/null 2>&1
+    python3 ${SASSY_SRC}/utils/sassy_cron.py
+    chown www-data:www-data ZTF20*.png >> /dev/null 2>&1
+  fi
+}
+
+
+
 # +
 # execute
 # -
@@ -276,7 +303,8 @@ _create_sassy_cron_ztf ${dry_run} ${_user} ${_pass} ${_max_jd} ${_max_rb} ${_min
 _create_sassy_cron_glade ${dry_run} ${_user} ${_pass} ${_max_mpc} ${_min_mpc}
 _create_sassy_cron_q3c ${dry_run} ${_user} ${_pass} ${_radius_degree}
 _create_sassy_cron ${dry_run} ${_user} ${_pass} ${_radius_degree}
-# _drop_interim ${dry_run} ${_user} ${_pass}
+_drop_interim ${dry_run} ${_user} ${_pass}
+_add_classifier_and_plot ${dry_run}
 
 
 # +

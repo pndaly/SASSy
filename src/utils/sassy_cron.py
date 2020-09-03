@@ -61,7 +61,7 @@ def get_avro_filename(_jd=0.0, _candid=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/da
             if os.path.exists(_f):
                 return f"{_f}"
     except Exception:
-        return ''
+        return
 
 
 # +
@@ -86,11 +86,34 @@ def sassy_cron(_log=None):
     for _q in _query.all():
         if _log:
             _log.info(f"_q={_q}, type(_q)={type(_q)}")
+
+        # get classifier(s)
         _ignore, _aetype, _aeprob = _alerce.get_classifier(oid=f'{_q.zoid}', classifier='early')
         _ignore, _altype, _alprob = _alerce.get_classifier(oid=f'{_q.zoid}', classifier='late')
         if _log:
             _log.info(f"_aetype={_aetype}, _aeprob={_aeprob}")
             _log.info(f"_altype={_altype}, _alprob={_alprob}")
+
+        # get filename and plot cutouts
+        _file = get_avro_filename(_jd=_q.zjd, _candid=_q.zcandid)
+        if _file is not None:
+            try:
+                _q.dpng = avro_plot_cutout(_avro_file=_file, _cutout='difference', _oid=_q.zoid, _jd=_q.zjd, _gid=int(_q.gid), _log=_log)
+            except:
+                _q.dpng = ''
+            try:
+                _q.spng = avro_plot_cutout(_avro_file=_file, _cutout='science', _oid=_q.zoid, _jd=_q.zjd, _gid=int(_q.gid), _log=_log)
+            except:
+                _q.spng = ''
+            try:
+                _q.tpng = avro_plot_cutout(_avro_file=_file, _cutout='template', _oid=_q.zoid, _jd=_q.zjd, _gid=int(_q.gid), _log=_log)
+            except:
+                _q.tpng = ''
+        if _log:
+            _log.info(f"_file={_file}")
+            _log.info(f"_q.dpng={_q.dpng}")
+            _log.info(f"_q.dsng={_q.spng}")
+            _log.info(f"_q.tpng={_q.tpng}")
 
         # update database
         try:
@@ -115,15 +138,6 @@ def sassy_cron(_log=None):
             _s.rollback()
             if _log:
                 _log.error(f"failed to commit record, _e={_q}, error={_f}")
-
-        # get filename
-        _file = get_avro_filename(_jd=_q.zjd, _candid=_q.zcandid)
-        if _log:
-            _log.info(f"filename _f={_file}")
-
-        # save figure
-        #if _file != '':
-        #    avro_plot_cutout(_avro_file=_file, _cutout='difference', _oid=_q.zoid, _candid=int(_q.zcandid), _log=_log)
 
     # disconnect from database
     db_disconnect(_s)

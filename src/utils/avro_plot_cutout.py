@@ -20,6 +20,11 @@ import os
 # initialize
 # -
 # noinspection PyBroadException
+try:
+    import matplotlib as mpl
+    mpl.use('Agg')
+except Exception:
+    pass
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
@@ -29,7 +34,6 @@ import matplotlib.pyplot as plt
 # -
 COLOUR_MAPS = [_map for _map in cm.datad]
 CUTOUTS = ['difference', 'science', 'template']
-PNG_OUTPUT = 'test.png'
 
 
 # +
@@ -48,7 +52,7 @@ def _get_fits_data(_s=None):
 # function: avro_plot_cutout()
 # -
 # noinspection PyBroadException,PyUnresolvedReferences
-def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _candid=0, _log=None):
+def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=None):
 
     # check input(s)
     if not isinstance(_avro_file, str) or _avro_file.strip() == '':
@@ -57,32 +61,23 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _candid=0, _log=None):
         raise Exception(f'invalid input, _cutout={_cutout}')
     if not isinstance(_oid, str) or _oid.strip() == '':
         raise Exception(f'invalid input, _oid={_oid}')
-    if not isinstance(_candid, int) or _candid < 0:
-        raise Exception(f'invalid input, _candid={_candid}')
+    if not isinstance(_jd, float) or _jd < 0.0:
+        raise Exception(f'invalid input, _jd={_jd}')
+    if not isinstance(_gid, int) or _gid < 0:
+        raise Exception(f'invalid input, _gid={_gid}')
 
     _file = os.path.abspath(os.path.expanduser(_avro_file.strip()))
     if not os.path.exists(_file):
         return
-    if _candid == 0:
-        _candid = os.path.basename(_file).split('.')[0]
     if _log is not None:
-        _log.debug(f'_avro_file={_avro_file}')
-        _log.debug(f'_cutout={_cutout}')
-        _log.debug(f'_oid={_oid}')
-        _log.debug(f'_candid={_candid}')
-        _log.debug(f'_log={_log}, type={type(_log)}')
-        _log.debug(f'_file={_file}')
+        _log.debug(f"avro_plot_cutout(_avro_file='{_avro_file}', _cutout='{_cutout}', _oid='{_oid}', _jd={_jd}, _gid={_gid}, _log={_log}) ... entry")
 
     # set default(s)
+    _sjd = str(_jd).strip().replace('.', '')
     _dif = True if _cutout.strip().lower() == 'difference' else False
     _sci = True if _cutout.strip().lower() == 'science' else False
     _tmp = True if _cutout.strip().lower() == 'template' else False
-    _packets = []
-
-    if _log is not None:
-        _log.debug(f'_dif={_dif}')
-        _log.debug(f'_sci={_sci}')
-        _log.debug(f'_tmp={_tmp}')
+    _packets, _png_files = [], []
 
     # read the packet(s)
     try:
@@ -90,7 +85,12 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _candid=0, _log=None):
             for _pk in fastavro.reader(_f):
                 _packets.append(_pk)
     except Exception as _e:
+        if _log is not None:
+            _log.error(f"failed to open {_file}, error={_e}")
         raise Exception(f'failed to open {_file}, error={_e}')
+    else:
+        if _log is not None:
+            _log.debug(f"_packets={_packets}, len(_packets)={len(_packets)}")
 
     # plot data
     for _i in range(len(_packets)):
@@ -100,33 +100,40 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _candid=0, _log=None):
         if _dif:
             _col = 'viridis' if 'viridis' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutDifference']['stampData'])
-            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_candid}_{_i}_difference.png'))
+            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'))
+            _title = 'Difference'
         elif _sci:
             _col = 'coolwarm' if 'coolwarm' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutScience']['stampData'])
-            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_candid}_{_i}_science.png'))
+            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'))
+            _title = 'Science'
         elif _tmp:
             _col = 'heat' if 'heat' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutTemplate']['stampData'])
-            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_candid}_{_i}_template.png'))
+            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'))
+            _title = 'Template'
+        _png_files.append(_output)
 
         # plot it
         try:
             _fig = plt.figure()
             _fig.add_subplot(1, 1, 1)
             plt.imshow(_data, cmap=_col, origin='lower')
-            if _dif:
-                plt.title(f'Difference')
-            if _sci:
-                plt.title(f'Science')
-            if _tmp:
-                plt.title(f'Template')
+            plt.title(_title)
             _buf = io.BytesIO()
             plt.savefig(_output)
             plt.savefig(_buf, format='png', dpi=100, bbox_inches='tight')
             plt.close()
-        except Exception:
+        except Exception as _f:
+            if _log is not None:
+                _log.error(f'failed to plot cutout, error={_f}')
             pass
+
+    # return filename
+    _of = _png_files[0] if len(_png_files) > 0 else ''
+    if _log is not None:
+        _log.debug(f"avro_plot_cutout() ... exit ... _png_file={_png_files}, _of={_of}")
+    return _of
 
 
 # +
@@ -139,9 +146,10 @@ if __name__ == '__main__':
     _p.add_argument('--file', default='', help="""AVRO input file""")
     _p.add_argument('--cutout', default=CUTOUTS[1], help=f"""AVRO cutout, default '%(default)s', choice of {CUTOUTS}""")
     _p.add_argument('--oid', default=f"ZTF20{get_hash()[:8]}", help="""ZTF Object Id""")
-    _p.add_argument('--candid', default=0, help="""ZTF Candidate Id""")
+    _p.add_argument('--jd', default=0.0, help="""ZTF Julian Day""")
+    _p.add_argument('--gid', default=0, help="""Glade Id""")
 
     # execute
     args = _p.parse_args()
     avro_plot_cutout(_avro_file=args.file, _cutout=args.cutout, _oid=args.oid,
-                     _candid=int(args.candid), _log=UtilsLogger('AvroPlot2').logger)
+                     _jd=float(args.jd), _gid=int(args.gid), _log=UtilsLogger('AvroPlot2').logger)
