@@ -122,8 +122,8 @@ def sassy_cron(_log=None):
             _log.info(f"filename _f={_file}")
 
         # save figure
-        if _file != '':
-            avro_plot_cutout(_avro_file=_file, _cutout='difference', _oid=_q.zoid, _candid=int(_q.zcandid), _log=_log)
+        #if _file != '':
+        #    avro_plot_cutout(_avro_file=_file, _cutout='difference', _oid=_q.zoid, _candid=int(_q.zcandid), _log=_log)
 
     # disconnect from database
     db_disconnect(_s)

@@ -155,8 +155,7 @@ write_blue "%% bash ${0} --authorization=${_authorization} --max_jd=${_max_jd} -
 # -
 _user=$(echo ${_authorization} | cut -d':' -f1)
 _pass=$(echo ${_authorization} | cut -d':' -f2)
-
-
+_radius_degree=$( echo "scale=6; ${_radius} / 3600.00" | bc -l)
 
 
 # +
@@ -207,14 +206,14 @@ _create_sassy_cron_q3c () {
   if [[ ${1} -eq 1 ]]; then
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_q3c_q3c_ang2ipix_idx;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_q3c;\""
-    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_q3c (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec, gid, gra, gdec, gz, gdist, gsep) AS WITH x AS (SELECT DISTINCT z.zoid, z.zjd, z.zmagap, z.zmagpsf, z.zmagdiff, z.zfid, z.zdrb, z.zrb, z.zsid, z.zcandid, z.zssnamenr, z.zra, z.zdec, g.gid, g.gra, g.gdec, g.gz, g.gdist, q3c_dist(z.zra, z.zdec, g.gra, g.gdec) FROM sassy_cron_ztf as z, sassy_cron_glade as g WHERE q3c_join(z.zra, z.zdec, g.gra, g.gdec, ${4}/3600.0)) SELECT DISTINCT * FROM x;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_q3c (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec, gid, gra, gdec, gz, gdist, gsep) AS WITH x AS (SELECT DISTINCT z.zoid, z.zjd, z.zmagap, z.zmagpsf, z.zmagdiff, z.zfid, z.zdrb, z.zrb, z.zsid, z.zcandid, z.zssnamenr, z.zra, z.zdec, g.gid, g.gra, g.gdec, g.gz, g.gdist, q3c_dist(z.zra, z.zdec, g.gra, g.gdec) FROM sassy_cron_ztf as z, sassy_cron_glade as g WHERE q3c_join(z.zra, z.zdec, g.gra, g.gdec, ${4})) SELECT DISTINCT * FROM x;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron_q3c (q3c_ang2ipix(zra, zdec));\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_q3c_q3c_ang2ipix_idx ON sassy_cron_q3c;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron_q3c;\""
   else
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_q3c_q3c_ang2ipix_idx;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_q3c;"
-    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_q3c (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec, gid, gra, gdec, gz, gdist, gsep) AS WITH x AS (SELECT DISTINCT z.zoid, z.zjd, z.zmagap, z.zmagpsf, z.zmagdiff, z.zfid, z.zdrb, z.zrb, z.zsid, z.zcandid, z.zssnamenr, z.zra, z.zdec, g.gid, g.gra, g.gdec, g.gz, g.gdist, q3c_dist(z.zra, z.zdec, g.gra, g.gdec) FROM sassy_cron_ztf as z, sassy_cron_glade as g WHERE q3c_join(z.zra, z.zdec, g.gra, g.gdec, ${4}/3600.0)) SELECT DISTINCT * FROM x;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_q3c (zoid, zjd, zmagap, zmagpsf, zmagdiff, zfid, zdrb, zrb, zsid, zcandid, zssnamenr, zra, zdec, gid, gra, gdec, gz, gdist, gsep) AS WITH x AS (SELECT DISTINCT z.zoid, z.zjd, z.zmagap, z.zmagpsf, z.zmagdiff, z.zfid, z.zdrb, z.zrb, z.zsid, z.zcandid, z.zssnamenr, z.zra, z.zdec, g.gid, g.gra, g.gdec, g.gz, g.gdist, q3c_dist(z.zra, z.zdec, g.gra, g.gdec) FROM sassy_cron_ztf as z, sassy_cron_glade as g WHERE q3c_join(z.zra, z.zdec, g.gra, g.gdec, ${4})) SELECT DISTINCT * FROM x;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron_q3c (q3c_ang2ipix(zra, zdec));"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_q3c_q3c_ang2ipix_idx ON sassy_cron_q3c;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron_q3c;"
@@ -227,7 +226,7 @@ _create_sassy_cron () {
   if [[ ${1} -eq 1 ]]; then
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_q3c_ang2ipix_idx;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron;\""
-    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron AS WITH q AS (SELECT DISTINCT * FROM sassy_cron_q3c), e AS (SELECT DISTINCT * FROM q LEFT OUTER JOIN tns_q3c AS t ON q3c_join(q.zra, q.zdec, t.ra, t.dec , ${4}/3600.0)) SELECT DISTINCT * FROM e WHERE tns_id IS null;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron AS WITH q AS (SELECT DISTINCT * FROM sassy_cron_q3c), e AS (SELECT DISTINCT * FROM q LEFT OUTER JOIN tns_q3c AS t ON q3c_join(q.zra, q.zdec, t.ra, t.dec , ${4})) SELECT DISTINCT * FROM e WHERE tns_id IS null;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN aetype VARCHAR(64) DEFAULT '';\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN altype VARCHAR(64) DEFAULT '';\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"ALTER TABLE sassy_cron ADD COLUMN aeprob FLOAT DEFAULT 'NaN';\""
@@ -238,7 +237,7 @@ _create_sassy_cron () {
   else
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_q3c_ang2ipix_idx;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron;"
-    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron AS WITH q AS (SELECT DISTINCT * FROM sassy_cron_q3c), e AS (SELECT DISTINCT * FROM q LEFT OUTER JOIN tns_q3c AS t ON q3c_join(q.zra, q.zdec, t.ra, t.dec , ${4}/3600.0)) SELECT DISTINCT * FROM e WHERE tns_id IS null;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron AS WITH q AS (SELECT DISTINCT * FROM sassy_cron_q3c), e AS (SELECT DISTINCT * FROM q LEFT OUTER JOIN tns_q3c AS t ON q3c_join(q.zra, q.zdec, t.ra, t.dec , ${4})) SELECT DISTINCT * FROM e WHERE tns_id IS null;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN aetype VARCHAR(64) DEFAULT '';"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN altype VARCHAR(64) DEFAULT '';"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "ALTER TABLE sassy_cron ADD COLUMN aeprob FLOAT DEFAULT 'NaN';"
@@ -275,9 +274,9 @@ _drop_interim () {
 # -
 _create_sassy_cron_ztf ${dry_run} ${_user} ${_pass} ${_max_jd} ${_max_rb} ${_min_jd} ${_min_rb}
 _create_sassy_cron_glade ${dry_run} ${_user} ${_pass} ${_max_mpc} ${_min_mpc}
-_create_sassy_cron_q3c ${dry_run} ${_user} ${_pass} ${_radius}
-_create_sassy_cron ${dry_run} ${_user} ${_pass} ${_radius}
-_drop_interim ${dry_run} ${_user} ${_pass}
+_create_sassy_cron_q3c ${dry_run} ${_user} ${_pass} ${_radius_degree}
+_create_sassy_cron ${dry_run} ${_user} ${_pass} ${_radius_degree}
+# _drop_interim ${dry_run} ${_user} ${_pass}
 
 
 # +

@@ -114,7 +114,7 @@ class SassyCron(db.Model):
     # glade element(s)
     gdec = db.Column(db.Float)
     gdist = db.Column(db.Float)
-    gid = db.Column(db.Integer)
+    gid = db.Column(db.Integer, primary_key=True)
     gra = db.Column(db.Float)
     gsep = db.Column(db.Float)
     gz = db.Column(db.Float)
@@ -143,14 +143,14 @@ class SassyCron(db.Model):
     zdec = db.Column(db.Float, index=True)
     zdrb = db.Column(db.Float)
     zfid = db.Column(db.Integer)
-    zjd = db.Column(db.Float)
-    zoid = db.Column(db.String(DB_VARCHAR_50))
+    zjd = db.Column(db.Float, primary_key=True)
+    zoid = db.Column(db.String(DB_VARCHAR_50), primary_key=True)
     zmagap = db.Column(db.Float)
     zmagpsf = db.Column(db.Float)
     zmagdiff = db.Column(db.Float)
     zra = db.Column(db.Float, index=True)
     zrb = db.Column(db.Float)
-    zsid = db.Column(db.Integer, primary_key=True)
+    zsid = db.Column(db.Integer)
     zssnamenr = db.Column(db.String(DB_VARCHAR_200))
 
     # alerce element(s)
@@ -194,7 +194,7 @@ class SassyCron(db.Model):
     # (overload) method: __str__()
     # -
     def __str__(self):
-        return self.zoid
+        return f'{self.zcandid}'
 
     # +
     # (static) method: serialize_list()
