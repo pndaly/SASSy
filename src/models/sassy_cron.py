@@ -64,6 +64,10 @@ __text__ = """
  source_group         | character varying(128)      |           |          | 
  alias                | character varying(128)      |           |          | 
  certificate          | character varying(128)      |           |          | 
+ aetype               | character varying(64)       |           |          | 
+ altype               | character varying(64)       |           |          | 
+ aeprob               | double precision            |           |          | 
+ alprob               | double precision            |           |          | 
 Indexes:
     "sassy_cron_q3c_ang2ipix_idx" btree (q3c_ang2ipix(zra, zdec)) CLUSTER
 """
@@ -75,6 +79,7 @@ Indexes:
 DB_VARCHAR_200 = 200
 DB_VARCHAR_128 = 128
 DB_VARCHAR_50 = 50
+DB_VARCHAR_64 = 64
 DB_VARCHAR_32 = 32
 
 SASSY_APP_HOST = os.getenv('SASSY_APP_HOST', "sassy.as.arizona.edu")
@@ -148,11 +153,21 @@ class SassyCron(db.Model):
     zsid = db.Column(db.Integer, primary_key=True)
     zssnamenr = db.Column(db.String(DB_VARCHAR_200))
 
+    # alerce element(s)
+    aetype = db.Column(db.String(DB_VARCHAR_64))
+    altype = db.Column(db.String(DB_VARCHAR_64))
+    aeprob = db.Column(db.Float)
+    alprob = db.Column(db.Float)
+
     # +
     # method: serialized()
     # -
     def serialized(self):
         return {
+            'aeprob': float(self.aeprob),
+            'alprob': float(self.alprob),
+            'aetype': str(self.aetype),
+            'altype': str(self.altype),
             'gdec': float(self.gdec),
             'gdist': float(self.gdist),
             'gid': int(self.gid),
@@ -404,24 +419,26 @@ def sassy_cron_cli_db(iargs=None):
         try:
             with open(iargs.output, 'w') as _wf:
                 _wf.write('#gdec,gdist,gid,gra,gsep,gz,zcandid,zdec,zdrb,'
-                          'zfid,zlambda,zfilter,zjd,zoid,zmagap,zmagpsf,zmagdiff,zra,zrb,zsid\n')
+                          'zlambda,zfilter,zjd,zoid,zmagap,zmagpsf,zmagdiff,zra,zrb,zsid,aeprob,alprob,aetype,altype\n')
                 for _e in SassyCron.serialize_list(query.all()):
                     _wf.write(f"{_e['gdec']},{_e['gdist']},{_e['gid']},{_e['gra']},{_e['gz']},"
-                              f"{_e['zcandid']},{_e['zdec']},{_e['zdrb']},{_e['zfid']},{_e['zlambda']}"
+                              f"{_e['zcandid']},{_e['zdec']},{_e['zdrb']},{_e['zlambda']},"
                               f"{_e['zfilter']},{_e['zjd']},{_e['zoid']},{_e['zmagap']},"
-                              f"{_e['zmagpsf']},{_e['zmagdiff']},{_e['zra']},{_e['zrb']},{_e['zsid']}\n")
+                              f"{_e['zmagpsf']},{_e['zmagdiff']},{_e['zra']},{_e['zrb']},{_e['zsid']},"
+                              f"{_e['aeprob']},{_e['alprob']},{_e['aetype']},{_e['altype']}\n")
         except Exception:
             pass
 
     # dump output to screen
     else:
         print('#gdec,gdist,gid,gra,gsep,gz,zcandid,zdec,zdrb,'
-              'zfid,zlambda,zfilter,zjd,zoid,zmagap,zmagpsf,zmagdiff,zra,zrb,zsid')
+              'zlambda,zfilter,zjd,zoid,zmagap,zmagpsf,zmagdiff,zra,zrb,zsid,aeprob,alprob,aetype,altype')
         for _e in SassyCron.serialize_list(query.all()):
             print(f"{_e['gdec']},{_e['gdist']},{_e['gid']},{_e['gra']},{_e['gz']},"
-                  f"{_e['zcandid']},{_e['zdec']},{_e['zdrb']},{_e['zfid']},{_e['zlambda']}"
+                  f"{_e['zcandid']},{_e['zdec']},{_e['zdrb']},{_e['zlambda']},"
                   f"{_e['zfilter']},{_e['zjd']},{_e['zoid']},{_e['zmagap']},"
-                  f"{_e['zmagpsf']},{_e['zmagdiff']},{_e['zra']},{_e['zrb']},{_e['zsid']}")
+                  f"{_e['zmagpsf']},{_e['zmagdiff']},{_e['zra']},{_e['zrb']},{_e['zsid']},"
+                  f"{_e['aeprob']},{_e['alprob']},{_e['aetype']},{_e['altype']}")
 
 
 # +
