@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from src.common import *
 from src.models.sassy_cron import *
 from src.utils.Alerce import *
+from src.utils.avro_plot_cutout import *
 
 
 # +
@@ -27,7 +28,8 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 # noinspection PyBroadException
 def db_connect():
     try:
-        engine = create_engine(f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
+        engine = create_engine(
+            f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
         get_session = sessionmaker(bind=engine)
         return get_session()
     except Exception as e:
@@ -48,10 +50,25 @@ def db_disconnect(_session=None):
 
 
 # +
-# function: sassy_cron_2()
+# function: get_avro_filename()
 # -
 # noinspection PyBroadException
-def sassy_cron_2(_log=None):
+def get_avro_filename(_jd=0.0, _candid=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/dataraid0/ztf")):
+    try:
+        _ts = jd_to_isot(_jd).split('T')[0].split('-')
+        for _h in _dirs.split(':'):
+            _f = os.path.join(f'{_h}', f'{_ts[0]}', f'{_ts[1]}', f'{_ts[2]}', f'{_candid}.avro')
+            if os.path.exists(_f):
+                return f"{_f}"
+    except Exception:
+        return ''
+
+
+# +
+# function: sassy_cron()
+# -
+# noinspection PyBroadException
+def sassy_cron(_log=None):
 
     # check input(s)
     _log = _log if isinstance(_log, logging.Logger) else None
@@ -62,7 +79,7 @@ def sassy_cron_2(_log=None):
         _log.info(f'_s={_s}, type(_s)={type(_s)}')
 
     # get Alerce class
-    _alerce = Alerce()
+    _alerce = Alerce(_log)
 
     # get data
     _query = _s.query(SassyCron)
@@ -90,13 +107,23 @@ def sassy_cron_2(_log=None):
             _q.altype = '?'
         try:
             if _log:
-                _log.info(f"commiting {_q.__repr__()} with _aetype={_aetype}, _aeprob={_aeprob}, _altype={_altype}, _alprob={_alprob}")
+                _log.info(f"committing {_q.__repr__()} with _aetype={_aetype}, _aeprob={_aeprob}, _altype={_altype}, "
+                          f"_alprob={_alprob}")
             _s.commit()
             _s.flush()
         except Exception as _f:
             _s.rollback()
             if _log:
                 _log.error(f"failed to commit record, _e={_q}, error={_f}")
+
+        # get filename
+        _file = get_avro_filename(_jd=_q.zjd, _candid=_q.zcandid)
+        if _log:
+            _log.info(f"filename _f={_file}")
+
+        # save figure
+        if _file != '':
+            avro_plot_cutout(_avro_file=_file, _cutout='difference', _oid=_q.zoid, _candid=int(_q.zcandid), _log=_log)
 
     # disconnect from database
     db_disconnect(_s)
@@ -106,4 +133,4 @@ def sassy_cron_2(_log=None):
 # main()
 # -
 if __name__ == '__main__':
-    sassy_cron_2(_log=UtilsLogger('SassyCron').logger)
+    sassy_cron(_log=UtilsLogger('SassyCron').logger)

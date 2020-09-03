@@ -250,6 +250,26 @@ _create_sassy_cron () {
 }
 
 
+_drop_interim () {
+  write_magenta "_drop_interim(dry_run=${1}, user=${2}, pass=${3})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_ztf_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_ztf;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_glade_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_glade;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_q3c_q3c_ang2ipix_idx;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_q3c;\""
+  else
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_ztf_q3c_ang2ipix_idx;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_ztf;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_glade_q3c_ang2ipix_idx;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_glade;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_q3c_q3c_ang2ipix_idx;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_q3c;"
+  fi
+}
+
+
 # +
 # execute
 # -
@@ -257,6 +277,7 @@ _create_sassy_cron_ztf ${dry_run} ${_user} ${_pass} ${_max_jd} ${_max_rb} ${_min
 _create_sassy_cron_glade ${dry_run} ${_user} ${_pass} ${_max_mpc} ${_min_mpc}
 _create_sassy_cron_q3c ${dry_run} ${_user} ${_pass} ${_radius}
 _create_sassy_cron ${dry_run} ${_user} ${_pass} ${_radius}
+_drop_interim ${dry_run} ${_user} ${_pass}
 
 
 # +
