@@ -312,17 +312,17 @@ _drop_interim () {
 _add_classifier_and_plot () {
   write_magenta "_add_classifier_and_plot(dry_run=${1})"
   if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/get_iers.py"
     write_yellow "DryRun> source ~/.bashrc_conda"
     write_yellow "DryRun> conda activate"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/get_iers.py"
     write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
     write_yellow "DryRun> rm -f ZTF20*.png >> /dev/null 2>&1"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron.py"
     write_yellow "DryRun> chown www-data:www-data ZTF20*.png >> /dev/null 2>&1"
   else
+    python3 ${SASSY_SRC}/utils/get_iers.py
     source ~/.bashrc_conda
     conda activate
-    python3 ${SASSY_SRC}/utils/get_iers.py
     cd ${SASSY_SRC}/static/img
     rm -f ZTF20*.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron.py
