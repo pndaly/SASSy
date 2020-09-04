@@ -233,6 +233,14 @@ class Alerce(object):
         return self.__alerce_catalogs
 
     @property
+    def alerce_early_classifier(self):
+        return [_v for _k, _v in self.__alerce_early_classifier.items()]
+
+    @property
+    def alerce_late_classifier(self):
+        return [_v for _k, _v in self.__alerce_late_classifier.items()]
+
+    @property
     def alerce_outputs(self):
         return self.__alerce_outputs
 

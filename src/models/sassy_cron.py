@@ -222,6 +222,30 @@ def sassy_cron_get_text():
 # -
 def sassy_cron_filters(query, request_args):
 
+    # return records with aetype like value (API: ?aetype='Bogus')
+    if request_args.get('aetype'):
+        query = query.filter(SassyCron.aetype.ilike(f"%{request_args['aetype']}%"))
+
+    # return records with altype like value (API: ?altype='Bogus')
+    if request_args.get('altype'):
+        query = query.filter(SassyCron.altype.ilike(f"%{request_args['altype']}%"))
+
+    # return records with gdist >= value (API: ?gdist__gte=150.0)
+    if request_args.get('gdist__gte'):
+        query = query.filter(SassyCron.gdist >= float(request_args['gdist__gte']))
+
+    # return records with gdist <= value (API: ?gdist__lte=150.0)
+    if request_args.get('gdist__lte'):
+        query = query.filter(SassyCron.gdist <= float(request_args['gdist__lte']))
+
+    # return records with gsep >= value (API: ?gsep__gte=30.0)
+    if request_args.get('gsep__gte'):
+        query = query.filter(SassyCron.gsep >= float(request_args['gsep__gte'])/3600.0)
+
+    # return records with gsep <= value (API: ?gsep__lte=30.0)
+    if request_args.get('gsep__lte'):
+        query = query.filter(SassyCron.gsep <= float(request_args['gsep__lte'])/3600.0)
+
     # return records with zcandid (API: ?zcandid=xxdcdcdvfwd)
     if request_args.get('zcandid'):
         query = query.filter(SassyCron.zcandid == str(request_args['zcandid']))
@@ -341,6 +365,18 @@ def sassy_cron_cli_db(iargs=None):
     request_args = {}
 
     # get input(s) alphabetically
+    if iargs.aetype:
+        request_args['aetype'] = f'{iargs.aetype}'
+    if iargs.altype:
+        request_args['altype'] = f'{iargs.altype}'
+    if iargs.gdist__gte:
+        request_args['gdist__gte'] = f'{iargs.gdist__gte}'
+    if iargs.gdist__lte:
+        request_args['gdist__lte'] = f'{iargs.gdist__lte}'
+    if iargs.gsep__gte:
+        request_args['gsep__gte'] = f'{iargs.gsep__gte}'
+    if iargs.gsep__lte:
+        request_args['gsep__lte'] = f'{iargs.gsep__lte}'
     if iargs.zcandid:
         request_args['zcandid'] = f'{iargs.zcandid}'
     if iargs.zdec__gte:
@@ -455,6 +491,12 @@ if __name__ == '__main__':
     # get command line argument(s) alphabetically
     # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description=f'Query SassyCron Table', formatter_class=argparse.RawTextHelpFormatter)
+    _p.add_argument(f'--aetype', help=f'Alerce Early Classifier <= <str>')
+    _p.add_argument(f'--altype', help=f'Alerce Late Classifier <= <str>')
+    _p.add_argument(f'--gdist__gte', help=f'Glade Distance (Mpc) >= <float>')
+    _p.add_argument(f'--gdist__lte', help=f'Glade Distance (Mpc) <= <float>')
+    _p.add_argument(f'--gsep__gte', help=f'Glade separation (asec) >= <float>')
+    _p.add_argument(f'--gsep__lte', help=f'Glade separation (asec) <= <float>')
     _p.add_argument(f'--zcandid', help=f'ZTF Candidate ID <int>')
     _p.add_argument(f'--zdec__gte', help=f'ZTF Dec >= <float>')
     _p.add_argument(f'--zdec__lte', help=f'ZTF Dec <= <float>')

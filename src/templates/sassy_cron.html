@@ -11,7 +11,7 @@
     <div class="col-md-12">
       <h2>SassyCron</h2>
       <br><h5><font color="grey">This cron job runs every hour and asks the question: How many alerts within the past 24 hours, with a 
-                                 real/bogus score &gte; 0.5, have a host in the GLADE catalog within 45&Prime; and within 500 Mpc that 
+                 real/bogus score &gt; 0.5, have a host in the GLADE catalog within 45&Prime; and within 500 Mpc that
 				 are <i>not</i> in the TNS database and are <i>not</i> known solar system objects? For each such candidate, 
 				 we then query the <a href="https://alerce.online">Alerce</a> database to obtain a classifier and produce 
 				 images of the cutouts. The table is explorable using the standard SASSy controls on the left.</font></h5><br><br>
@@ -28,7 +28,7 @@
           <button type="submit" class="btn btn-success">Select</button>
           <a href="/sassy/cron" class="btn btn-warning">Reset</a>
         </div>
-
+        <br>
         <div class="form-group">
           <label for="sort_value">Sort By ...</label>
           <select id="sort_value" name="sort_value" class="form-control form-control-sm" value="{{ request.args.sort_value }}">
@@ -54,9 +54,9 @@
             <option value="ascending"  {% if request.args.sort_order=='ascending' %}  selected {% endif %}>Ascending</option>
           </select>
         </div>
-
+        <br>
         <div class="form-group">
-          <label for="sort_value">Using Control(s) ...</label>
+          <label for="sort_value">ZTF Control(s) ...</label>
           <input type="text" class="form-control form-control-sm" id="zoid" name="zoid" value="{{ request.args.zoid }}" placeholder="ZTF20xxxxxxx">
         </div>
 
@@ -78,7 +78,7 @@
           <div class="col">
             <input type="number" step="0.01" class="form-control form-control-sm" id="zdec__gte" name="zdec__gte" value="{{ request.args.zdec__gte }}" placeholder="-90.0">
           </div>
-          <label for="dec__gte"><font color="grey">&le;</font><small>Dec</small><font color="grey">&le;</font></label>
+          <label for="dec__gte"><font color="grey">&le;</font><small>Dec&deg;</small><font color="grey">&le;</font></label>
           <div class="col">
             <input type="number" step="0.01" class="form-control form-control-sm" id="zdec__lte" name="zdec__lte" value="{{ request.args.zdec__lte }}" placeholder="+90.0">
           </div>
@@ -86,7 +86,7 @@
 
         <div class="form-row">
           <div class="col">
-            <input type="number" step="0.01" class="form-control form-control-sm" id="zdrb__gte" name="zdrb__gte" value="{{ request.args.zdrb__gte }}" placeholder="0.0">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="zdrb__gte" name="zdrb__gte" value="{{ request.args.zdrb__gte }}" placeholder="0.5">
           </div>
           <label for="drb__gte"><font color="grey">&le;</font><small>drb</small><font color="grey">&le;</font></label>
           <div class="col">
@@ -139,7 +139,7 @@
           <div class="col">
             <input type="number" step="0.01" class="form-control form-control-sm" id="zra__gte" name="zra__gte" value="{{ request.args.zra__gte }}" placeholder="0.0">
           </div>
-	      <label for="ra__gte"><font color="grey">&le;</font><small>RA</small><font color="grey">&le;</font></label>
+	      <label for="ra__gte"><font color="grey">&le;</font><small>RA&deg;</small><font color="grey">&le;</font></label>
           <div class="col">
             <input type="number" step="0.01" class="form-control form-control-sm" id="zra__lte" name="zra__lte" value="{{ request.args.zra__lte }}" placeholder="360.0">
           </div>
@@ -154,7 +154,71 @@
             <input type="number" step="0.01" class="form-control form-control-sm" id="zrb__lte" name="zrb__lte" value="{{ request.args.zrb__lte }}" placeholder="1.0">
           </div>
         </div>
+        <br>
+        <div class="form-group">
+          <label for="nothing">Glade Control(s) ...</label>
+        </div>
 
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="gdist__gte" name="gdist__gte" value="{{ request.args.gdist__gte }}" placeholder="0.0">
+          </div>
+          <label for="gdist__gte"><font color="grey">&le;</font><small>g<sub>dist</sub> Mpc</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="gdist__lte" name="gdist__lte" value="{{ request.args.gdist__lte }}" placeholder="500.0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="gsep__gte" name="gsep__gte" value="{{ request.args.gsep__gte }}" placeholder="0.0">
+          </div>
+          <label for="gsep__gte"><font color="grey">&le;</font><small>g<sub>sep</sub> &Prime;</small><font color="grey">&le;</font></label>
+          <div class="col">
+            <input type="number" step="0.01" class="form-control form-control-sm" id="gsep__lte" name="gsep__lte" value="{{ request.args.gsep__lte }}" placeholder="45.0">
+          </div>
+        </div>
+        <br>
+        <div class="form-group">
+          <label for="nothing2">Alerce Control(s) ...</label>
+        </div>
+
+        <div class="form-group">
+          <label for="aetype"><small>Early Classifier</small></label>
+          <select id="aetype" name="aetype" class="form-control form-control-sm" value="{{ request.args.aetype }}">
+            <option value="" {% if request.args.aetype=='' %} selected {% endif %}>(any)</option>
+            <option value="AGN" {% if request.args.aetype=='AGN' %} selected {% endif %}>AGN</option>
+            <option value="Supernova" {% if request.args.aetype=='Supernova' %} selected {% endif %}>Supernova</option>
+            <option value="Variable Star" {% if request.args.aetype=='Variable_Star' %} selected {% endif %}>Variable Star</option>
+            <option value="Asteroid" {% if request.args.aetype=='Asteroid' %} selected {% endif %}>Asteroid</option>
+            <option value="Bogus" {% if request.args.aetype=='Bogus' %} selected {% endif %}>Bogus</option>
+          </select>
+        </div>
+
+
+        <div class="form-group">
+          <label for="altype"><small>Late Classifier</small></label>
+          <select id="altype" name="altype" class="form-control form-control-sm" value="{{ request.args.altype }}">
+            <option value="" {% if request.args.altype=='' %} selected {% endif %}>(any)</option>
+            <option value="AGN" {% if request.args.altype=='AGN' %} selected {% endif %}>AGN Type I</option>
+            <option value="Blazar" {% if request.args.altype=='Blazar' %} selected {% endif %}>Blazar</option>
+            <option value="Cataclysmic Variable / Nova" {% if request.args.altype=="Cataclysmic_Variable" %} selected {% endif %}>Cataclysmic Variable / Nova</option>
+            <option value="Quasar Type I" {% if request.args.altype=='Quasar_Type_I' %} selected {% endif %}>Quasar Type I</option>
+            <option value="Super-luminous Supernova" {% if request.args.altype=='Super-luminous_Supernova' %} selected {% endif %}>Super-luminous Supernova</option>
+            <option value="Supernova Type II" {% if request.args.altype=='Supernova_Type_II' %} selected {% endif %}>Supernova Type II</option>
+            <option value="Supernova Type Ia" {% if request.args.altype=='Supernova_Type_Ia' %} selected {% endif %}>Supernova Type Ia</option>
+            <option value="Supernova Type Ibc" {% if request.args.altype=='Supernova_Type_Ibc' %} selected {% endif %}>Supernova Type Ibc</option>
+            <option value="Eclipsing Binary (Contact)" {% if request.args.altype=='Eclipsing_Binary_(Contact)' %} selected {% endif %}>Eclipsing Binary (Contact)</option>
+            <option value="Eclipsing Binary (Detached/Semi-Detached)" {% if request.args.altype=='Eclipsing_Binary_(Detached/Semi-Detached)' %} selected {% endif %}>Eclipsing Binary (Detached/Semi-Detached)</option>
+            <option value="Periodic/Other" {% if request.args.altype=='Periodic/Other' %} selected {% endif %}>Periodic/Other</option>
+            <option value="RS Canum Venaticorum" {% if request.args.altype=='RA_Canum_Venaticorum' %} selected {% endif %}>RS Canum Venaticorum</option>
+            <option value="Cepheid" {% if request.args.altype=='Cepheid' %} selected {% endif %}>Cepheid</option>
+            <option value="Delta Scuti" {% if request.args.altype=='Delta_Scuti' %} selected {% endif %}>Delta Scuti</option>
+            <option value="Long Period Variable" {% if request.args.altype=='Long_Period_Variable' %} selected {% endif %}>Long Period Variable</option>
+            <option value="RR Lyra" {% if request.args.altype=='RR_Lyra' %} selected {% endif %}>RR Lyra</option>
+          </select>
+        </div>
+        <br>
         <div align="center">
           <button type="submit" class="btn btn-success">Select</button>
           <a href="/sassy/cron" class="btn btn-warning">Reset</a>
@@ -196,7 +260,7 @@
 
         <table class="table table-striped table-sm">
         <thead>
-          <th colspan="13" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
+          <th colspan="16" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
           <th colspan="4" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
           <th colspan="6" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
         </thead>
@@ -230,9 +294,9 @@
               <th><font color="blue">z</font></th>
             </tr>
             <tr>
-              <th><font color="grey">64&Prime; x 64&Prime;</font></th>
-              <th><font color="grey">64&Prime; x 64&Prime;</font></th>
-              <th><font color="grey">64&Prime; x 64&Prime;</font></th>
+              <th><font color="grey">cutout</font></th>
+              <th><font color="grey">cutout</font></th>
+              <th><font color="grey">cutout</font></th>
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">sid</font></th>
@@ -261,9 +325,9 @@
           <tbody>
             {% for alert in context.results %}
               <tr>
-               <img title="{{ alert.spng }}" src="{{ alert.spng }}"  height="75" width="75">
-               <img title="{{ alert.dpng }}" src="{{ alert.dpng }}"  height="75" width="75">
-               <img title="{{ alert.tpng }}" src="{{ alert.tpng }}"  height="75" width="75">
+               <td><img title="{{ url_for('static', filename='/img/{{ alert.spng }}') }}" src="/static/img/{{ alert.spng }}" height="75" width="75"></td>
+               <td><img title="{{ url_for('static', filename='/img/{{ alert.dpng }}') }}" src="/static/img/{{ alert.tpng }}" height="75" width="75"></td>
+               <td><img title="{{ url_for('static', filename='/img/{{ alert.tpng }}') }}" src="/static/img/{{ alert.dpng }}" height="75" width="75"></td>
                <td>{{ alert.zoid }}</td>
                <td>{{ alert.zcandid }}</td>
                <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
