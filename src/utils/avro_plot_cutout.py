@@ -87,10 +87,7 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
     except Exception as _e:
         if _log is not None:
             _log.error(f"failed to open {_file}, error={_e}")
-        raise Exception(f'failed to open {_file}, error={_e}')
-    else:
-        if _log is not None:
-            _log.debug(f"_packets={_packets}, len(_packets)={len(_packets)}")
+        pass
 
     # plot data
     for _i in range(len(_packets)):

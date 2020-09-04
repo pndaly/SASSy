@@ -10,10 +10,11 @@
   <div class="row">
     <div class="col-md-12">
       <h2>SassyCron</h2>
-      This page provides a default interface to the SassyCron database view indexed by Q3C. The table lists records in ascending
-      order by database <i>sid</i>. Use the filters on the right to narrow down the results to areas of interest.
-      When the results look good, add <code>?format=json</code> to the URL. You can then access the URL to
-      retrieve the full data and use it in your scripts. <p></p>
+      <br><h5><font color="grey">This cron job runs every hour and asks the question: How many alerts within the past 24 hours, with a 
+                                 real/bogus score &gte; 0.5, have a host in the GLADE catalog within 45&Prime; and within 500 Mpc that 
+				 are <i>not</i> in the TNS database and are <i>not</i> known solar system objects? For each such candidate, 
+				 we then query the <a href="https://alerce.online">Alerce</a> database to obtain a classifier and produce 
+				 images of the cutouts. The table is explorable using the standard SASSy controls on the left.</font></h5><br><br>
     </div>
   </div>
   <!-- end of introduction -->
@@ -201,6 +202,9 @@
         </thead>
           <thead>
             <tr>
+              <th><font color="blue">Science</font></th>
+              <th><font color="blue">Difference</font></th>
+              <th><font color="blue">Template</font></th>
               <th><font color="blue">ObjectId</font></th>
               <th><font color="blue">Candid</font></th>
               <th><font color="blue">ID</font></th>
@@ -226,6 +230,9 @@
               <th><font color="blue">z</font></th>
             </tr>
             <tr>
+              <th><font color="grey">64&Prime; x 64&Prime;</font></th>
+              <th><font color="grey">64&Prime; x 64&Prime;</font></th>
+              <th><font color="grey">64&Prime; x 64&Prime;</font></th>
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">sid</font></th>
@@ -254,6 +261,9 @@
           <tbody>
             {% for alert in context.results %}
               <tr>
+               <img title="{{ alert.spng }}" src="{{ alert.spng }}"  height="75" width="75">
+               <img title="{{ alert.dpng }}" src="{{ alert.dpng }}"  height="75" width="75">
+               <img title="{{ alert.tpng }}" src="{{ alert.tpng }}"  height="75" width="75">
                <td>{{ alert.zoid }}</td>
                <td>{{ alert.zcandid }}</td>
                <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
