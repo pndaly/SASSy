@@ -12,20 +12,29 @@
 # -
 
 
+function GetJD () {
+  year=$1
+  month=$2
+  day=$3
+  echo $((day - 32075 + 1461 * (year + 4800 - (14 - month) / 12) / 4 + 367 * (month - 2 + ((14 - month) / 12) * 12) / 12 - 3 * ((year + 4900 - (14 - month) / 12) / 100) / 4))
+}
+_jd=$(GetJD $(date +%Y | bc -l) $(date +%m | bc -l) $(date +%d | bc -l) | bc -l)
+
+
 # +
 # default(s)
 # -
-source /var/www/SASSy/etc/Sassy.sh /var/www/SASSy
-
 authorization="sassy:db_secret"
-max_jd=$(python3 -c "from src import *; print(get_jd(0))")
+min_jd=$(echo "${_jd} - 0.5" | bc -l)
 max_mpc=500.0
 max_rb=1.0
-min_jd=$(python3 -c "from src import *; print(get_jd(-1))")
+max_jd=$(echo "${_jd} + 0.5" | bc -l)
 min_mpc=0.0
 min_rb=0.5
 radius=45.0
+srcdir="/var/www/SASSy"
 dry_run=0
+jd_now=0
 
 
 # +
@@ -71,9 +80,11 @@ usage () {
   write_yellow "  --min_mpc=<float>,      Minimum distance (Mpc),                      default=${min_mpc}"                                          2>&1
   write_yellow "  --min_rb=<float>,       Minimum real-bogus score,                    default=${min_rb}"                                           2>&1
   write_yellow "  --radius=<float>,       search radius (arcsec),                      default=${radius}"                                           2>&1
+  write_yellow "  --srcdir=<str>,         source code directory,                       default=${srcdir}"                                           2>&1
   write_yellow ""                                                                                                                                   2>&1
   write_cyan   "Flag(s):"                                                                                                                           2>&1
-  write_cyan   "  --dry-run,         show (but do not execute) command(s),             default=false"                                               2>&1
+  write_cyan   "  --dry-run,              show (but do not execute) command(s),        default=false"                                               2>&1
+  write_cyan   "  --jd-now,               reset jd to time now,                        default=false"                                               2>&1
   write_cyan   ""                                                                                                                                   2>&1
 }
 
@@ -115,8 +126,16 @@ while [[ $# -gt 0 ]]; do
       _radius=$(echo ${1} | cut -d'=' -f2)
       shift
       ;;
+    --srcdir*)
+      _srcdir=$(echo ${1} | cut -d'=' -f2)
+      shift
+      ;;
     --dry-run)
       dry_run=1
+      shift
+      ;;
+    --jd-now)
+      jd_now=1
       shift
       ;;
     --help|*)
@@ -138,6 +157,7 @@ done
 [[ -z ${_min_mpc} ]] && _min_mpc=${min_mpc}
 [[ -z ${_min_rb} ]] && _min_rb=${min_rb}
 [[ -z ${_radius} ]] && _radius=${radius}
+[[ -z ${_srcdir} ]] && _srcdir=${srcdir}
 
 [[ ! ${_max_jd} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> max_jd=${_max_jd} is invalid!" && exit 0
 [[ ! ${_max_mpc} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> max_mpc=${_max_mpc} is invalid!" && exit 0
@@ -146,16 +166,30 @@ done
 [[ ! ${_min_mpc} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> min_mpc=${_min_mpc} is invalid!" && exit 0
 [[ ! ${_min_rb} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> min_rb=${_min_rb} is invalid!" && exit 0
 [[ ! ${_radius} =~ ^[0-9]*\.[0-9]*$ ]] && write_red "<ERROR> radius=${_radius} is invalid!" && exit 0
+[[ ! -d ${_srcdir} ]] && write_red "<ERROR> source=${_srcdir} does not exist!" && exit 0
 
-write_blue "%% bash ${0} --authorization=${_authorization} --max_jd=${_max_jd} --max_mpc=${_max_mpc} --max_rb=${_max_rb} --min_jd=${_min_jd} --min_mpc=${_min_mpc} --min_rb=${_min_rb} --radius=${_radius} --dry-run=${dry_run}" 2>&1
+
+# +
+# initialization
+# -
+source ${_srcdir}/etc/Sassy.sh ${_srcdir}
+if [[ ${jd_now} -eq 1 ]]; then
+  _max_jd=$(python3 -c "from src import *; print(get_jd(0))")
+  _min_jd=$(python3 -c "from src import *; print(get_jd(-1))")
+fi
 
 
 # +
 # variable(s)
 # -
-_user=$(echo ${_authorization} | cut -d':' -f1)
-_pass=$(echo ${_authorization} | cut -d':' -f2)
-_radius_degree=$( echo "scale=6; ${_radius} / 3600.00" | bc -l)
+_username=$(echo ${_authorization} | cut -d':' -f1)
+_password=$(echo ${_authorization} | cut -d':' -f2)
+_radius_degree=$(echo "scale=6; ${_radius} / 3600.00" | bc -l)
+
+
+write_blue "%% bash ${0} --authorization=${_authorization} --max_jd=${_max_jd} --max_mpc=${_max_mpc} --max_rb=${_max_rb} --min_jd=${_min_jd} --min_mpc=${_min_mpc} --min_rb=${_min_rb} --radius=${_radius} --srcdir=${_srcdir} --dry-run=${dry_run} --jd-now=${jd_now}" 2>&1
+
+write_cyan "Using: _authorization=${_authorization} _max_jd=${_max_jd} _max_mpc=${_max_mpc} _max_rb=${_max_rb} _min_jd=${_min_jd} _min_mpc=${_min_mpc} _min_rb=${_min_rb} _radius=${_radius} _radius_degree=${_radius_degree} _srcdir=${_srcdir} _username=${_username} _password=${_password} dry_run=${dry_run} jd_now=${jd_now}" 2>&1
 
 
 # +
@@ -301,11 +335,11 @@ _add_classifier_and_plot () {
 # +
 # execute
 # -
-_create_sassy_cron_ztf ${dry_run} ${_user} ${_pass} ${_max_jd} ${_max_rb} ${_min_jd} ${_min_rb}
-_create_sassy_cron_glade ${dry_run} ${_user} ${_pass} ${_max_mpc} ${_min_mpc}
-_create_sassy_cron_q3c ${dry_run} ${_user} ${_pass} ${_radius_degree}
-_create_sassy_cron ${dry_run} ${_user} ${_pass} ${_radius_degree}
-_drop_interim ${dry_run} ${_user} ${_pass}
+_create_sassy_cron_ztf   ${dry_run} ${_username} ${_password} ${_max_jd} ${_max_rb} ${_min_jd} ${_min_rb}
+_create_sassy_cron_glade ${dry_run} ${_username} ${_password} ${_max_mpc} ${_min_mpc}
+_create_sassy_cron_q3c   ${dry_run} ${_username} ${_password} ${_radius_degree}
+_create_sassy_cron       ${dry_run} ${_username} ${_password} ${_radius_degree}
+_drop_interim            ${dry_run} ${_username} ${_password}
 _add_classifier_and_plot ${dry_run}
 
 
