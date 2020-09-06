@@ -97,18 +97,18 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
         if _dif:
             _col = 'viridis' if 'viridis' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutDifference']['stampData'])
-            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'))
-            _title = 'Difference'
+            _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'
+            _title = f'Difference ({_col})'
         elif _sci:
             _col = 'coolwarm' if 'coolwarm' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutScience']['stampData'])
-            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'))
-            _title = 'Science'
+            _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'
+            _title = f'Science ({_col})'
         elif _tmp:
             _col = 'heat' if 'heat' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutTemplate']['stampData'])
-            _output = os.path.abspath(os.path.expanduser(f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'))
-            _title = 'Template'
+            _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'
+            _title = f'Template ({_col})'
         _png_files.append(_output)
 
         # plot it

@@ -263,6 +263,7 @@
           <th colspan="16" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
           <th colspan="4" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
           <th colspan="6" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
+          <th colspan="3" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
         </thead>
           <thead>
             <tr>
@@ -292,6 +293,10 @@
               <th><font color="blue">distance</font></th>
               <th><font color="blue">separation</font></th>
               <th><font color="blue">z</font></th>
+              <th><font color="blue">Alerce</font></th>
+              <th><font color="blue">Lasair</font></th>
+              <th><font color="blue">MMT</font></th>
+              <th><font color="blue">MMT</font></th>
             </tr>
             <tr>
               <th><font color="grey">cutout</font></th>
@@ -320,6 +325,10 @@
               <th><font color="grey">Mpc</font></th>
               <th><font color="grey"><center>&Prime;</center></font></th>
               <th><font color="grey"></font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey"></font></th>
+              <th><font color="grey">Spectrum</font></th>
+              <th><font color="grey">Image</font></th>
             </tr>
           </thead>
           <tbody>
@@ -415,6 +424,10 @@
                {% else %}
                  <td>{{ "%.3f"|format(alert.gz) }}</td>
                {% endif %}
+               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" title="{{ alert.zoid }}">{{ alert.zoid }}</a></td>
+               <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}">{{ alert.zoid }}</a></td>
+	       <td><a href="{{ url_for('mmt_binospec', obstype='longslit', payload=alert) }}/" title="BinoSpecSpectrum_{{ alert.zoid }}">Get MMT Spectrum</a></td>
+	       <td><a href="{{ url_for('mmt_binospec', obstype='imaging', payload=alert) }}/" title="BinoSpecImage_{{ alert.zoid }}">Get MMT Image</a></td>
               </tr>
             {% endfor %}
           </tbody>
