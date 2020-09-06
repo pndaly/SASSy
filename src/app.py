@@ -12,10 +12,8 @@ from src.utils.utils import *
 # noinspection PyBroadException
 try:
     from src.utils.sassy_bot import *
-    from src.utils.sassy_cron import *
 except:
     sassy_bot_read = None
-    sassy_cron_read = None
 
 from flask import Flask
 from flask import jsonify
@@ -98,7 +96,6 @@ import pytz
 # constant(s)
 # -
 ARIZONA = pytz.timezone('America/Phoenix')
-BOT_RESULTS_PER_PAGE = 25
 COLUMNS = ['jd', 'filter', 'magpsf', 'sigmapsf', 'diffmaglim']
 HEADERS = ['jd', 'filter', 'magpsf', 'sigmapsf', 'diffmaglim']
 PSQL_CONNECT_MSG = f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME} using {SASSY_DB_USER}:{SASSY_DB_PASS}'
