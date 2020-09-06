@@ -112,7 +112,7 @@ def sassy_cron(_log=None):
         if _log:
             _log.info(f"_file={_file}")
             _log.info(f"_q.dpng={_q.dpng}")
-            _log.info(f"_q.dsng={_q.spng}")
+            _log.info(f"_q.spng={_q.spng}")
             _log.info(f"_q.tpng={_q.tpng}")
 
         # update database

@@ -1605,6 +1605,26 @@ def ligo_q3c_text():
 
 
 # +
+# route(s): /mmt/binopsec/imaging, /sassy/mmt/binospec/imaging
+# -
+@app.route('/sassy/mmt/imaging', methods=['GET', 'POST'])
+@app.route('/mmt/imaging', methods=['GET', 'POST'])
+def mmt_binospec_imaging(payload=None):
+    logger.debug(f'route /sassy/binospec/imaging entry: payload={payload}')
+    return render_template('generic.html')
+
+
+# +
+# route(s): /mmt/binopsec/longslit, /sassy/mmt/binospec/longslit
+# -
+@app.route('/sassy/mmt/longslit', methods=['GET', 'POST'])
+@app.route('/mmt/longslit', methods=['GET', 'POST'])
+def mmt_binospec_longslit(payload=None):
+    logger.debug(f'route /sassy/binospec/longslit entry: payload={payload}')
+    return render_template('generic.html')
+
+
+# +
 # route(s): /psql/, /sassy/psql/
 # -
 @app.route('/sassy/psql/', methods=['GET', 'POST'])

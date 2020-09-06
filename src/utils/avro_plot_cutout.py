@@ -77,7 +77,7 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
     _dif = True if _cutout.strip().lower() == 'difference' else False
     _sci = True if _cutout.strip().lower() == 'science' else False
     _tmp = True if _cutout.strip().lower() == 'template' else False
-    _packets, _png_files = [], []
+    _packets, _png_files, _title = [], [], ''
 
     # read the packet(s)
     try:

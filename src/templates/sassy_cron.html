@@ -426,8 +426,8 @@
                {% endif %}
                <td><a href="https://alerce.online/object/{{ alert.zoid }}/" title="{{ alert.zoid }}">{{ alert.zoid }}</a></td>
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}">{{ alert.zoid }}</a></td>
-	       <td><a href="{{ url_for('mmt_binospec', obstype='longslit', payload=alert) }}/" title="BinoSpecSpectrum_{{ alert.zoid }}">Get MMT Spectrum</a></td>
-	       <td><a href="{{ url_for('mmt_binospec', obstype='imaging', payload=alert) }}/" title="BinoSpecImage_{{ alert.zoid }}">Get MMT Image</a></td>
+	           <td><a href="{{ url_for('mmt_binospec_longslit', payload=alert) }}/" title="BinoSpecLongslit_{{ alert.zoid }}">Spectrum</a></td>
+	           <td><a href="{{ url_for('mmt_binospec_imaging', payload=alert) }}/" title="BinoSpecImaging_{{ alert.zoid }}">Image</a></td>
               </tr>
             {% endfor %}
           </tbody>
