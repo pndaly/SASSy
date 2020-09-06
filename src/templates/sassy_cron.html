@@ -10,11 +10,11 @@
   <div class="row">
     <div class="col-md-12">
       <h2>SassyCron</h2>
-      <br><h5><font color="grey">This cron job runs every hour and asks the question: How many alerts within the past 24 hours, with a 
-                 real/bogus score &gt; 0.5, have a host in the GLADE catalog within 45&Prime; and within 500 Mpc that
-				 are <i>not</i> in the TNS database and are <i>not</i> known solar system objects? For each such candidate, 
-				 we then query the <a href="https://alerce.online">Alerce</a> database to obtain a classifier and produce 
-				 images of the cutouts. The table is explorable using the standard SASSy controls on the left.</font></h5><br><br>
+      <br><h5><font color="grey">This cron job runs every hour and asks the question: How many alerts within the past 24 hours (from now), with a 
+        real/bogus score &gt; 0.5, have a host in the GLADE catalog within the circumscribed circle of the ZTF cutout FoV (45&Prime;) at a distance 
+	of &lt; 500 Mpc that are <i>not</i> in the TNS database and are <i>not</i> known solar system objects? For each such candidate, 
+	we then query the <a href="https://alerce.online">Alerce</a> database to obtain a classifier and produce 
+	images of the cutouts. The table is explorable using the standard SASSy controls on the left.</font></h5><br><br>
     </div>
   </div>
   <!-- end of introduction -->
@@ -263,7 +263,7 @@
           <th colspan="16" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
           <th colspan="4" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
           <th colspan="6" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
-          <th colspan="3" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
+          <th colspan="4" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
         </thead>
           <thead>
             <tr>
@@ -305,7 +305,7 @@
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">sid</font></th>
-              <th><font color="grey"><center>{g,r,i}</center></font></th>
+              <th><font color="grey">{g,r,i}</font></th>
               <th><font color="grey">&#8491;</font></th>
               <th><font color="grey"> </font></th>
               <th><font color="grey">m</font></th>
@@ -323,20 +323,20 @@
               <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">Mpc</font></th>
-              <th><font color="grey"><center>&Prime;</center></font></th>
-              <th><font color="grey"></font></th>
-              <th><font color="grey"></font></th>
-              <th><font color="grey"></font></th>
-              <th><font color="grey">Spectrum</font></th>
-              <th><font color="grey">Image</font></th>
+              <th><font color="grey">&Prime;</font></th>
+              <th><font color="grey"> </font></th>
+              <th><font color="grey">link</font></th>
+              <th><font color="grey">link</font></th>
+              <th><font color="grey">Observe<font></th>
+              <th><font color="grey">Observe<font></th>
             </tr>
           </thead>
           <tbody>
             {% for alert in context.results %}
               <tr>
-               <td><img title="{{ url_for('static', filename='/img/{{ alert.spng }}') }}" src="/static/img/{{ alert.spng }}" height="75" width="75"></td>
-               <td><img title="{{ url_for('static', filename='/img/{{ alert.dpng }}') }}" src="/static/img/{{ alert.tpng }}" height="75" width="75"></td>
-               <td><img title="{{ url_for('static', filename='/img/{{ alert.tpng }}') }}" src="/static/img/{{ alert.dpng }}" height="75" width="75"></td>
+               <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.spng }}" title="/static/img/{{ alert.spng }}" height="75" width="75"></td>
+               <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75"></td>
+               <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.tpng }}" title="/static/img/{{ alert.dpng }}" height="75" width="75"></td>
                <td>{{ alert.zoid }}</td>
                <td>{{ alert.zcandid }}</td>
                <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
@@ -424,10 +424,10 @@
                {% else %}
                  <td>{{ "%.3f"|format(alert.gz) }}</td>
                {% endif %}
-               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" title="{{ alert.zoid }}">{{ alert.zoid }}</a></td>
-               <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}">{{ alert.zoid }}</a></td>
-	           <td><a href="{{ url_for('mmt_binospec_longslit', payload=alert) }}/" title="BinoSpecLongslit_{{ alert.zoid }}">Spectrum</a></td>
-	           <td><a href="{{ url_for('mmt_binospec_imaging', payload=alert) }}/" title="BinoSpecImaging_{{ alert.zoid }}">Image</a></td>
+               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
+               <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
+               <td><a href="{{ url_for('mmt_binospec_longslit', zoid=alert.zoid) }}" title="BinoSpecLongslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
+               <td><a href="{{ url_for('mmt_binospec_imaging', zoid=alert.zoid) }}" title="BinoSpecImaging_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Image</a></td>
               </tr>
             {% endfor %}
           </tbody>

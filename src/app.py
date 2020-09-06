@@ -1602,23 +1602,23 @@ def ligo_q3c_text():
 
 
 # +
-# route(s): /mmt/binopsec/imaging, /sassy/mmt/binospec/imaging
+# route(s): /mmt/binopsec/imaging/<zoid>, /sassy/mmt/binospec/imaging/<zoid>
 # -
-@app.route('/sassy/mmt/imaging', methods=['GET', 'POST'])
-@app.route('/mmt/imaging', methods=['GET', 'POST'])
-def mmt_binospec_imaging(payload=None):
-    logger.debug(f'route /sassy/binospec/imaging entry: payload={payload}')
-    return render_template('generic.html')
+@app.route('/sassy/mmt/imaging/<zoid>', methods=['GET', 'POST'])
+@app.route('/mmt/imaging/<zoid>', methods=['GET', 'POST'])
+def mmt_binospec_imaging(zoid=''):
+    logger.debug(f'route /sassy/binospec/imaging/{zoid} entry')
+    return render_template('generic.html', url={'url': ''})
 
 
 # +
-# route(s): /mmt/binopsec/longslit, /sassy/mmt/binospec/longslit
+# route(s): /mmt/binopsec/longslit/<zoid>, /sassy/mmt/binospec/longslit/<zoid>
 # -
-@app.route('/sassy/mmt/longslit', methods=['GET', 'POST'])
-@app.route('/mmt/longslit', methods=['GET', 'POST'])
-def mmt_binospec_longslit(payload=None):
-    logger.debug(f'route /sassy/binospec/longslit entry: payload={payload}')
-    return render_template('generic.html')
+@app.route('/sassy/mmt/longslit/<zoid>', methods=['GET', 'POST'])
+@app.route('/mmt/longslit/<zoid>', methods=['GET', 'POST'])
+def mmt_binospec_longslit(zoid=''):
+    logger.debug(f'route /sassy/binospec/longslit/{zoid} entry')
+    return render_template('generic.html', url={'url': ''})
 
 
 # +
