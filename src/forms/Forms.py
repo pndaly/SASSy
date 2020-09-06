@@ -9,6 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 from flask_wtf import FlaskForm
 from wtforms import FloatField
+from wtforms import IntegerField
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -57,6 +58,8 @@ DEFAULT_COMMAND = 'SELECT * FROM glade_q3c WHERE q3c_radial_query(ra, dec, 23.5,
 CATALOGS = [('Glade_q3c', 'Glade_q3c'), ('Gwgc_q3c', 'Gwgc_q3c'), ('Ligo_q3c', 'Ligo_q3c'), ('Tns_q3c', 'Tns_q3c')]
 REGEXP_DEC = re.compile("[+-]?[0-9]{2}:[0-9]{2}:[0-9]{2}")
 REGEXP_RA = re.compile("[0-9]{2}:[0-9]{2}:[0-9]{2}")
+
+MMT_IMAGING_FILTERS = [('g', 'g'), ('r', 'r'), ('i', 'i'), ('z', 'z')]
 
 
 # +
@@ -219,6 +222,34 @@ class SassyBotForm(FlaskForm):
         DataRequired(), NumberRange(min=0.0, max=1.0, message=f'0.0 < real-bogus minimum < 1.0')])
     rb_max = FloatField('Real-Bogus Maximum', default=0.95, validators=[
         DataRequired(), NumberRange(min=0.0, max=1.0, message=f'0.0 < real-bogus maximum < 1.0')])
+
+    # submit
+    submit = SubmitField('Submit')
+
+
+# +
+# class: MMTImagingForm(), inherits from FlaskForm
+# -
+class MMTImagingForm(FlaskForm):
+
+    # fields
+    ra_hms = StringField('RA', default='', validators=[
+        DataRequired(), Regexp(regex=REGEXP_RA, flags=re.IGNORECASE, message='RA format is HH:MM:SS.S')])
+    dec_dms = StringField('Dec', default='', validators=[
+        DataRequired(), Regexp(regex=REGEXP_DEC, flags=re.IGNORECASE, message='Dec format is +/-dd:mm:ss.s')])
+    epoch = FloatField('Epoch', default=2000.0, validators=[
+        DataRequired(), NumberRange(min=2000.0, message=f'2000.0 < epoch')])
+    exposuretime = FloatField('Exposure Time', default=0.0, validators=[
+        DataRequired(), NumberRange(min=0.0, message=f'0.0 < exposure time')])
+    filter = SelectField('Filter', choices=MMT_IMAGING_FILTERS, default=MMT_IMAGING_FILTERS[0], validators=[
+        DataRequired()])
+    magnitude = FloatField('Magnitude', default=0.0, validators=[DataRequired()])
+    notes = StringField('Note(s)', default='', validators=[DataRequired()])
+    numexposures = IntegerField('Exposures', default=1, validators=[
+        DataRequired(), NumberRange(min=1, message=f'1 < # exposures')])
+    zoid = StringField('Object Id', default='', validators=[DataRequired()])
+    visits = IntegerField('Visits', default=1, validators=[
+        DataRequired(), NumberRange(min=1, message=f'1 < # visits')])
 
     # submit
     submit = SubmitField('Submit')

@@ -28,6 +28,7 @@ from src.forms.Forms import AstronomicalRadialQueryForm
 from src.forms.Forms import AstronomicalEllipticalQueryForm
 from src.forms.Forms import DigitalRadialQueryForm
 from src.forms.Forms import DigitalEllipticalQueryForm
+from src.forms.Forms import MMTImagingForm
 from src.forms.Forms import PsqlQueryForm
 from src.forms.Forms import SexagisimalRadialQueryForm
 from src.forms.Forms import SexagisimalEllipticalQueryForm
@@ -1608,7 +1609,39 @@ def ligo_q3c_text():
 @app.route('/mmt/imaging/<zoid>', methods=['GET', 'POST'])
 def mmt_binospec_imaging(zoid=''):
     logger.debug(f'route /sassy/binospec/imaging/{zoid} entry')
-    return render_template('generic.html', url={'url': ''})
+
+    # get observation request
+    _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
+
+    # form
+    form = MMTImagingForm()
+
+    # GET method
+    if request.method == 'GET':
+        form.ra_hms.data = ra_to_hms(_cronrec.zra)
+        form.dec_dms.data = dec_to_dms(_cronrec.zdec)
+        form.epoch.data = 2000.0
+        form.exposuretime.data = 360.0
+        form.filter.data = ZTF_FILTERS.get(_cronrec.zfid)[0]
+        form.magnitude.data = round((_cronrec.zmagap + _cronrec.zmagpsf) / 2.0, 3)
+        form.numexposures.data = 5
+        form.visits.data = 1
+        form.notes.data = f"{_cronrec.zoid}: {_cronrec.altype}"
+        form.zoid.data = f"{_cronrec.zoid}"
+        return render_template('mmt_imaging.html', form=form, record=_cronrec)
+
+    # validate form (POST request)
+    if form.validate_on_submit():
+        return render_template(
+            'mmt_imaging_payload.html', url={'url': ''},
+            payload={"dec": f"{form.dec_dms.data}", "epoch": float(form.epoch.data),
+                     "exposuretime": float(form.exposuretime.data), "filter": f"{form.filter.data.strip()}",
+                     "magnitude": float(form.magnitude.data), "notes": f"{form.notes.data.strip()}",
+                     "numberexposures": int(form.numexposures.data), "objectid": f"{form.zoid.data}",
+                     "observationtype": "imaging", "ra": f"{form.ra_hms.data}", "visits": int(form.visits.data)})
+
+    # return for GET
+    return render_template('mmt_imaging.html', form=form)
 
 
 # +

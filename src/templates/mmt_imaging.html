@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <form action="" method="post">
+  <div class="container">
+   {{ form.hidden_tag() }}
+   <h3>MMT Imaging Configuration</h3>
+   <div class="row">
+    <div class="col-md-2">
+     {{ form.ra_hms.label }}<br>
+     {{ form.ra_hms(size=16) }}<br>
+     {% for error in form.ra_hms.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>HH:MM:SS.S (J2k)</small></span>
+    </div>
+    <div class="col-md-2">
+     {{ form.dec_dms.label }}<br>
+     {{ form.dec_dms(size=16) }}<br>
+     {% for error in form.dec_dms.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>&plusmn;dd:mm:ss.s (J2k)</small></span>
+    </div>
+    <div class="col-md-2">
+     {{ form.epoch.label }}<br>
+     {{ form.epoch(size=6, disabled=true) }}<br>
+     {% for error in form.epoch.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>J2000</small></span><br>
+    </div>
+    <div class="col-md-2">
+     {{ form.exposuretime.label }}<br>
+     {{ form.exposuretime(size=6) }}<br>
+     {% for error in form.exposuretime.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>&gt; 0.0</small></span>
+    </div>
+    <div class="col-md-2">
+     {{ form.numexposures.label }}<br>
+     {{ form.numexposures(size=12) }}<br>
+     {% for error in form.numexposures.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>&gt; 1</small></span>
+    </div>
+    <div class="col-md-2">
+     {{ form.visits.label }}<br>
+     {{ form.visits(size=12) }}<br>
+     {% for error in form.visits.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>&gt; 0</small></span>
+    </div>
+   </div>
+   <br>
+   <div class="row">
+    <div class="col-md-2">
+     {{ form.filter.label }}<br>
+     {{ form.filter }}<br>
+     {% for error in form.filter.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>(g, r, i, z)</small></span>
+    </div>
+    <div class="col-md-2">
+     {{ form.magnitude.label }}<br>
+     {{ form.magnitude(size=12) }}<br>
+     {% for error in form.magnitude.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+    </div>
+    <div class="col-md-2">
+     {{ form.zoid.label }}<br>
+     {{ form.zoid(size=16) }}<br>
+     {% for error in form.zoid.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+    </div>
+    <div class="col-md-2">
+     {{ form.notes.label }}<br>
+     {{ form.notes(size=64) }}<br>
+     {% for error in form.notes.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>For telescope operator</small></span>
+    </div>
+   </div>
+   <br>
+
+   <div class="d-flex justify-content-between">
+    <div class="row">
+     {{ form.submit(class_="btn btn-md btn-primary") }}
+    </div>
+    <div>
+     <a href="{{ url_for('cron_records') }}" class="btn btn-md btn-danger">Cancel</a>
+    </div>
+   </div>
+
+  </div>
+  <hr>
+ </form>
+{% endblock %}
