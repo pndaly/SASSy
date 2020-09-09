@@ -1701,7 +1701,7 @@ def mmt_imaging(zoid=''):
                      "exposuretime": float(form.exposuretime.data), "filter": f"{form.filter.data.strip()}",
                      "magnitude": float(form.magnitude.data), "notes": f"{form.notes.data.strip()}",
                      "numberexposures": int(form.numexposures.data), "objectid": f"{form.zoid.data}",
-                     "observationtype": "imaging", "ra": f"{form.ra_hms.data}",
+                     "observationtype": "imaging", "ra": f"{form.ra_hms.data}", "maskid": 110,
                      "findingchartfilename": os.path.basename(_finder) if _finder is not None else '',
                      "token": f"{form.token.data.strip()}", "visits": int(form.visits.data)})
 
