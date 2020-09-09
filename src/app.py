@@ -1609,7 +1609,7 @@ def ligo_q3c_text():
 # -
 @app.route('/sassy/mmt/imaging/<zoid>', methods=['GET', 'POST'])
 @app.route('/mmt/imaging/<zoid>', methods=['GET', 'POST'])
-def mmt_binospec_imaging(zoid=''):
+def mmt_imaging(zoid=''):
     logger.debug(f'route /sassy/mmt/imaging/{zoid} entry')
 
     # get observation request
@@ -1623,12 +1623,12 @@ def mmt_binospec_imaging(zoid=''):
         form.ra_hms.data = ra_to_hms(_cronrec.zra)
         form.dec_dms.data = dec_to_dms(_cronrec.zdec)
         form.epoch.data = 2000.0
-        form.exposuretime.data = 360.0
+        form.exposuretime.data = 300.0
         form.filter.data = ZTF_FILTERS.get(_cronrec.zfid)[0]
         form.magnitude.data = round((_cronrec.zmagap + _cronrec.zmagpsf) / 2.0, 3)
         form.numexposures.data = 5
         form.visits.data = 1
-        form.notes.data = f"{_cronrec.spng.split('.')[0]}: {_cronrec.altype}"
+        form.notes.data = f"{_cronrec.spng.split('.')[0].replace('_science', '')}: {_cronrec.altype}"
         form.zoid.data = f"{_cronrec.zoid}"
         form.token.data = ''
         return render_template('mmt_imaging.html', form=form, record=_cronrec)
@@ -1639,11 +1639,21 @@ def mmt_binospec_imaging(zoid=''):
         # get base name and remove existing file(s)
         _base = f"{_cronrec.spng.split('.')[0].replace('_science', '')}"
         _sdss = f"{app.static_folder}/img/{_base}_sdss.jpg"
-        _finder = f"{app.static_folder}/img/{_base}_finder.png"
         if os.path.exists(_sdss):
-            os.remove(_finder)
+            if logger:
+                logger.debug(f'Deleting {_sdss}')
+            os.remove(_sdss)
+        else:
+            if logger:
+                logger.debug(f'Need to create {_sdss}')
+        _finder = f"{app.static_folder}/img/{_base}_finder.png"
         if os.path.exists(_finder):
+            if logger:
+                logger.debug(f'Deleting {_finder}')
             os.remove(_finder)
+        else:
+            if logger:
+                logger.debug(f'Need to create {_finder}')
 
         # create jpg
         _jpg = None
@@ -1670,11 +1680,15 @@ def mmt_binospec_imaging(zoid=''):
                 logger.info(f"_png={_png}")
 
         # combine all pngs
-        _images = [
-            f"{app.static_folder}/img/{_base}_science.png",
-            f"{app.static_folder}/img/{_base}_difference.png",
-            f"{app.static_folder}/img/{_base}_template.png",
-            f"{app.static_folder}/img/{_base}_sdss.png"]
+        _images= []
+        if os.path.exists(f"{app.static_folder}/img/{_base}_science.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_science.png")
+        if os.path.exists(f"{app.static_folder}/img/{_base}_difference.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_difference.png")
+        if os.path.exists(f"{app.static_folder}/img/{_base}_template.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_template.png")
+        if os.path.exists(f"{app.static_folder}/img/{_base}_sdss.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_sdss.png")
         try:
             _output = combine_pngs(_files=_images, _output=_finder, _log=logger)
         except Exception as _c:
@@ -1682,7 +1696,7 @@ def mmt_binospec_imaging(zoid=''):
                 logger.error(f'Failed to combine image(s), error={_c}')
 
         return render_template(
-            'mmt_imaging_payload.html', url={'url': ''},
+            'mmt_payload.html', url={'url': ''},
             payload={"dec": f"{form.dec_dms.data}", "epoch": float(form.epoch.data),
                      "exposuretime": float(form.exposuretime.data), "filter": f"{form.filter.data.strip()}",
                      "magnitude": float(form.magnitude.data), "notes": f"{form.notes.data.strip()}",
@@ -1700,7 +1714,7 @@ def mmt_binospec_imaging(zoid=''):
 # -
 @app.route('/sassy/mmt/longslit/<zoid>', methods=['GET', 'POST'])
 @app.route('/mmt/longslit/<zoid>', methods=['GET', 'POST'])
-def mmt_binospec_longslit(zoid=''):
+def mmt_longslit(zoid=''):
     logger.debug(f'route /sassy/mmt/longslit/{zoid} entry')
 
     # get observation request
@@ -1720,7 +1734,7 @@ def mmt_binospec_longslit(zoid=''):
         form.magnitude.data = round((_cronrec.zmagap + _cronrec.zmagpsf) / 2.0, 3)
         form.numexposures.data = 5
         form.visits.data = 1
-        form.notes.data = f"{_cronrec.spng.split('.')[0]}: {_cronrec.altype}"
+        form.notes.data = f"{_cronrec.spng.split('.')[0].replace('_science', '')}: {_cronrec.altype}"
         form.zoid.data = f"{_cronrec.zoid}"
         form.token.data = ''
         return render_template('mmt_longslit.html', form=form, record=_cronrec)
@@ -1730,12 +1744,22 @@ def mmt_binospec_longslit(zoid=''):
 
         # get base name and remove existing file(s)
         _base = f"{_cronrec.spng.split('.')[0].replace('_science', '')}"
-        _sdss = f"{app.static_folder}/img/{_base}_sdss.jpg"
         _finder = f"{app.static_folder}/img/{_base}_finder.png"
         if os.path.exists(_sdss):
-            os.remove(_finder)
+            if logger:
+                logger.debug(f'Deleting {_sdss}')
+            os.remove(_sdss)
+        else:
+            if logger:
+                logger.debug(f'Need to create {_sdss}')
+        _sdss = f"{app.static_folder}/img/{_base}_sdss.jpg"
         if os.path.exists(_finder):
+            if logger:
+                logger.debug(f'Deleting {_finder}')
             os.remove(_finder)
+        else:
+            if logger:
+                logger.debug(f'Need to create {_finder}')
 
         # create jpg
         _jpg = None
@@ -1762,11 +1786,15 @@ def mmt_binospec_longslit(zoid=''):
                 logger.info(f"_png={_png}")
 
         # combine all pngs
-        _images = [
-            f"{app.static_folder}/img/{_base}_science.png",
-            f"{app.static_folder}/img/{_base}_difference.png",
-            f"{app.static_folder}/img/{_base}_template.png",
-            f"{app.static_folder}/img/{_base}_sdss.png"]
+        _images= []
+        if os.path.exists(f"{app.static_folder}/img/{_base}_science.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_science.png")
+        if os.path.exists(f"{app.static_folder}/img/{_base}_difference.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_difference.png")
+        if os.path.exists(f"{app.static_folder}/img/{_base}_template.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_template.png")
+        if _png is not None and os.path.exists(f"{app.static_folder}/img/{_base}_sdss.png"):
+            _images.append(f"{app.static_folder}/img/{_base}_sdss.png")
         try:
             _output = combine_pngs(_files=_images, _output=_finder, _log=logger)
         except Exception as _c:
@@ -1774,7 +1802,7 @@ def mmt_binospec_longslit(zoid=''):
                 logger.error(f'Failed to combine image(s), error={_c}')
 
         return render_template(
-            'mmt_longslit_payload.html', url={'url': ''},
+            'mmt_payload.html', url={'url': ''},
             payload={"dec": f"{form.dec_dms.data}", "epoch": float(form.epoch.data),
                      "centralwavelength": float(form.central_lambda.data),
                      "grating": f"{form.grating.data.strip()}", "slitmask": f"form.data.slitmask.strip()",

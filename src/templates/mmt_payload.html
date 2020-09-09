@@ -2,14 +2,19 @@
 {% block content %}
 <div class="container">
  <div class="row">
+ <h2><i>Do you really want to send this {{ payload.observationtype }} observation request to MMT?</i></h2>
+ </div>
+ <br>
+ <div class="row">
+  <h4><font color="grey">Observation Payload:</font></h4>
   <div class="col-md-12">
-   <h2><i>Do you really want to send this observation request to MMT?</i></h2>
    <br>
-   <h4><font color="grey">{{ payload }}</font></h4>
+   <h6><font color="blue">{{ payload }}</font></h6>
   </div>
  </div>
  <br>
  <div class="row">
+  <h4><font color="grey">Finding Chart:</font></h4>
   <div class="col-md-12">
    <img src="{{ url_for('static', filename='img') }}/{{ payload.findingchartfilename }}" height="200" width="800" title="{{ payload.findingchartfilename }}">
   </div>

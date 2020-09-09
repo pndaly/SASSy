@@ -67,9 +67,7 @@ def get_sdss_image(**kw):
         raise Exception(f"failed to complete request, _req={_req}, error={_e}")
 
     # if everything is ok, create the jpg image and return the path
-    if _log:
-        _log.debug(f"_req.status_code={_req.status_code}, _req.content={_req.content}")
-    if _req is not None and hasattr(_req, 'status_code') and (_req.status_code == 200 or _req.status_code == 404) and hasattr(_req, 'content'):
+    if _req is not None and hasattr(_req, 'status_code') and (_req.status_code == 200) and hasattr(_req, 'content'):
         try:
             with open(_jpg, 'wb') as _f:
                 _f.write(_req.content)
@@ -84,20 +82,18 @@ def get_sdss_image(**kw):
 # function: jpg_to_png()
 # -
 # noinspection PyBroadException
-def jpg_to_png(_jpg=''):
+def jpg_to_png(_jpg=None):
 
     # check input(s)
-    if not isinstance(_jpg, str) or _jpg.strip() == '':
-        raise Exception(f'invalid input, _jpg={_jpg}')
-
-    # set default(s)
+    if _jpg is None or not isinstance(_jpg, str) or _jpg.strip() == '':
+        return
     _jpg_file = os.path.abspath(os.path.expanduser(_jpg))
     if not os.path.exists(_jpg_file):
-        raise Exception(f'file not found, _jpg_file={_jpg_file}')
-    _png_file = _jpg_file.replace('.jpg', '.png')
+        return
 
     # convert
     try:
+        _png_file = _jpg_file.replace('.jpg', '.png')
         _data = Image.open(_jpg)
         _data.save(_png_file)
         return _png_file
