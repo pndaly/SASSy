@@ -60,6 +60,10 @@ REGEXP_DEC = re.compile("[+-]?[0-9]{2}:[0-9]{2}:[0-9]{2}")
 REGEXP_RA = re.compile("[0-9]{2}:[0-9]{2}:[0-9]{2}")
 
 MMT_IMAGING_FILTERS = [('g', 'g'), ('r', 'r'), ('i', 'i'), ('z', 'z')]
+MMT_LONGSLIT_FILTERS = [('LP3800', 'LP3800'), ('LP3500', 'LP3500')]
+MMT_LONGSLIT_MASKS = [('Longslit1', 'Longslit1'), ('Longslit0_75', 'Longslit0_75'),
+                      ('Longslit1_25', 'Longslit1_25'), ('Longslit1_5', 'Longslit1_5'), ('Longslit5', 'Longslit5')]
+MMT_LONGSLIT_GRATINGS = [('600', '600'), ('270', '270'), ('1000', '1000')]
 
 
 # +
@@ -250,6 +254,41 @@ class MMTImagingForm(FlaskForm):
     zoid = StringField('Object Id', default='', validators=[DataRequired()])
     visits = IntegerField('Visits', default=1, validators=[
         DataRequired(), NumberRange(min=1, message=f'1 < # visits')])
+    token = StringField('Access Token', default='', validators=[DataRequired()])
+
+    # submit
+    submit = SubmitField('Submit')
+
+
+# +
+# class: MMTLongslitForm(), inherits from FlaskForm
+# -
+class MMTLongslitForm(FlaskForm):
+
+    # fields
+    ra_hms = StringField('RA', default='', validators=[
+        DataRequired(), Regexp(regex=REGEXP_RA, flags=re.IGNORECASE, message='RA format is HH:MM:SS.S')])
+    dec_dms = StringField('Dec', default='', validators=[
+        DataRequired(), Regexp(regex=REGEXP_DEC, flags=re.IGNORECASE, message='Dec format is +/-dd:mm:ss.s')])
+    epoch = FloatField('Epoch', default=2000.0, validators=[
+        DataRequired(), NumberRange(min=2000.0, message=f'2000.0 < epoch')])
+    central_lambda = FloatField('Central Wavelength', default=0.0, validators=[DataRequired()])
+    exposuretime = FloatField('Exposure Time', default=0.0, validators=[
+        DataRequired(), NumberRange(min=0.0, message=f'0.0 < exposure time')])
+    filter = SelectField('Filter', choices=MMT_LONGSLIT_FILTERS, default=MMT_LONGSLIT_FILTERS[0], validators=[
+        DataRequired()])
+    grating = SelectField('Grating', choices=MMT_LONGSLIT_GRATINGS, default=MMT_LONGSLIT_GRATINGS[0], validators=[
+        DataRequired()])
+    slitmask = SelectField('Slit Mask', choices=MMT_LONGSLIT_MASKS, default=MMT_LONGSLIT_MASKS[0], validators=[
+        DataRequired()])
+    magnitude = FloatField('Magnitude', default=0.0, validators=[DataRequired()])
+    notes = StringField('Note(s)', default='', validators=[DataRequired()])
+    numexposures = IntegerField('Exposures', default=1, validators=[
+        DataRequired(), NumberRange(min=1, message=f'1 < # exposures')])
+    zoid = StringField('Object Id', default='', validators=[DataRequired()])
+    visits = IntegerField('Visits', default=1, validators=[
+        DataRequired(), NumberRange(min=1, message=f'1 < # visits')])
+    token = StringField('Access Token', default='', validators=[DataRequired()])
 
     # submit
     submit = SubmitField('Submit')

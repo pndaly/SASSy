@@ -33,7 +33,7 @@ __doc__ = """
 
 __author__ = 'Philip N. Daly'
 __date__ = '17 January, 2019'
-__email__ = 'pndaly@email.arizona.edu'
+__email__ = 'pndaly@arizona.edu'
 __institution__ = 'Steward Observatory, 933 N. Cherry Avenue, Tucson AZ 85719'
 
 
@@ -41,7 +41,7 @@ __institution__ = 'Steward Observatory, 933 N. Cherry Avenue, Tucson AZ 85719'
 # constant(s)
 # -
 AVRO_FILTERS = {1: 'g', 2: 'r', 3: 'i'}
-AVRO_OPTIONS = ['csv', 'curve', 'cutouts', 'image', 'keyword', 'packet', 'schema', 'table']
+AVRO_OPTIONS = ['csv', 'curve', 'cutouts', 'image', 'keyword', 'non_detections', 'packet', 'schema', 'table']
 
 
 # +
@@ -188,7 +188,7 @@ def action(iargs):
         # read the data
         with open(_ifile, 'rb') as _f:
             _reader = fastavro.reader(_f)
-            _schema = _reader.schema
+            _schema = _reader.writer_schema
             for _packet in _reader:
                 _packets.append(_packet)
     except Exception as e:
@@ -196,10 +196,10 @@ def action(iargs):
 
     # dump lightcurve to csv
     _show = _show.lower()
-    _of = f"{os.path.basename(_ifile).split('.')[0]}.csv"
-    _of = os.path.abspath(os.path.expanduser(_of))
-    print(f'Creating CSV: {_of}')
     if _show == 'csv':
+        _of = f"{os.path.basename(_ifile).split('.')[0]}.csv"
+        _of = os.path.abspath(os.path.expanduser(_of))
+        print(f'Creating CSV: {_of}')
         _total = pd.DataFrame()
         for _i in range(len(_packets)):
             _df = make_dataframe(_packets[_i])
@@ -228,6 +228,14 @@ def action(iargs):
                 print(f"{_keyword} = {_packets[_i][f'{_keyword}']}")
             else:
                 print(f'{_keyword} not present in packet')
+
+    # dump non_detections
+    elif _show == 'non_detections':
+        for _i in range(len(_packets)):
+            prv = _packets[_i]['prv_candidates']
+            for _j in range(len(prv)):
+                if prv[_j]['candid'] == None:
+                    print(f"jd: {prv[_j]['jd']}, non-detection: {prv[_j]['diffmaglim']}")
 
     # dump packet
     elif _show == 'packet':

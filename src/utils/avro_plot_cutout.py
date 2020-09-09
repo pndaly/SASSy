@@ -95,17 +95,17 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
         # get data
         _col, _data, _output = '', None, ''
         if _dif:
-            _col = 'viridis' if 'viridis' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            _col = 'greyscale' if 'greyscale' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutDifference']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'
             _title = f'Difference ({_col})'
         elif _sci:
-            _col = 'coolwarm' if 'coolwarm' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            _col = 'greyscale' if 'greyscale' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutScience']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'
             _title = f'Science ({_col})'
         elif _tmp:
-            _col = 'heat' if 'heat' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            _col = 'greyscale' if 'greyscale' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutTemplate']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'
             _title = f'Template ({_col})'

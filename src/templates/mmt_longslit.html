@@ -4,7 +4,7 @@
  <form action="" method="post">
   <div class="container">
    {{ form.hidden_tag() }}
-   <h3>MMT Imaging Configuration</h3>
+   <h3>MMT Longslit Configuration</h3>
    <div class="row">
     <div class="col-md-2">
      {{ form.ra_hms.label }}<br>
@@ -67,7 +67,7 @@
     </div>
     <div class="col-md-2">
      {{ form.magnitude.label }}<br>
-     {{ form.magnitude(size=12) }}<br>
+     {{ form.magnitude(size=8) }}<br>
      {% for error in form.magnitude.errors %}
       <span class="error-label"><small>[{{ error }}]</small></span>
      {% endfor %}
@@ -89,9 +89,32 @@
     </div>
    </div>
    <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-2">
+     {{ form.grating.label }}<br>
+     {{ form.grating }}<br>
+     {% for error in form.grating.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>lines/mm</small></span>
+    </div>
+    <div class="col-md-2">
+     {{ form.slitmask.label }}<br>
+     {{ form.slitmask }}<br>
+     {% for error in form.slitmask.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+    </div>
+    <div class="col-md-2">
+     {{ form.central_lambda.label }}<br>
+     {{ form.central_lambda(size=16) }}<br>
+     {% for error in form.central_lambda.errors %}
+      <span class="error-label"><small>[{{ error }}]</small></span>
+     {% endfor %}
+     <span class="purple-label"><small>&#8491;</small></span>
+    </div>
+    <div class="col-md-6">
      {{ form.token.label }}<br>
-     {{ form.token(size=122) }}<br>
+     {{ form.token(size=54) }}<br>
      {% for error in form.token.errors %}
       <span class="error-label"><small>[{{ error }}]</small></span>
      {% endfor %}

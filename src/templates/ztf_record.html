@@ -145,9 +145,9 @@
   var day = 86400000;
 
   document.addEventListener('DOMContentLoaded', function() {
-    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Science/', {scale: 'log', colormap: 'viridis', onload: setZoom},  {display: 'JS9Sci'});
-    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Template/', {scale: 'log', colormap: 'viridis', onload: setZoom}, {display: 'JS9Tmp'});
-    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Difference/', {scale: 'log', colormap: 'viridis', onload: setZoom}, {display: 'JS9Dif'});
+    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Science/', {scale: 'log', colormap: 'greyscale', onload: setZoom},  {display: 'JS9Sci'});
+    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Template/', {scale: 'log', colormap: 'greyscale', onload: setZoom}, {display: 'JS9Tmp'});
+    JS9.Preload('/sassy/ztf/{{ alert.id }}/cutout/Difference/', {scale: 'log', colormap: 'greyscale', onload: setZoom}, {display: 'JS9Dif'});
     plotLightCurve();
   });
 

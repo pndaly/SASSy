@@ -7,6 +7,7 @@
 # noinspection PyUnresolvedReferences
 from src import *
 from src.common import *
+from src.utils.combine_pngs import *
 from src.utils.utils import *
 
 # noinspection PyBroadException
@@ -29,6 +30,7 @@ from src.forms.Forms import AstronomicalEllipticalQueryForm
 from src.forms.Forms import DigitalRadialQueryForm
 from src.forms.Forms import DigitalEllipticalQueryForm
 from src.forms.Forms import MMTImagingForm
+from src.forms.Forms import MMTLongslitForm
 from src.forms.Forms import PsqlQueryForm
 from src.forms.Forms import SexagisimalRadialQueryForm
 from src.forms.Forms import SexagisimalEllipticalQueryForm
@@ -1603,12 +1605,12 @@ def ligo_q3c_text():
 
 
 # +
-# route(s): /mmt/binopsec/imaging/<zoid>, /sassy/mmt/binospec/imaging/<zoid>
+# route(s): /mmt/imaging/<zoid>, /sassy/mmt/imaging/<zoid>
 # -
 @app.route('/sassy/mmt/imaging/<zoid>', methods=['GET', 'POST'])
 @app.route('/mmt/imaging/<zoid>', methods=['GET', 'POST'])
 def mmt_binospec_imaging(zoid=''):
-    logger.debug(f'route /sassy/binospec/imaging/{zoid} entry')
+    logger.debug(f'route /sassy/mmt/imaging/{zoid} entry')
 
     # get observation request
     _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
@@ -1626,31 +1628,174 @@ def mmt_binospec_imaging(zoid=''):
         form.magnitude.data = round((_cronrec.zmagap + _cronrec.zmagpsf) / 2.0, 3)
         form.numexposures.data = 5
         form.visits.data = 1
-        form.notes.data = f"{_cronrec.zoid}: {_cronrec.altype}"
+        form.notes.data = f"{_cronrec.spng.split('.')[0]}: {_cronrec.altype}"
         form.zoid.data = f"{_cronrec.zoid}"
+        form.token.data = ''
         return render_template('mmt_imaging.html', form=form, record=_cronrec)
 
     # validate form (POST request)
     if form.validate_on_submit():
+
+        # get base name and remove existing file(s)
+        _base = f"{_cronrec.spng.split('.')[0].replace('_science', '')}"
+        _sdss = f"{app.static_folder}/img/{_base}_sdss.jpg"
+        _finder = f"{app.static_folder}/img/{_base}_finder.png"
+        if os.path.exists(_sdss):
+            os.remove(_finder)
+        if os.path.exists(_finder):
+            os.remove(_finder)
+
+        # create jpg
+        _jpg = None
+        try:
+            _jpg = get_sdss_image(
+                **{'ra': ra_to_hms(_cronrec.zra), 'dec': dec_to_dms(_cronrec.zdec), 'jpg': f'{_sdss}', 'log': logger})
+        except Exception as _j:
+            if logger:
+                logger.error(f'Failed to create image, error={_j}')
+        else:
+            if logger:
+                logger.info(f"_jpg={_jpg}")
+
+        # convert to png
+        _png = None
+        try:
+            if _jpg is not None:
+                _png = jpg_to_png(_jpg=_jpg)
+        except Exception as _p:
+            if logger:
+                logger.error(f'Failed to convert image, error={_p}')
+        else:
+            if logger:
+                logger.info(f"_png={_png}")
+
+        # combine all pngs
+        _images = [
+            f"{app.static_folder}/img/{_base}_science.png",
+            f"{app.static_folder}/img/{_base}_difference.png",
+            f"{app.static_folder}/img/{_base}_template.png",
+            f"{app.static_folder}/img/{_base}_sdss.png"]
+        try:
+            _output = combine_pngs(_files=_images, _output=_finder, _log=logger)
+        except Exception as _c:
+            if logger:
+                logger.error(f'Failed to combine image(s), error={_c}')
+
         return render_template(
             'mmt_imaging_payload.html', url={'url': ''},
             payload={"dec": f"{form.dec_dms.data}", "epoch": float(form.epoch.data),
                      "exposuretime": float(form.exposuretime.data), "filter": f"{form.filter.data.strip()}",
                      "magnitude": float(form.magnitude.data), "notes": f"{form.notes.data.strip()}",
                      "numberexposures": int(form.numexposures.data), "objectid": f"{form.zoid.data}",
-                     "observationtype": "imaging", "ra": f"{form.ra_hms.data}", "visits": int(form.visits.data)})
+                     "observationtype": "imaging", "ra": f"{form.ra_hms.data}",
+                     "findingchartfilename": os.path.basename(_finder) if _finder is not None else '',
+                     "token": f"{form.token.data.strip()}", "visits": int(form.visits.data)})
 
     # return for GET
     return render_template('mmt_imaging.html', form=form)
 
 
 # +
-# route(s): /mmt/binopsec/longslit/<zoid>, /sassy/mmt/binospec/longslit/<zoid>
+# route(s): /mmt/longslit/<zoid>, /sassy/mmt/longslit/<zoid>
 # -
 @app.route('/sassy/mmt/longslit/<zoid>', methods=['GET', 'POST'])
 @app.route('/mmt/longslit/<zoid>', methods=['GET', 'POST'])
 def mmt_binospec_longslit(zoid=''):
-    logger.debug(f'route /sassy/binospec/longslit/{zoid} entry')
+    logger.debug(f'route /sassy/mmt/longslit/{zoid} entry')
+
+    # get observation request
+    _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
+
+    # form
+    form = MMTLongslitForm()
+
+    # GET method
+    if request.method == 'GET':
+        form.ra_hms.data = ra_to_hms(_cronrec.zra)
+        form.dec_dms.data = dec_to_dms(_cronrec.zdec)
+        form.epoch.data = 2000.0
+        form.exposuretime.data = 360.0
+        form.filter.data = ZTF_FILTERS.get(_cronrec.zfid)[0]
+        form.central_lambda.data = ZTF_WAVELENGTH.get(_cronrec.zfid)
+        form.magnitude.data = round((_cronrec.zmagap + _cronrec.zmagpsf) / 2.0, 3)
+        form.numexposures.data = 5
+        form.visits.data = 1
+        form.notes.data = f"{_cronrec.spng.split('.')[0]}: {_cronrec.altype}"
+        form.zoid.data = f"{_cronrec.zoid}"
+        form.token.data = ''
+        return render_template('mmt_longslit.html', form=form, record=_cronrec)
+
+    # validate form (POST request)
+    if form.validate_on_submit():
+
+        # get base name and remove existing file(s)
+        _base = f"{_cronrec.spng.split('.')[0].replace('_science', '')}"
+        _sdss = f"{app.static_folder}/img/{_base}_sdss.jpg"
+        _finder = f"{app.static_folder}/img/{_base}_finder.png"
+        if os.path.exists(_sdss):
+            os.remove(_finder)
+        if os.path.exists(_finder):
+            os.remove(_finder)
+
+        # create jpg
+        _jpg = None
+        try:
+            _jpg = get_sdss_image(
+                **{'ra': ra_to_hms(_cronrec.zra), 'dec': dec_to_dms(_cronrec.zdec), 'jpg': f'{_sdss}', 'log': logger})
+        except Exception as _j:
+            if logger:
+                logger.error(f'Failed to create image, error={_j}')
+        else:
+            if logger:
+                logger.info(f"_jpg={_jpg}")
+
+        # convert to png
+        _png = None
+        try:
+            if _jpg is not None:
+                _png = jpg_to_png(_jpg=_jpg)
+        except Exception as _p:
+            if logger:
+                logger.error(f'Failed to convert image, error={_p}')
+        else:
+            if logger:
+                logger.info(f"_png={_png}")
+
+        # combine all pngs
+        _images = [
+            f"{app.static_folder}/img/{_base}_science.png",
+            f"{app.static_folder}/img/{_base}_difference.png",
+            f"{app.static_folder}/img/{_base}_template.png",
+            f"{app.static_folder}/img/{_base}_sdss.png"]
+        try:
+            _output = combine_pngs(_files=_images, _output=_finder, _log=logger)
+        except Exception as _c:
+            if logger:
+                logger.error(f'Failed to combine image(s), error={_c}')
+
+        return render_template(
+            'mmt_longslit_payload.html', url={'url': ''},
+            payload={"dec": f"{form.dec_dms.data}", "epoch": float(form.epoch.data),
+                     "centralwavelength": float(form.central_lambda.data),
+                     "grating": f"{form.grating.data.strip()}", "slitmask": f"form.data.slitmask.strip()",
+                     "exposuretime": float(form.exposuretime.data), "filter": f"{form.filter.data.strip()}",
+                     "magnitude": float(form.magnitude.data), "notes": f"{form.notes.data.strip()}",
+                     "numberexposures": int(form.numexposures.data), "objectid": f"{form.zoid.data}",
+                     "observationtype": "longslit", "ra": f"{form.ra_hms.data}",
+                     "findingchartfilename": os.path.basename(_finder) if _finder is not None else '',
+                     "token": f"{form.token.data.strip()}", "visits": int(form.visits.data)})
+
+    # return for GET
+    return render_template('mmt_longslit.html', form=form)
+
+
+# +
+# route(s): /mmt/request/, /sassy/mmt/request/
+# -
+@app.route('/sassy/mmt/request/', methods=['GET'])
+@app.route('/mmt/request/', methods=['GET'])
+def mmt_request(payload=''):
+    logger.debug(f'route /sassy/mmt/request/{payload} entry')
     return render_template('generic.html', url={'url': ''})
 
 
