@@ -58,9 +58,9 @@
    <br>
    <div class="row">
     <div class="col-md-2">
-     {{ form.filter.label }}<br>
-     {{ form.filter }}<br>
-     {% for error in form.filter.errors %}
+     {{ form.filter_name.label }}<br>
+     {{ form.filter_name }}<br>
+     {% for error in form.filter_name.errors %}
       <span class="error-label"><small>[{{ error }}]</small></span>
      {% endfor %}
      <span class="purple-label"><small>(g, r, i, z)</small></span>
@@ -98,9 +98,9 @@
      <span class="purple-label"><small>lines/mm</small></span>
     </div>
     <div class="col-md-2">
-     {{ form.slitmask.label }}<br>
-     {{ form.slitmask }}<br>
-     {% for error in form.slitmask.errors %}
+     {{ form.slitwidth.label }}<br>
+     {{ form.slitwidth }}<br>
+     {% for error in form.slitwidth.errors %}
       <span class="error-label"><small>[{{ error }}]</small></span>
      {% endfor %}
     </div>

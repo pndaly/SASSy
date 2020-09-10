@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-12">
+	  <h2><i>The {{ obstype }} observation submission to MMT succeeded, targetid={{ targetid }}</i></h2>
+  </div>
+ </div>
+ <br>
+ <div class="row">
+  <div class="col-md-2">
+   <a href="{{ url_for('cron_records') }}" class="btn btn-md btn-info"><i class="fas fa-backward"></i> &nbsp;Back</a>
+  </div>
+ </div>
+</div>
+{% endblock %}
