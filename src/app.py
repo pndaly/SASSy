@@ -2202,38 +2202,6 @@ def ztf_detail(id=0):
 
 
 # +
-# route(s): /ztf/<int:id>/csvhtml/, /sassy/<int:id>/csvhtml/
-# -
-# noinspection PyShadowingBuiltins
-@app.route('/sassy/ztf/<int:id>/csvhtml/')
-@app.route('/ztf/<int:id>/csvhtml/')
-def ztf_get_csvhtml(id=0):
-    logger.debug(f'route /sassy/ztf/{id}/csvhtml/ entry')
-
-    # check input(s)
-    details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
-                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/csvhtml/', 'value': f'{id}'}]
-    if not isinstance(id, int) or id <= 0:
-        logger.warning(f'input(s) are invalid')
-        details[0]['line'] = 'at entry'
-        return render_template('error.html', details=details)
-
-    # get data
-    alert = None
-    try:
-        alert = db_ztf.session.query(ZtfAlert).get(id)
-    except Exception as _e:
-        logger.error(f'alert not found, alert={alert}, error={_e}')
-        details[0]['line'] = 'at db.session.query()'
-        return render_template('error.html', details=details)
-    else:
-        logger.info(f'alert={alert} is OK, type={type(alert)}')
-
-    # write file
-    return alert.get_csv().to_html()
-
-
-# +
 # route(s): /ztf/<int:id>/csv/, /sassy/<int:id>/csv/
 # -
 # noinspection PyShadowingBuiltins
@@ -2281,6 +2249,38 @@ def ztf_get_csv(id=0):
     logger.error(f'{_of} not found')
     details[0]['line'] = 'at exit'
     return render_template('error.html', details=details)
+
+
+# +
+# route(s): /ztf/<int:id>/csvhtml/, /sassy/<int:id>/csvhtml/
+# -
+# noinspection PyShadowingBuiltins
+@app.route('/sassy/ztf/<int:id>/csvhtml/')
+@app.route('/ztf/<int:id>/csvhtml/')
+def ztf_get_csvhtml(id=0):
+    logger.debug(f'route /sassy/ztf/{id}/csvhtml/ entry')
+
+    # check input(s)
+    details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
+                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/csvhtml/', 'value': f'{id}'}]
+    if not isinstance(id, int) or id <= 0:
+        logger.warning(f'input(s) are invalid')
+        details[0]['line'] = 'at entry'
+        return render_template('error.html', details=details)
+
+    # get data
+    alert = None
+    try:
+        alert = db_ztf.session.query(ZtfAlert).get(id)
+    except Exception as _e:
+        logger.error(f'alert not found, alert={alert}, error={_e}')
+        details[0]['line'] = 'at db.session.query()'
+        return render_template('error.html', details=details)
+    else:
+        logger.info(f'alert={alert} is OK, type={type(alert)}')
+
+    # write file
+    return alert.get_csv().to_html()
 
 
 # +
@@ -2442,6 +2442,42 @@ def ztf_photometry(id=0):
 
     # return
     return jsonify(alert.get_photometry())
+
+
+# +
+# route(s): /ztf/<int:id>/non_detections/, /sassy/ztf/<int:id>/non_detections/
+# -
+# noinspection PyShadowingBuiltins,PyBroadException
+@app.route('/sassy/ztf/<int:id>/non_detections/')
+@app.route('/ztf/<int:id>/non_detections/')
+def ztf_non_detections(id=0):
+    logger.debug(f'route /sassy/ztf/{id}/non_detections/ entry')
+
+    # check input(s)
+    details = [{'format': '<number>', 'line': '', 'name': 'id', 'route': f'/sassy/ztf/{id}',
+                'type': 'int', 'url': f'{SASSY_APP_URL}/ztf/{id}/non_detections/', 'value': f'{id}'}]
+    if not isinstance(id, int) or id <= 0:
+        logger.warning(f'input(s) are invalid')
+        details[0]['line'] = 'at entry'
+        return render_template('error.html', details=details)
+
+    # get data
+    alert = None
+    try:
+        alert = db_ztf.session.query(ZtfAlert).get(id)
+    except Exception as _e:
+        logger.error(f'alert not found, alert={alert}, error={_e}')
+        details[0]['line'] = 'at db.session.query()'
+        return render_template('error.html', details=details)
+    else:
+        logger.info(f'alert={alert} is OK, type={type(alert)}')
+
+    # return
+    _non_det = alert.get_non_detections()
+    _non_det_dict = {}
+    for _x, _y in enumerate(_non_det):
+        _non_det_dict[f"{_x}"] = _y
+    return jsonify(_non_det_dict)
 
 
 # +
