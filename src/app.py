@@ -1766,7 +1766,7 @@ def mmt_imaging(zoid=''):
     # validate form (POST request)
     if form.validate_on_submit():
         return render_template('mmt_request.html', url={'url': ''},
-            payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='imaging'))
+                               payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='imaging'))
 
     # return for GET
     return render_template('mmt_imaging.html', form=form)
@@ -1794,7 +1794,7 @@ def mmt_longslit(zoid=''):
     # validate form (POST request)
     if form.validate_on_submit():
         return render_template('mmt_request.html', url={'url': ''},
-            payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='longslit'))
+                               payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='longslit'))
 
     # return for GET
     return render_template('mmt_longslit.html', form=form)
@@ -1824,9 +1824,9 @@ def mmt_request():
 
     # return error if we cannot parse it
     if _payload is None or not isinstance(_payload, dict):
-       details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
-                'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_payload}'}]
-       return render_template('error.html', details=details)
+        details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
+                    'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_payload}'}]
+        return render_template('error.html', details=details)
 
     # send request
     try:
@@ -1843,9 +1843,9 @@ def mmt_request():
             return render_template('mmt_request_notok.html', status=_status, obstype=f"{_payload['observationtype']}")
 
     except:
-       details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
-                'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_payload}'}]
-       return render_template('error.html', details=details)
+        details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
+                    'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_payload}'}]
+        return render_template('error.html', details=details)
 
 
 # +
