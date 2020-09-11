@@ -100,6 +100,18 @@ ZTF_PREVIOUS_CANDIDATES_RADIUS = 0.000416667
 
 
 # +
+# function: jd_to_isot()
+# -
+# noinspection PyBroadException
+def jd_to_isot(jd=math.nan):
+    """ return isot from jd """
+    try:
+        return Time(jd, format='jd', precision=6).isot
+    except:
+        return None
+
+
+# +
 # initialize sqlalchemy (deferred)
 # -
 db = SQLAlchemy()
@@ -471,14 +483,13 @@ class ZtfAlert(db.Model):
     def get_non_detections(self):
         non_detections = []
         filter_mapping = {1: 'g', 2: 'r', 3: 'i'}
-        prv_candidates = ZtfAlert.serialize_list(self.prv_candidate)
-        for _prv in prv_candidates:
+        for _prv in self.avro_packet['prv_candidates']:
             if 'candid' in _prv and _prv['candid'] is None:
                 if all(_k in _prv for _k in ['diffmaglim', 'jd', 'fid']):
                     non_detections.append(
                         {'diffmaglim': float(_prv['diffmaglim']), 'jd': float(_prv['jd']),
                          'filter': filter_mapping.get(_prv['fid'], ''), 'isot': jd_to_isot(_prv['jd'])})
-        return _non_detections
+        return non_detections
 
     # +
     # (overload) method: __str__()
