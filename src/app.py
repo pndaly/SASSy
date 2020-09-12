@@ -410,7 +410,7 @@ def cron_records():
     page = request.args.get('page', 1, type=int)
 
     # set default(s)
-    zjd_min, zjd_max = math.nan, -math.nan
+    zjd_min, zjd_max, iso_min, iso_max = math.nan, -math.nan, '', ''
     paginator = None
     latest = None
     response = {}
@@ -444,6 +444,7 @@ def cron_records():
         try:
             zjd_min = min([_k['zjd'] for _k in response['results']])
             zjd_max = max([_k['zjd'] for _k in response['results']])
+            iso_min, iso_max = jd_to_isot(zjd_min), jd_to_isot(zjd_max)
         except:
             pass
 
@@ -491,7 +492,8 @@ def cron_records():
             pass
         arg_str = urlencode(_args)
         return render_template('sassy_cron.html', context=response, page=paginator.page, arg_str=arg_str, latest=latest,
-                               zjd_min=zjd_min, zjd_max=zjd_max, url={'url': f'{SASSY_APP_URL}', 'page': 'sassy_cron'})
+                               iso_min=iso_min, iso_max=iso_max, zjd_min=zjd_min, zjd_max=zjd_max,
+                               url={'url': f'{SASSY_APP_URL}', 'page': 'sassy_cron'})
 
 
 # +
