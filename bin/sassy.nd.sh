@@ -154,8 +154,8 @@ echo "  objectid VARCHAR(50) NOT NULL,"                                   >> /tm
 echo "  diffmaglim double precision NOT NULL,"                            >> /tmp/sassy.nd.sh 2>&1
 echo "  jd double precision NOT NULL,"                                    >> /tmp/sassy.nd.sh 2>&1
 echo "  fid integer NOT NULL);"                                           >> /tmp/sassy.nd.sh 2>&1
-echo "CREATE INDEX ON idx_nondetection_jd nondetection (jd);"             >> /tmp/sassy.nd.sh 2>&1
-echo "CREATE INDEX ON idx_nondetection_objectid nondetection (objectid);" >> /tmp/sassy.nd.sh 2>&1
+echo "CREATE INDEX idx_nondetection_jd ON nondetection(jd);"              >> /tmp/sassy.nd.sh 2>&1
+echo "CREATE INDEX idx_nondetection_objectid ON nondetection(objectid);"  >> /tmp/sassy.nd.sh 2>&1
 echo "END_TABLE"                                                          >> /tmp/sassy.nd.sh 2>&1
 echo ""                                                                   >> /tmp/sassy.nd.sh 2>&1
 
