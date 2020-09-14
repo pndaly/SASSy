@@ -34,10 +34,23 @@ __doc__ = """
 
 
 # +
-# __text__
+# __nd_text__
 # -
-__text__ = """
+__nd_text__ = """
+NonDetection database record(s):
+id:             Idenitifier for this alert, assigned by SASSy.
+objectid:       Identifier for this object.
+diffmaglim:     Limiting magnitude over the entire image. [mag]
+jd:             Julian date of observation.
+fid:            Filter in use for observation
+"""
 
+
+# +
+# __ztf_text__
+# -
+__ztf_text__ = """
+ZTFAlert database record(s):
 sid:             Unique ID for this alert, assigned by SASSy. sid in JSON view.
 objectId:        Unique identifier for this object.
 time:            Observation time at start of exposure [UTC]
@@ -115,6 +128,56 @@ def jd_to_isot(jd=math.nan):
 # initialize sqlalchemy (deferred)
 # -
 db = SQLAlchemy()
+
+
+# +
+# class: NonDetection(), inherits from db.Model
+# -
+# noinspection PyPep8Naming,PyUnresolvedReferences
+class NonDetection(db.Model):
+
+    # +
+    # member variable(s)
+    # -
+
+    # define table name
+    __tablename__ = 'nondetection'
+
+    id = db.Column(db.Integer, primary_key=True)
+    objectid = db.Column(db.String(DB_OBJCHAR), index=True)
+    diffmaglim = db.Column(db.Float, nullable=False)
+    jd = db.Column(db.Float, nullable=False, index=True)
+    fid = db.Column(db.Integer, nullable=False)
+
+    # +
+    # getter decorator(s):
+    # -
+    @property
+    def wall_time(self):
+        t = Time(self.jd, format='jd')
+        return t.datetime
+
+    @property
+    def filter(self):
+        return ZTF_FILTERS[self.fid - 1]
+
+    def serialized(self):
+        return {
+            'candidate': {
+                'id': int(self.id),
+                'objectid': self.objectId,
+                'diffmaglim': float(self.diffmaglim),
+                'jd': float(self.jd),
+                'fid': int(self.fid)
+            }
+        }
+
+    # +
+    # (static) method: serialize_list()
+    # -
+    @staticmethod
+    def serialize_list(_non_detections):
+        return [nd.serialized() for nd in _non_detections]
 
 
 # +
@@ -548,10 +611,78 @@ def _get_astropy_coords(objectname=''):
 
 
 # +
+# function: nd_get_text()
+# -
+def nd_get_text():
+    return __nd_text__
+
+
+# +
 # function: ztf_get_text()
 # -
 def ztf_get_text():
-    return __text__
+    return __ztf_text__
+
+
+# +
+# function: nd_filters() alphabetically
+# -
+def nd_filters(query, request_args):
+
+    # return records with a nd_diffmaglim >= value (API: ?nd_diffmaglim__gte=0.4)
+    if request_args.get('nd_diffmaglim__gte'):
+        query = query.filter(NonDetection.diffmaglim >= float(request_args['nd_diffmaglim__gte']))
+
+    # return records with a nd_diffmaglim <= value (API: ?nd_diffmaglim__lte=0.4)
+    if request_args.get('nd_diffmaglim__lte'):
+        query = query.filter(NonDetection.diffmaglim <= float(request_args['nd_diffmaglim__lte']))
+
+    # return records with a nd_fid = value (API: ?nd_fid=1)
+    if request_args.get('nd_fid'):
+        query = query.filter(NonDetection.fid == int(request_args['nd_fid']))
+
+    # return records with a given nd_filter (API: ?nd_filter=g)
+    if request_args.get('nd_filter'):
+        query = query.filter(NonDetection.fid == ZTF_FILTERS.index(request_args['nd_filter']) + 1)
+
+    # return records with nd_id = value (API: ?nd_id=20)
+    if request_args.get('nd_id'):
+        query = query.filter(NonDetection.id == int(request_args['nd_id']))
+
+    # return records with nd_id >= value (API: ?nd_id__gte=20)
+    if request_args.get('nd_id__gte'):
+        query = query.filter(NonDetection.id >= int(request_args['nd_id__gte']))
+
+    # return records with nd_id <= value (API: ?nd_id__lte=20)
+    if request_args.get('nd_id__lte'):
+        query = query.filter(NonDetection.id <= int(request_args['nd_id__lte']))
+
+    # return records with a nd_jd >= value (API: ?nd_jd__gte=2458302.6906713)
+    if request_args.get('nd_jd__gte'):
+        query = query.filter(NonDetection.jd >= float(request_args['nd_jd__gte']))
+
+    # return records with a nd_jd <= value (API: ?nd_jd__lte=2458302.6906713)
+    if request_args.get('nd_jd_lte'):
+        query = query.filter(NonDetection.jd <= float(request_args['nd_jd__lte']))
+
+    # return records with nd_objectid (API: ?nd_objectId=ZTFsdneuenf)
+    if request_args.get('nd_objectid'):
+        query = query.filter(NonDetection.objectid == request_args['nd_objectid'])
+
+    # return records with nd_oid like value (API: ?nd_oid=ZTFsdneuenf)
+    if request_args.get('nd_oid'):
+        query = query.filter(NonDetection.objectid.ilike(f"%{request_args['nd_oid']}%"))
+
+    # sort results
+    sort_by = request_args.get('sort_value', 'jd')
+    sort_order = request_args.get('sort_order', 'desc')
+    if sort_order == 'desc':
+        query = query.order_by(getattr(NonDetection, sort_by).desc())
+    elif sort_order == 'asc':
+        query = query.order_by(getattr(NonDetection, sort_by).asc())
+
+    # return query
+    return query
 
 
 # +
@@ -766,6 +897,100 @@ def ztf_filters(query, request_args):
 
     # return query
     return query
+
+
+# +
+# function: nd_cli_db()
+# -
+# noinspection PyBroadException
+def nd_cli_db(iargs=None):
+
+    # check input(s)
+    if iargs is None:
+        raise Exception('Invalid arguments')
+
+    # if --text is present, describe of the catalog
+    if iargs.text:
+        print(nd_get_text())
+        return
+
+    # set default(s)
+    request_args = {}
+
+    # get input(s) alphabetically
+    if iargs.nd_diffmaglim__lte:
+        request_args['nd_diffmaglim__gte'] = f'{iargs.nd_diffmaglim__gte}'
+    if iargs.nd_diffmaglim__lte:
+        request_args['nd_diffmaglim__lte'] = f'{iargs.nd_diffmaglim__lte}'
+    if iargs.nd_fid:
+        request_args['nd_fid'] = f'{iargs.nd_fid}'
+    if iargs.nd_filter:
+        request_args['nd_filter'] = f'{iargs.nd_filter}'
+    if iargs.nd_id:
+        request_args['nd_id'] = f'{iargs.nd_id}'
+    if iargs.nd_id__gte:
+        request_args['nd_id__gte'] = f'{iargs.nd_id__gte}'
+    if iargs.nd_id__lte:
+        request_args['nd_id__lte'] = f'{iargs.nd_id__lte}'
+    if iargs.nd_jd__lte:
+        request_args['nd_jd__gte'] = f'{iargs.nd_jd__gte}'
+    if iargs.nd_jd__lte:
+        request_args['nd_jd__lte'] = f'{iargs.nd_jd__lte}'
+    if iargs.nd_oid:
+        request_args['nd_oid'] = f'{iargs.nd_oid}'
+    if iargs.nd_objectid:
+        request_args['nd_objectid'] = f'{iargs.nd_objectid}'
+
+    # set up access to database
+    try:
+        if iargs.verbose:
+            print(f'connection string = postgresql+psycopg2://'
+                  f'{SASSY_DB_USER}:{SASSY_DB_PASS}@{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
+        engine = create_engine(f'postgresql+psycopg2://'
+                               f'{SASSY_DB_USER}:{SASSY_DB_PASS}@{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
+        if iargs.verbose:
+            print(f'engine = {engine}')
+        _session = sessionmaker(bind=engine)
+        if iargs.verbose:
+            print(f'Session = {_session}')
+        session = _session()
+        if iargs.verbose:
+            print(f'session = {session}')
+    except Exception as e:
+        raise Exception(f'Failed to connect to database, error={e}')
+
+    # execute query
+    try:
+        if iargs.verbose:
+            print(f'executing query')
+        query = session.query(NonDetection)
+        if iargs.verbose:
+            print(f'query = {query}')
+        query = nd_filters(query, request_args)
+        if iargs.verbose:
+            print(f'query = {query}')
+        query = query.order_by(NonDetection.jd.desc())
+        if iargs.verbose:
+            print(f'query = {query}')
+    except Exception as e:
+        raise Exception(f'Failed to execute query, error={e}')
+
+    # dump output to file
+    if isinstance(iargs.output, str) and iargs.output.strip() != '':
+        try:
+            with open(iargs.output, 'w') as _wf:
+                _wf.write(f'#id,jd,objectid,fid,filter,diffmaglim\n')
+                for _e in NonDetection.serialize_list(query.all()):
+                    _wf.write(f"{_e['id']},{_e['jd']},{_e['objectid']},{_e['fid']},{ZTF_FILTERS[_e['fid'] - 1]},"
+                              f"{_e['diffmaglim']}\n")
+        except:
+            pass
+
+    # dump output to screen
+    else:
+        print(f'#id,jd,objectid,fid,filter,diffmaglim')
+        for _e in NonDetection.serialize_list(query.all()):
+            print(f"{_e['id']},{_e['jd']},{_e['objectid']},{_e['fid']},{ZTF_FILTERS[_e['fid'] - 1]},{_e['diffmaglim']}")
 
 
 # +
@@ -1088,6 +1313,18 @@ if __name__ == '__main__':
     _p.add_argument(f'--time__gte', help=f'ISO time >= <str>')
     _p.add_argument(f'--time__lte', help=f'ISO time <= <str>')
 
+    _p.add_argument(f'--nd_diffmaglim__gte', help=f'NonDetection diffmaglim >= <float>')
+    _p.add_argument(f'--nd_diffmaglim__lte', help=f'NonDetection diffmaglim <= <float>')
+    _p.add_argument(f'--nd_fid', help=f'NonDetection filter id = <int>')
+    _p.add_argument(f'--nd_filter', help=f'NonDetection filter = <str>')
+    _p.add_argument(f'--nd_id', help=f'NonDetection DB id = <int>')
+    _p.add_argument(f'--nd_id__gte', help=f'NonDetection DB id >= <int>')
+    _p.add_argument(f'--nd_id__lte', help=f'NonDetection DB id <= <int>')
+    _p.add_argument(f'--nd_jd__gte', help=f'NonDetection jd >= <float>')
+    _p.add_argument(f'--nd_jd__lte', help=f'NonDetection jd <= <float>')
+    _p.add_argument(f'--nd_objectid', help=f'NonDetection object id = <str>')
+    _p.add_argument(f'--nd_oid', help=f'NonDetection object id like <str>')
+
     _p.add_argument(f'--output', default='', help=f'Output file <str>')
     _p.add_argument(f'--text', default=False, action='store_true', help=f'if present, describe the catalog')
     _p.add_argument(f'--verbose', default=False, action='store_true', help=f'if present, produce more verbose output')
@@ -1096,5 +1333,6 @@ if __name__ == '__main__':
     # execute
     if args:
         ztf_cli_db(args)
+        nd_cli_db(args)
     else:
         raise Exception(f'Insufficient command line arguments specified\nUse: python {sys.argv[0]} --help') 
