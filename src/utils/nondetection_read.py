@@ -46,28 +46,25 @@ def nondetection_read(_file='', _dir=''):
         raise Exception(f'invalid input, _dir={_dir}')
 
     # set default(s)
-    _file_list = []
+    _files = []
 
-    # get all data
-    if _file != '':
-        _file = os.path.abspath(os.path.expanduser(_file))
-        if os.path.exists(_file):
-            print(f"Appending {_file}")
-            _file_list.append(_file)
-
+    # get all files
     if _dir != '':
         _dir = os.path.abspath(os.path.expanduser(_dir))
         if os.path.isdir(_dir):
             _files = glob.glob(f"{_dir}/*.avro")
-            if not _files:
-                print(f"Appending {_files}")
-                _file_list.append(_files)
+
+    if _file != '':
+        _file = os.path.abspath(os.path.expanduser(_file))
+        if os.path.exists(_file):
+            _files.append(_file)
 
     # proceed if we have files to process
-    if not _file_list:
+    if len(_files) == 0:
         print(f'No files to process')
         return
-    print(f"Processing files {_file_list}")
+    else:
+        print(f'Processing {len(_files)} files')
 
     # connect to database
     try:
@@ -81,7 +78,7 @@ def nondetection_read(_file='', _dir=''):
         raise Exception(f'Failed to connect to database, error={_e0}')
 
     # process files
-    for _fe in _file_list:
+    for _fe in _files:
         _oid = ''
         _non_detections = []
         _packets = []
@@ -101,19 +98,22 @@ def nondetection_read(_file='', _dir=''):
             if 'objectId' in _packets[_i] and 'prv_candidates' in _packets[_i]:
                 _oid = _packets[_i]['objectId']
                 _prv = _packets[_i]['prv_candidates']
-                for _j in range(len(_prv)):
-                    if 'candid' in _prv[_j] and _prv[_j]['candid'] is None:
-                        if all(_k in _prv[_j] for _k in ['diffmaglim', 'jd', 'fid']):
-                            _nd = NonDetection(diffmaglim=float(_prv[_j]['diffmaglim']), jd=float(_prv[_j]['jd']),
-                                               fid=_prv[_j]['fid'], objectid=_oid)
-                            try:
-                                print(f"Inserting object {_oid} into database")
-                                session.add(_nd)
-                                session.commit()
-                                print(f"Inserted object {_oid} into database")
-                            except Exception as _e3:
-                                session.rollback()
-                                print(f"Failed inserting object {_oid} into database, error={_e3}")
+                if _prv is not None:
+                    for _j in range(len(_prv)):
+                        if 'candid' in _prv[_j] and _prv[_j]['candid'] is None:
+                            if all(_k in _prv[_j] for _k in ['diffmaglim', 'jd', 'fid']):
+                                _diffmaglim = float(_prv[_j]['diffmaglim'])
+                                _jd = float(_prv[_j]['jd'])
+                                _fid = int(_prv[_j]['fid'])
+                                _nd = NonDetection(diffmaglim=_diffmaglim, jd=_jd, fid=_fid, objectid=_oid)
+                                try:
+                                    print(f"Inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database")
+                                    session.add(_nd)
+                                    session.commit()
+                                    print(f"Inserted nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database")
+                                except Exception as _e3:
+                                    session.rollback()
+                                    print(f"Failed inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database, error={_e3}")
 
 
 # +
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     args = _p.parse_args()
 
     # execute
-    if args.file:
+    if args.file or args.directory:
         nondetection_read(args.file.strip(), args.directory.strip())
     else:
         print(f'<<ERROR>> Insufficient command line arguments specified\nUse: python3 {sys.argv[0]} --help')
