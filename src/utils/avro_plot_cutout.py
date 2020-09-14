@@ -93,29 +93,29 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
     for _i in range(len(_packets)):
 
         # get data
-        _col, _data, _output = '', None, ''
+        _cmap, _data, _output = 'gray', None, ''
         if _dif:
-            _col = 'greyscale' if 'greyscale' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            # _cmap = 'gray' if 'gray' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutDifference']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'
-            _title = f'Difference ({_col})'
+            _title = f'Difference ({_cmap})'
         elif _sci:
-            _col = 'greyscale' if 'greyscale' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            # _cmap = 'gray' if 'gray' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutScience']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'
-            _title = f'Science ({_col})'
+            _title = f'Science ({_cmap})'
         elif _tmp:
-            _col = 'greyscale' if 'greyscale' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            # _cmap = 'gray' if 'gray' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutTemplate']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'
-            _title = f'Template ({_col})'
+            _title = f'Template ({_cmap})'
         _png_files.append(_output)
 
         # plot it
         try:
             _fig = plt.figure()
             _fig.add_subplot(1, 1, 1)
-            plt.imshow(_data, cmap=_col, origin='lower')
+            plt.imshow(_data, cmap=_cmap, origin='lower')
             plt.title(_title)
             _buf = io.BytesIO()
             plt.savefig(_output)
