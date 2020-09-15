@@ -26,6 +26,7 @@ __doc__ = """
 # +
 # constant(s)
 # -
+DEF_NELMS = 10000
 SASSY_DB_HOST = os.getenv('SASSY_DB_HOST', None)
 SASSY_DB_USER = os.getenv('SASSY_DB_USER', None)
 SASSY_DB_PASS = os.getenv('SASSY_DB_PASS', None)
@@ -37,16 +38,18 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 # function: nondetection_read()
 # -
 # noinspection PyBroadException
-def nondetection_read(_file='', _dir=''):
+def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
 
     # check input(s)
     if not isinstance(_file, str):
         raise Exception(f'invalid input, _file={_file}')
     if not isinstance(_dir, str):
         raise Exception(f'invalid input, _dir={_dir}')
+    if not isinstance(_nelms, int) or _nelms <= 0:
+        raise Exception(f'invalid input, _nelms={_nelms}')
 
     # set default(s)
-    _files = []
+    _files, _total, _icount = [], 0, 0
 
     # get all files
     if _dir != '':
@@ -60,11 +63,12 @@ def nondetection_read(_file='', _dir=''):
             _files.append(_file)
 
     # proceed if we have files to process
-    if len(_files) == 0:
+    _total = len(_files)
+    if _total == 0:
         print(f'No files to process')
         return
     else:
-        print(f'Processing {len(_files)} files')
+        print(f'Processing {_total} files')
 
     # connect to database
     try:
@@ -107,10 +111,10 @@ def nondetection_read(_file='', _dir=''):
                                 _fid = int(_prv[_j]['fid'])
                                 _nd = NonDetection(diffmaglim=_diffmaglim, jd=_jd, fid=_fid, objectid=_oid)
                                 try:
-                                    print(f"Inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database")
+                                    if _total % _nelms == 0:
+                                        print(f"Inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database [{_nelms} / {_total}]")
                                     session.add(_nd)
                                     session.commit()
-                                    print(f"Inserted nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database")
                                 except Exception as _e3:
                                     session.rollback()
                                     print(f"Failed inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database, error={_e3}")
@@ -126,10 +130,11 @@ if __name__ == '__main__':
                                  formatter_class=argparse.RawTextHelpFormatter)
     _p.add_argument('-f', '--file', default='', help="""Input file [%(default)s]""")
     _p.add_argument('-d', '--directory', default='', help="""Input directory [%(default)s]""")
+    _p.add_argument('-n', '--nelms', default=DEF_NELMS, help="""Number of elements between screen updates [%(default)s]""")
     args = _p.parse_args()
 
     # execute
     if args.file or args.directory:
-        nondetection_read(args.file.strip(), args.directory.strip())
+        nondetection_read(_file=args.file.strip(), _dir=args.directory.strip(), _nelms=int(args.nelms))
     else:
         print(f'<<ERROR>> Insufficient command line arguments specified\nUse: python3 {sys.argv[0]} --help')
