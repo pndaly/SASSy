@@ -4,14 +4,12 @@
 # +
 # import(s)
 # -
-from src.models.ztf import NonDetection
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 import argparse
 import fastavro
 import glob
 import os
+import psycopg2
+import psycopg2.extras
 import sys
 
 
@@ -26,7 +24,7 @@ __doc__ = """
 # +
 # constant(s)
 # -
-DEF_NELMS = 10000
+DEF_NELMS = 100000
 SASSY_DB_HOST = os.getenv('SASSY_DB_HOST', None)
 SASSY_DB_USER = os.getenv('SASSY_DB_USER', None)
 SASSY_DB_PASS = os.getenv('SASSY_DB_PASS', None)
@@ -38,7 +36,7 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 # function: nondetection_read()
 # -
 # noinspection PyBroadException
-def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
+def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS, _create=False):
 
     # check input(s)
     if not isinstance(_file, str):
@@ -49,7 +47,8 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
         raise Exception(f'invalid input, _nelms={_nelms}')
 
     # set default(s)
-    _files, _total, _icount = [], 0, 0
+    _create = _create if isinstance(_create, bool) else False
+    _files, _non_detections, _total, _ic = [], [], 0, 0
 
     # get all files
     if _dir != '':
@@ -72,52 +71,89 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
 
     # connect to database
     try:
-        print(f'connection string = postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
-              f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
-        engine = create_engine(f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
-                               f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
-        get_session = sessionmaker(bind=engine)
-        session = get_session()
+        connection = psycopg2.connect(host=SASSY_DB_HOST, database=SASSY_DB_NAME, user=SASSY_DB_USER, password=SASSY_DB_PASS, port=int(SASSY_DB_PORT))
+        connection.autocommit = True
     except Exception as _e0:
-        raise Exception(f'Failed to connect to database, error={_e0}')
+        raise Exception(f"Failed to connect to database, error={_e0}")
 
-    # process files
-    for _fe in _files:
-        _oid = ''
-        _non_detections = []
-        _packets = []
+    # create table
+    with connection.cursor() as cursor:
 
-        # read the data
-        try:
-            with open(_fe, 'rb') as _f:
-                _reader = fastavro.reader(_f)
-                _schema = _reader.writer_schema
-                for _packet in _reader:
-                    _packets.append(_packet)
-        except Exception as _e1:
-            raise Exception(f'failed to read data from {_fe}, error={_e1}')
+        # create table (if required)
+        if _create:
+            try:
+                cursor.execute("""
+                    DROP TABLE IF EXISTS nondetection;
+                    CREATE TABLE nondetection (
+                      id serial PRIMARY KEY,
+                      diffmaglim double precision NOT NULL,
+                      objectid VARCHAR(50) NOT NULL,
+                      jd double precision NOT NULL,
+                      fid integer NOT NULL);
+                    CREATE INDEX idx_nondetection_jd ON nondetection(jd);
+                    CREATE INDEX idx_nondetection_objectid ON nondetection(objectid);
+                """)
+            except Exception as _e1:
+                raise Exception(f"Failed to create database table, error={_e1}")
 
-        # process the data
-        for _i in range(len(_packets)):
-            if 'objectId' in _packets[_i] and 'prv_candidates' in _packets[_i]:
-                _oid = _packets[_i]['objectId']
-                _prv = _packets[_i]['prv_candidates']
-                if _prv is not None:
-                    for _j in range(len(_prv)):
-                        if 'candid' in _prv[_j] and _prv[_j]['candid'] is None:
-                            if all(_k in _prv[_j] for _k in ['diffmaglim', 'jd', 'fid']):
-                                _diffmaglim = float(_prv[_j]['diffmaglim'])
-                                _jd = float(_prv[_j]['jd'])
-                                _fid = int(_prv[_j]['fid'])
-                                _nd = NonDetection(diffmaglim=_diffmaglim, jd=_jd, fid=_fid, objectid=_oid)
-                                try:
-                                    if _total % _nelms == 0:
-                                        print(f"Inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database [{_nelms} / {_total}]")
-                                    session.add(_nd)
-                                    session.commit()
-                                except Exception as _e3:
-                                    session.rollback()
-                                    print(f"Failed inserting nondetection for {_oid} ({_diffmaglim:.2f}, {_jd:.4f}, {_fid}) into database, error={_e3}")
+        # get next id
+        # try:
+        #     cursor.execute("SELECT COUNT(*) from nondetection;")
+        #     _id = int(cursor.fetchone()[0]) + 1
+        # except:
+        #     _id = 0
+        # print(f'Next _id is {_id}')
+
+        # process files
+        for _fe in _files:
+            _oid = ''
+            _packets = []
+
+            # read the data
+            try:
+                with open(_fe, 'rb') as _f:
+                    _reader = fastavro.reader(_f)
+                    _schema = _reader.writer_schema
+                    for _packet in _reader:
+                        _packets.append(_packet)
+            except Exception as _e2:
+                raise Exception(f'Failed to read data from {_fe}, error={_e2}')
+
+            # process the data
+            for _i in range(len(_packets)):
+                if 'objectId' in _packets[_i] and 'prv_candidates' in _packets[_i]:
+                    _oid = _packets[_i]['objectId']
+                    _prv = _packets[_i]['prv_candidates']
+                    if _prv is not None:
+                        _prv = sorted(_prv, key=lambda x: x['jd'], reverse=True)
+                        for _cand in _prv:
+                            if all(_cand[_k1] is None for _k1 in ('candid', 'isdiffpos', 'ra', 'dec', 'magpsf', 'sigmapsf', 'ranr', 'decnr')) and \
+                                all(_cand[_k2] is not None for _k2 in ('diffmaglim', 'jd', 'fid')):
+                                    _non_detections.append((float(_cand['diffmaglim']), _oid, float(_cand['jd']), int(_cand['fid'])))
+                                    _ic += 1
+
+            # submit
+            if _ic > _nelms:
+                print(f"Inserting {_non_detections[0]} ... {_non_detections[-1]} ({len(_non_detections)} values) into database")
+                try:
+                    psycopg2.extras.execute_values(cursor, """INSERT INTO nondetection (diffmaglim, objectid, jd, fid) VALUES %s""", _non_detections, page_size=100)
+                    connection.commit()
+                except Exception as _e3:
+                    raise Exception(f'Failed to insert values into database, error={_e3}')
+                _ic = 0
+                _non_detections = []
+
+        # tidy up stragglers
+        if len(_non_detections) > 0:
+            print(f"Inserting stragglers {_non_detections[0]} ... {_non_detections[-1]} ({len(_non_detections)} values) into database")
+            try:
+                psycopg2.extras.execute_values(cursor, """INSERT INTO nondetection (diffmaglim, objectid, jd, fid) VALUES %s""", _non_detections, page_size=100)
+                connection.commit()
+            except Exception as _e4:
+                raise Exception(f'Failed to insert stragglers into database, error={_e4}')
+
+        # close
+        connection.close()
 
 
 # +
@@ -131,10 +167,11 @@ if __name__ == '__main__':
     _p.add_argument('-f', '--file', default='', help="""Input file [%(default)s]""")
     _p.add_argument('-d', '--directory', default='', help="""Input directory [%(default)s]""")
     _p.add_argument('-n', '--nelms', default=DEF_NELMS, help="""Number of elements between screen updates [%(default)s]""")
+    _p.add_argument(f'--create', default=False, action='store_true', help='if present, create table')
     args = _p.parse_args()
 
     # execute
     if args.file or args.directory:
-        nondetection_read(_file=args.file.strip(), _dir=args.directory.strip(), _nelms=int(args.nelms))
+        nondetection_read(_file=args.file.strip(), _dir=args.directory.strip(), _nelms=int(args.nelms), _create=bool(args.create))
     else:
         print(f'<<ERROR>> Insufficient command line arguments specified\nUse: python3 {sys.argv[0]} --help')
