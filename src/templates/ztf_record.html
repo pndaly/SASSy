@@ -166,35 +166,31 @@
     return new Date((Number(jd) - unix_epoch_julian_day) * day);
   }
 
-  function buildMagPsf(data, fid) {
+  function buildSeries(data, fid){
 
-    // finds all previous candidates of this object with the same filter
+    // Finds all previous candidates of this object with the same filter that are not non-detections
     var matches = data.prv_candidate.filter(function(match){
       return match.candidate.fid === fid && "magpsf" in match.candidate;
     });
-    console.log({'buildMagPsf> matches': matches});
 
-    // gets the magnitude values of all matching previous candidates
+    // Gets the magpsf value of all matching previous candidates
     var mags = matches.map(function(match){
       return match.candidate.magpsf.toFixed(2);
     });
-    console.log({'buildMagPsf> mags': mags});
 
-    // gets the error of the magnitude values of all matching previous candidates
+    // Gets the error of the magpsf value of all matching previous candidates
     var mag_err = matches.map(function(match){
       return match.candidate.sigmapsf.toFixed(2);
     });
-    console.log({'buildMagPsf> mag_err': mag_err});
 
-    // gets the timestamp of all matching previous candidates
+    // Gets the timestamp of all matching previous candidates
     var jds = matches.map(function(match){
       return match.candidate.jd;
     });
-    console.log({'buildMagPsf> jds': jds});
 
-    // builds an array of the correct symbol for each matching previous candidate
-    //  - an isDiffPos value of t or 1 indicates a positive subtraction, represented by a full circle
-    //  - an isDiffPos value of f or 0 indicates a negative subtraction, represented by an empty circle
+    // Builds an array of the correct symbol for each matching previous candidate
+    // An isDiffPos value of t or 1 indicates a positive subtraction, represented by a full circle
+    // An isDiffPos value of f or 0 indicates a negative subtraction, represented by an empty circle
     var symbols = matches.map(function(match){
       if (['t', '1'].includes(match.candidate.isDiffPos)) {
         return 'circle';
@@ -202,10 +198,9 @@
         return 'circle-open';
       }
     });
-    console.log({'buildMagPsf> symbols': symbols});
 
-    // adds the current candidate data for that filter to the previously constructed arrays
-    if (data.candidate.fid === fid) {
+    // Adds the current candidate data for that filter to the previously constructed arrays
+    if(data.candidate.fid === fid){
       mags.push(data.candidate.magpsf.toFixed(2));
       mag_err.push(data.candidate.sigmapsf.toFixed(2));
       jds.push(data.candidate.jd);
@@ -223,7 +218,7 @@
       },
       mode: 'markers',
       type: 'scatter',
-      name: filters[fid - 1] + ' (magpsf)',
+      name: filters[fid - 1],
       marker:{
         symbol: symbols,
         color: filter_colorscale[fid - 1][1],
@@ -232,83 +227,7 @@
     }
   }
 
-  function buildDiffMagLim(data, fid) {
-
-    // finds all previous candidates of this object with the same filter
-    var matches = data.prv_candidate.filter(function(match){
-      return match.candidate.fid === fid && "diffmaglim" in match.candidate;
-    });
-    console.log({'buildDiffMagLim> matches': matches});
-
-    // gets the (difference) magnitude values of all matching previous candidates
-    var diffmags = matches.map(function(match){
-      return match.candidate.diffmaglim.toFixed(2);
-    });
-    console.log({'buildDiffMagLim> diffmags': diffmags});
-
-    // gets the timestamp of all matching previous candidates
-    var jds = matches.map(function(match){
-      return match.candidate.jd;
-    });
-    console.log({'buildDiffMagLim> jds': jds});
-
-    // builds an array of the correct symbol for each matching previous candidate
-    //  - an isDiffPos value of t or 1 indicates a positive subtraction, represented by a full circle
-    //  - an isDiffPos value of f or 0 indicates a negative subtraction, represented by an empty circle
-    var symbols = matches.map(function(match){
-      if (['t', '1'].includes(match.candidate.isDiffPos)) {
-        return 'diamond-open';
-      } else {
-        return 'diamond-open-dot';
-      }
-    });
-    console.log({'buildDiffMagLim> symbols': symbols});
-
-    // adds the current candidate data for that filter to the previously constructed arrays
-    if (data.candidate.fid === fid) {
-      diffmags.push(data.candidate.diffmaglim.toFixed(2));
-      jds.push(data.candidate.jd);
-    }
-
-    return {
-      y: diffmags,
-      x: jds.map(function(jd){return jdToDate(jd)}),
-      text: jds.map(function(jd){return 'jd: ' + jd}),
-      mode: 'markers',
-      type: 'scatter',
-      name: filters[fid - 1] + ' (diffmaglim)',
-      marker:{
-        symbol: symbols,
-        color: filter_colorscale[fid - 1][1],
-        size: 7
-      }
-    }
-  }
-
-  function buildNonDetections(data, fid) {
-    // non-detections are the diffmaglim for everything but the candidate
-    var non_detections = data.prv_candidate.filter(function(match){
-      return !("candid" in match.candidate);
-    });
-    console.log({'buildNonDetections> non_detections': non_detections});
-
-    return {
-      x: non_detections.map(function(nd){return jdToDate(nd.candidate.jd);}),
-      y: non_detections.map(function(nd){return nd.candidate.diffmaglim;}),
-      mode: 'markers',
-      type: 'scatter',
-      name: 'non-detections',
-      marker: {
-        symbol: 'triangle-down',
-        color: non_detections.map(function(nd){return (nd.candidate.fid - 1)/2}),
-        colorscale: filter_colorscale,
-        cmin: -0.5,
-        cmax: 2.5
-      }
-    }
-  }
-
-  function buildPlot(data) {
+  function buildPlot(data){
     var fids = data.prv_candidate.map(function(prv_candidate){
       return prv_candidate.candidate.fid;
     })
@@ -321,14 +240,27 @@
 
     var plot_data  = [];
     for(var i=0; i<fids.length; i++){
-      plot_data.push(buildMagPsf(data, fids[i]));
+      plot_data.push(buildSeries(data, fids[i]));
     }
 
-    for(var i=0; i<fids.length; i++){
-      plot_data.push(buildDiffMagLim(data, fids[i]));
-    }
+    non_detections = data.prv_candidate.filter(function(match){
+      return !("candid" in match.candidate);
+    });
 
-    plot_data.push(buildNonDetections(data));
+    plot_data.push({
+      x: non_detections.map(function(nd){return jdToDate(nd.candidate.jd);}),
+      y: non_detections.map(function(nd){return nd.candidate.diffmaglim;}),
+      mode: 'markers',
+      type: 'scatter',
+      name: 'non-detections',
+      marker: {
+        symbol: 'triangle-down',
+        color: non_detections.map(function(nd){return (nd.candidate.fid - 1)/2}),
+        colorscale: filter_colorscale,
+        cmin: -0.5,
+        cmax: 2.5
+      }
+    });
 
     var layout = {
       title: 'Light Curve',
@@ -343,7 +275,7 @@
     Plotly.newPlot('lightcurve', plot_data, layout);
   }
 
-  function plotLightCurve() {
+  function plotLightCurve(){
     var request = new XMLHttpRequest();
     request.open('GET', '/sassy/ztf/{{ alert.id }}/?format=json', true);
 

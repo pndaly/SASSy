@@ -81,7 +81,6 @@ Classtar:             Return alerts where the The Star/Galaxy classification sco
                       the provided bounds. Measured from the difference image, not the reference.
 FWHM:                 Return alerts where the FWHM is less than or equal to the given value. 
                       Measured from the difference image, not the reference. [pixels].
-
 """
 
 
@@ -165,7 +164,7 @@ class NonDetection(db.Model):
         return {
             'candidate': {
                 'id': int(self.id),
-                'objectid': self.objectId,
+                'objectid': self.objectid,
                 'diffmaglim': float(self.diffmaglim),
                 'jd': float(self.jd),
                 'fid': int(self.fid)
@@ -331,6 +330,11 @@ class ZtfAlert(db.Model):
         return query.order_by(ZtfAlert.jd.desc())
 
     @property
+    def non_detection(self):
+        query = db.session.query(NonDetection).filter(NonDetection.objectid == self.objectId)
+        return query.order_by(NonDetection.jd.desc())
+
+    @property
     def wall_time(self):
         t = Time(self.jd, format='jd')
         return t.datetime
@@ -379,13 +383,12 @@ class ZtfAlert(db.Model):
         return ZTF_FILTERS[self.fid - 1]
 
     def serialized(self, prv_candidate=False):
-        return {
+        alert = {
             'sid': self.id,
             'objectId': self.objectId,
             'publisher': self.publisher,
             'candid': self.alert_candid,
             'avro': self.avro,
-            'prv_candidate': ZtfAlert.serialize_list(self.prv_candidate) if prv_candidate else None,
             'candidate': {
                 'jd': self.jd,
                 'wall_time': self.wall_time,
@@ -498,27 +501,57 @@ class ZtfAlert(db.Model):
                 'drbversion': self.drbversion,
             }
         }
+        if prv_candidate:
+            prv_candidate = ZtfAlert.serialize_list(self.prv_candidate)
+            non_detections = NonDetection.serialize_list(self.non_detection)
+            ZtfAlert.add_candidates(prv_candidate, non_detections)
+            alert['prv_candidate'] = prv_candidate
+        return alert
 
-    def get_csv(self):
-        _keys = ['jd', 'fid', 'magpsf', 'sigmapsf', 'diffmaglim']
-        _filters = ['x', 'g', 'r', 'i']
-        _previous = ZtfAlert.serialize_list(self.prv_candidate)
-        _csv = []
-        for _c in _previous:
-            if 'candidate' in _c and all(_k in _c['candidate'] for _k in _keys):
-                _csv.append({
-                    'jd': _c['candidate']['jd'],
-                    'isot': Time(_c['candidate']['jd'], format='jd').isot,
-                    'filter': _filters[_c['candidate']['fid']],
-                    'magpsf': _c['candidate']['magpsf'],
-                    'sigmapsf': _c['candidate']['sigmapsf'],
-                    'diffmaglim': _c['candidate']['diffmaglim']
-                })
-        return pd.DataFrame(_csv)
+    @staticmethod
+    def add_candidates(candidates, new_candidates):
+        for candidate in new_candidates:
+            low = 0
+            high = len(candidates)
+            while low < high:
+                mid = (low+high)//2
+                if candidates[mid]['candidate']['jd'] < candidate['candidate']['jd']:
+                    low = mid+1
+                else:
+                    high = mid
+            candidates.insert(low, candidate)
+        return candidates
+
+    def get_photometry_old(self):
+        filter_mapping = ['g', 'r', 'i']
+        prv_candidates = ZtfAlert.serialize_list(self.prv_candidate)
+        non_detections = NonDetection.serialize_list(self.non_detection)
+        ZtfAlert.add_candidates(prv_candidates, non_detections)
+        photometry = {}
+        index = 0
+        for candidate in prv_candidates:
+            values = candidate['candidate']
+            photometry[index] = {}
+            for key in values.keys():
+                if key in ['jd', 'diffmaglim', 'magpsf', 'sigmapsf']:
+                    photometry[index][key] = values[key]
+                elif key == 'fid':
+                    photometry[index]['filter'] = filter_mapping[values[key]]
+            index += 1
+        photometry[index] = {
+            'jd': self.jd,
+            'filter': filter_mapping[self.fid - 1],
+            'magpsf': self.magpsf,
+            'sigmapsf': self.sigmapsf,
+            'diffmaglim': self.diffmaglim
+        }
+        return photometry
 
     def get_photometry(self):
-        filter_mapping = ['x', 'g', 'r', 'i']
+        filter_mapping = ['', 'g', 'r', 'i']
         prv_candidates = ZtfAlert.serialize_list(self.prv_candidate)
+        non_detections = NonDetection.serialize_list(self.non_detection)
+        ZtfAlert.add_candidates(prv_candidates, non_detections)
         photometry = {}
         index = 0
         for candidate in prv_candidates:
@@ -542,6 +575,12 @@ class ZtfAlert(db.Model):
             'diffmaglim': self.diffmaglim
         }
         return photometry
+
+    def get_csv(self):
+        csv = []
+        for _k, _v in self.get_photometry().items():
+            csv.append(_v)
+        return pd.DataFrame(csv)
 
     def get_non_detections(self):
         non_detections = []
@@ -706,7 +745,7 @@ def ztf_filters(query, request_args):
     if request_args.get('b__lte'):
         query = query.filter(ZtfAlert.gal_b <= float(request_args['b__lte']))
 
-    # return records with candid (API: ?candid=xxdcdcdvfwd) <<< CHECK!
+    # return records with candid (API: ?candid=1354526412715010015)
     if request_args.get('candid'):
         query = query.filter(ZtfAlert.alert_candid == request_args['candid'])
 
