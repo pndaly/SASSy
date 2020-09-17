@@ -4,12 +4,16 @@
 # +
 # import(s)
 # -
+from src import *
+from src.models.ztf import NonDetection
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+
 import argparse
 import fastavro
 import glob
 import os
-import psycopg2
-import psycopg2.extras
 import sys
 
 
@@ -36,7 +40,7 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 # function: nondetection_read()
 # -
 # noinspection PyBroadException
-def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS, _create=False):
+def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
 
     # check input(s)
     if not isinstance(_file, str):
@@ -44,11 +48,10 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS, _create=False):
     if not isinstance(_dir, str):
         raise Exception(f'invalid input, _dir={_dir}')
     if not isinstance(_nelms, int) or _nelms <= 0:
-        raise Exception(f'invalid input, _nelms={_nelms}')
+        _nelms = DEF_NELMS
 
     # set default(s)
-    _create = _create if isinstance(_create, bool) else False
-    _files, _non_detections, _total, _ic = [], [], 0, 0
+    _files, _non_detections, _total, _fc, _ic = [], [], 0, 0, 0
 
     # get all files
     if _dir != '':
@@ -64,53 +67,25 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS, _create=False):
     # proceed if we have files to process
     _total = len(_files)
     if _total == 0:
-        print(f'No files to process')
+        print(f'{get_isot()}> No files to process')
         return
     else:
-        print(f'Processing {_total} files')
+        print(f'{get_isot()}> Processing {_total} files')
 
     # connect to database
     try:
-        connection = psycopg2.connect(host=SASSY_DB_HOST, database=SASSY_DB_NAME,
-                                      user=SASSY_DB_USER, password=SASSY_DB_PASS, port=int(SASSY_DB_PORT))
-        connection.autocommit = True
-    except Exception as _e0:
-        raise Exception(f"Failed to connect to database, error={_e0}")
-
-    # create table
-    try:
-        cursor = connection.cursor()
+        engine = create_engine(f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
+                               f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
+        get_session = sessionmaker(bind=engine)
+        session = get_session()
     except Exception as _e1:
-        raise Exception(f"Failed to get cursor, error={_e1}")
-
-    # create table (if required)
-    if _create:
-        try:
-            cursor.execute("""
-            DROP TABLE IF EXISTS nondetection;
-            CREATE TABLE nondetection (id serial PRIMARY KEY,
-                  diffmaglim double precision NOT NULL,
-                  objectid VARCHAR(50) NOT NULL,
-                  jd double precision NOT NULL,
-                  fid integer NOT NULL);
-                CREATE INDEX idx_nondetection_jd ON nondetection(jd);
-                CREATE INDEX idx_nondetection_objectid ON nondetection(objectid);
-            """)
-        except Exception as _e2:
-            raise Exception(f"Failed to create database table, error={_e2}")
-
-    # get next id
-    # try:
-    #     cursor.execute("SELECT COUNT(*) from nondetection;")
-    #     _id = int(cursor.fetchone()[0]) + 1
-    # except:
-    #     _id = 0
-    # print(f'Next _id is {_id}')
+        raise Exception(f'Failed to connect to database, error={_e1}')
 
     # process files
     for _fe in _files:
-        _oid = ''
-        _packets = []
+
+        # (re)set variable(s)
+        _oid, _packets = '', []
 
         # read the data
         try:
@@ -119,8 +94,9 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS, _create=False):
                 _schema = _reader.writer_schema
                 for _packet in _reader:
                     _packets.append(_packet)
-        except Exception as _e3:
-            raise Exception(f'Failed to read data from {_fe}, error={_e3}')
+                _fc += 1
+        except Exception as _e2:
+            raise Exception(f'Failed to read data from {_fe}, error={_e2}')
 
         # process the data
         for _i in range(len(_packets)):
@@ -133,44 +109,55 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS, _create=False):
                         if all(_cand[_k1] is None for _k1 in
                                ('candid', 'isdiffpos', 'ra', 'dec', 'magpsf', 'sigmapsf', 'ranr', 'decnr')) and \
                                 all(_cand[_k2] is not None for _k2 in ('diffmaglim', 'jd', 'fid')):
-                            _non_detections.append(
-                                (float(_cand['diffmaglim']), _oid, float(_cand['jd']), int(_cand['fid'])))
+                            _non_detections.append({'objectid': _oid, 'diffmaglim': float(_cand['diffmaglim']),
+                                                    'jd': float(_cand['jd']), 'fid': int(_cand['fid'])})
                             _ic += 1
 
         # submit after _nelms records have been found
-        if _ic > _nelms:
-            print(f"Inserting {_non_detections[0]} ... {_non_detections[-1]} "
-                  f"({len(_non_detections)} values) into database")
-            try:
-                psycopg2.extras.execute_values(
-                    cursor,
-                    """INSERT INTO nondetection (diffmaglim, objectid, jd, fid) VALUES %s""",
-                    _non_detections, page_size=100)
-                connection.commit()
-            except Exception as _e4:
-                cursor.execute("rollback;")
-                raise Exception(f'Failed to insert values into database, error={_e4}')
-            else:
-                _ic = 0
-                _non_detections = []
+        if _ic > _nelms and len(_non_detections) > 0:
+            print(f"{get_isot()}> Inserting {len(_non_detections)} record(s) into database "
+                  f"({_fc*100.0/_total:.2f}% complete)")
+            _in, _out = 0, 0
+            for _elem in _non_detections:
+                try:
+                    if session.query(NonDetection).filter(NonDetection.objectid == _elem['objectid']).filter(
+                            NonDetection.jd == _elem['jd']).count() == 0:
+                        _in += 1
+                        session.add(NonDetection(objectid=_elem['objectid'], diffmaglim=_elem['diffmaglim'],
+                                                 jd=_elem['jd'], fid=_elem['fid']))
+                        session.commit()
+                    else:
+                        _out += 1
+                except Exception as _e3:
+                    session.rollback()
+                    raise Exception(f'Failed to insert values into database, error={_e3}')
+
+            # reset
+            print(f"{get_isot()}> Inserted {_in} record(s) into database, rejected {_out} duplicate(s)")
+            _ic, _non_detections = 0, []
 
     # tidy up stragglers
     if len(_non_detections) > 0:
-        print(f"Inserting stragglers {_non_detections[0]} ... {_non_detections[-1]} "
-              f"({len(_non_detections)} values) into database")
-        try:
-            psycopg2.extras.execute_values(
-                cursor,
-                """INSERT INTO nondetection (diffmaglim, objectid, jd, fid) VALUES %s""",
-                _non_detections, page_size=100)
-            connection.commit()
-        except Exception as _e5:
-            cursor.execute("rollback;")
-            raise Exception(f'Failed to insert stragglers into database, error={_e5}')
+        print(f"{get_isot()}> Inserting {len(_non_detections)} straggler(s) into database "
+              f"({_fc*100.0/_total:.2f}% complete)")
+        _in, _out = 0, 0
+        for _elem in _non_detections:
+            try:
+                if session.query(NonDetection).filter(NonDetection.objectid == _elem['objectid']).filter(
+                        NonDetection.jd == _elem['jd']).count() == 0:
+                    _in += 1
+                    session.add(NonDetection(objectid=_elem['objectid'], diffmaglim=_elem['diffmaglim'],
+                                             jd=_elem['jd'], fid=_elem['fid']))
+                    session.commit()
+                else:
+                    _out += 1
+            except Exception as _e4:
+                session.rollback()
+                raise Exception(f'Failed to insert stragglers into database, error={_e4}')
+        print(f"{get_isot()}> Inserted {_in} straggler(s) into database, rejected {_out} duplicate(s)")
 
     # close
-    cursor.close()
-    connection.close()
+    session.close_all()
 
 
 # +
@@ -184,12 +171,11 @@ if __name__ == '__main__':
     _p.add_argument('--file', default='', help="""Input file [%(default)s]""")
     _p.add_argument('--directory', default='', help="""Input directory [%(default)s]""")
     _p.add_argument('--nelms', default=DEF_NELMS, help="""Number of elements between screen updates [%(default)s]""")
-    _p.add_argument('--create', default=False, action='store_true', help='if present, create table')
     args = _p.parse_args()
 
     # execute
     if args.file or args.directory:
         nondetection_read(
-            _file=args.file.strip(), _dir=args.directory.strip(), _nelms=int(args.nelms), _create=bool(args.create))
+            _file=args.file.strip(), _dir=args.directory.strip(), _nelms=int(args.nelms))
     else:
         print(f'<<ERROR>> Insufficient command line arguments specified\nUse: python3 {sys.argv[0]} --help')
