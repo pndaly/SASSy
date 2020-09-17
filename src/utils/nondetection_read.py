@@ -14,6 +14,8 @@ import argparse
 import fastavro
 import glob
 import os
+import psycopg2
+import psycopg2.extras
 import sys
 
 
@@ -34,6 +36,50 @@ SASSY_DB_USER = os.getenv('SASSY_DB_USER', None)
 SASSY_DB_PASS = os.getenv('SASSY_DB_PASS', None)
 SASSY_DB_NAME = os.getenv('SASSY_DB_NAME', None)
 SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
+
+
+# +
+# function: db_get_valid()
+# -
+def db_get_valid(_session=None, _ilist=None):
+
+    # check input(s)
+    if _session is None or _ilist is None or not isinstance(_ilist, list) or _ilist is []:
+        return
+
+    # count record(s)
+    _valid = []
+    for _elem in _ilist:
+        try:
+            if _session.query(NonDetection).filter(NonDetection.objectid == _elem['objectid']).filter(
+                    NonDetection.jd == _elem['jd']).count() == 0:
+                _valid.append((_elem['diffmaglim'], _elem['objectid'], _elem['jd'], _elem['fid']))
+        except Exception as _e:
+            _session.rollback()
+            raise Exception(f'Failed to insert values into database, error={_e}')
+
+    # return valid entries
+    return _valid
+
+
+# +
+# db_bulk_insert()
+# -
+def db_bulk_insert(_connection=None, _cursor=None, _ivalid=None):
+
+    # check input(s)
+    if _connection is None or _cursor is None or _ivalid is None or not isinstance(_ivalid, list) or _ivalid is []:
+        return
+
+    # bulk ingest
+    try:
+        psycopg2.extras.execute_values(
+            _cursor,
+            """INSERT INTO nondetection (diffmaglim, objectid, jd, fid) VALUES %s""", _ivalid, page_size=100)
+        _connection.commit()
+    except Exception as _e:
+        _cursor.execute("rollback;")
+        raise Exception(f'Failed to insert values into database, error={_e}')
 
 
 # +
@@ -72,7 +118,7 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
     else:
         print(f'{get_isot()}> Processing {_total} files')
 
-    # connect to database
+    # connect to database (method 1)
     try:
         engine = create_engine(f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@'
                                f'{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}')
@@ -80,6 +126,15 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
         session = get_session()
     except Exception as _e1:
         raise Exception(f'Failed to connect to database, error={_e1}')
+
+    # connect to database (method 2)
+    try:
+        connection = psycopg2.connect(host=SASSY_DB_HOST, database=SASSY_DB_NAME,
+                                      user=SASSY_DB_USER, password=SASSY_DB_PASS, port=int(SASSY_DB_PORT))
+        connection.autocommit = True
+        cursor = connection.cursor()
+    except Exception as _e2:
+        raise Exception(f"Failed to connect to database, error={_e2}")
 
     # process files
     for _fe in _files:
@@ -95,8 +150,8 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
                 for _packet in _reader:
                     _packets.append(_packet)
                 _fc += 1
-        except Exception as _e2:
-            raise Exception(f'Failed to read data from {_fe}, error={_e2}')
+        except Exception as _e3:
+            raise Exception(f'Failed to read data from {_fe}, error={_e3}')
 
         # process the data
         for _i in range(len(_packets)):
@@ -117,46 +172,25 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
         if _ic > _nelms and len(_non_detections) > 0:
             print(f"{get_isot()}> Inserting {len(_non_detections)} record(s) into database "
                   f"({_fc*100.0/_total:.2f}% complete)")
-            _in, _out = 0, 0
-            for _elem in _non_detections:
-                try:
-                    if session.query(NonDetection).filter(NonDetection.objectid == _elem['objectid']).filter(
-                            NonDetection.jd == _elem['jd']).count() == 0:
-                        _in += 1
-                        session.add(NonDetection(objectid=_elem['objectid'], diffmaglim=_elem['diffmaglim'],
-                                                 jd=_elem['jd'], fid=_elem['fid']))
-                        session.commit()
-                    else:
-                        _out += 1
-                except Exception as _e3:
-                    session.rollback()
-                    raise Exception(f'Failed to insert values into database, error={_e3}')
-
+            _valid = db_get_valid(_session=session, _ilist=_non_detections)
+            if _valid:
+                db_bulk_insert(_connection=connection, _cursor=cursor, _ivalid=_valid)
+            print(f"{get_isot()}> Inserted {len(_valid)} valid record(s), rejected {_nelms-len(_valid)} duplicate(s)")
             # reset
-            print(f"{get_isot()}> Inserted {_in} record(s) into database, rejected {_out} duplicate(s)")
             _ic, _non_detections = 0, []
 
     # tidy up stragglers
     if len(_non_detections) > 0:
         print(f"{get_isot()}> Inserting {len(_non_detections)} straggler(s) into database "
               f"({_fc*100.0/_total:.2f}% complete)")
-        _in, _out = 0, 0
-        for _elem in _non_detections:
-            try:
-                if session.query(NonDetection).filter(NonDetection.objectid == _elem['objectid']).filter(
-                        NonDetection.jd == _elem['jd']).count() == 0:
-                    _in += 1
-                    session.add(NonDetection(objectid=_elem['objectid'], diffmaglim=_elem['diffmaglim'],
-                                             jd=_elem['jd'], fid=_elem['fid']))
-                    session.commit()
-                else:
-                    _out += 1
-            except Exception as _e4:
-                session.rollback()
-                raise Exception(f'Failed to insert stragglers into database, error={_e4}')
-        print(f"{get_isot()}> Inserted {_in} straggler(s) into database, rejected {_out} duplicate(s)")
+        _valid = db_get_valid(_session=session, _ilist=_non_detections)
+        if _valid:
+            db_bulk_insert(_connection=connection, _cursor=cursor, _ivalid=_valid)
+        print(f"{get_isot()}> Inserted {len(_valid)} valid straggler(s), rejected {_nelms-len(_valid)} duplicate(s)")
 
     # close
+    cursor.close()
+    connection.close()
     session.close_all()
 
 
