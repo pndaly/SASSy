@@ -308,6 +308,17 @@ _drop_interim () {
   fi
 }
 
+_fix_duplicates () {
+  write_magenta "_fix_duplicates(dry_run=${1}, user=${2}, pass=${3})"
+  if [[ ${1} -eq 1 ]]; then
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT zoid, zjd, zcandid, gid, COUNT(zoid), COUNT(zjd), COUNT(zcandid), COUNT(gid) FROM sassy_cron GROUP BY zoid, zjd, zcandid, gid HAVING COUNT(zoid)>1 AND COUNT(zjd)>1 AND COUNT(zcandid)>1 AND COUNT(gid)>1 ORDER BY zoid;\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -c \"DELETE FROM sassy_cron a USING sassy_cron b WHERE a.zsid < b.zsid AND a.zoid LIKE b.zoid AND a.zjd = b.zjd AND a.zcandid = b.zcandid AND a.gid = b.gid;\""
+  else
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT zoid, zjd, zcandid, gid, COUNT(zoid), COUNT(zjd), COUNT(zcandid), COUNT(gid) FROM sassy_cron GROUP BY zoid, zjd, zcandid, gid HAVING COUNT(zoid)>1 AND COUNT(zjd)>1 AND COUNT(zcandid)>1 AND COUNT(gid)>1 ORDER BY zoid;"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -c "DELETE FROM sassy_cron a USING sassy_cron b WHERE a.zsid < b.zsid AND a.zoid LIKE b.zoid AND a.zjd = b.zjd AND a.zcandid = b.zcandid AND a.gid = b.gid;"
+  fi
+}
+
 
 _add_classifier_and_plot () {
   write_magenta "_add_classifier_and_plot(dry_run=${1})"
@@ -340,6 +351,7 @@ _create_sassy_cron_glade ${dry_run} ${_username} ${_password} ${_max_mpc} ${_min
 _create_sassy_cron_q3c   ${dry_run} ${_username} ${_password} ${_radius_degree}
 _create_sassy_cron       ${dry_run} ${_username} ${_password} ${_radius_degree}
 _drop_interim            ${dry_run} ${_username} ${_password}
+_fix_duplicates          ${dry_run} ${_username} ${_password}
 _add_classifier_and_plot ${dry_run}
 
 
