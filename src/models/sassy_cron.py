@@ -139,7 +139,7 @@ class SassyCron(db.Model):
     tns_link = db.Column(db.String(DB_VARCHAR_128))
 
     # ztf element(s)
-    zcandid = db.Column(db.BigInteger)
+    zcandid = db.Column(db.BigInteger, primary_key=True)
     zdec = db.Column(db.Float, index=True)
     zdrb = db.Column(db.Float)
     zfid = db.Column(db.Integer)
