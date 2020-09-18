@@ -191,7 +191,7 @@ def nondetection_read(_file='', _dir='', _nelms=DEF_NELMS):
     # close
     cursor.close()
     connection.close()
-    session.close_all()
+    session.close_all_sessions()
 
 
 # +
