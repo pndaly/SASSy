@@ -25,7 +25,8 @@
   <!-- mollweide -->
   <div class="row">
     <div class="col-md-12">
-      <center><img src="{{ url_for('static', filename='/img/sassy_cron_mollweide.png') }}" title="/static/img/sassy_cron_mollweide.png"></center>
+      <!-- we don't specify an image source here as we want javascript to allow dynamic reloading: see script at end of file -->
+      <center><img id="sassy_cron_mollweide" title="{{ url_for('static', filename='img/sassy_cron_mollweide.png') }}"></center>
     </div>
   </div>
   <!-- end of mollweide -->
@@ -480,4 +481,11 @@
 {% endblock %}
 
 {% block js %}
+<script>
+ // allows dynamic re-load of a cached image
+ $(document).ready(function() {
+  var url = "{{ url_for('static', filename='img/sassy_cron_mollweide.png') }}?rnd="+Math.random();
+  $('#sassy_cron_mollweide').attr("src",url);
+ });
+</script>
 {% endblock %}
