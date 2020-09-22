@@ -10,6 +10,7 @@ from src.common import *
 from src.models.sassy_cron import *
 from src.utils.Alerce import *
 from src.utils.avro_plot_cutout import *
+from src.utils.sassy_cron_mollweide import *
 
 
 # +
@@ -141,6 +142,9 @@ def sassy_cron(_log=None):
 
     # disconnect from database
     db_disconnect(_s)
+
+    # plot mollweide
+    sassy_cron_mollweide(_log=_log, _output='sassy_cron_mollweide.png')
 
 
 # +
