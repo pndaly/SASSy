@@ -11,15 +11,22 @@ from src.utils.Alerce import Alerce
 from src.utils.utils import UtilsLogger
 
 import argparse
-import matplotlib.pyplot as plt
 import numpy as np
 import os
+
+try:
+    import matplotlib as mpl
+    mpl.use('Agg')
+except Exception:
+    pass
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 
 
 # +
 # constant(s)
 # -
-CLASSIFIERS = Alerce().alerce_early_classifier + ['None']
+CLASSIFIERS = Alerce().alerce_early_classifier + ['Unclassified']
 MARKERS = ['o', '*', 'd', 's', '+', 'x']
 ORIGIN = 180.0
 PROPORTIONAL = '\u221D'
@@ -99,20 +106,29 @@ def sassy_cron_mollweide(_log=None, _png='', _show=False, _test=False):
     _s = db_connect()
     _query = _s.query(SassyCron)
     for _q in _query.all():
+        if _log:
+            _log.info(f"Appending glade {[_q.gra, _q.gdec, 100.0/_q.gdist]}")
         _glade.append([_q.gra, _q.gdec, 100.0/_q.gdist])
-        _data[_q.zfid].get(_q.aetype.strip(), _data[_q.zfid]['None']).append(
-            [_q.zra, _q.zdec, 50.0*_q.aeprob if (0.0 <= _q.aeprob <= 1.0) else 25.0])
+        try:
+            if _log:
+                _log.info(f"Appending filter {[_q.zra, _q.zdec, 50.0*_q.aeprob if (0.0 <= _q.aeprob <= 1.0) else 25.0]}")
+            _data[_q.zfid].get(_q.aetype.strip(), _data[_q.zfid]['Unclassified']).append(
+                [_q.zra, _q.zdec, 50.0*_q.aeprob if (0.0 <= _q.aeprob <= 1.0) else 25.0])
+            _total += 1
+        except:
+            continue
     db_disconnect(_s)
 
     # set up plot
-    fig = plt.figure(figsize=(10, 8))
-    fig.set_tight_layout(True)
+    fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection="mollweide", **{'facecolor': 'LightCyan'})
 
     # plot test data
     if _test:
         try:
             x, y, z = munge_data(TEST_DATA)
+            if _log:
+                _log.info(f"Plotting test data x={x}, y={y}, z={z}")
             ax.scatter(np.radians(x), np.radians(y), color='black', s=z, marker='1', label="Test")
         except:
             pass
@@ -120,6 +136,8 @@ def sassy_cron_mollweide(_log=None, _png='', _show=False, _test=False):
     # plot glade
     try:
         x, y, z = munge_data(_glade)
+        if _log:
+            _log.info(f"Plotting glade data x={x}, y={y}, z={z}")
         ax.scatter(np.radians(x), np.radians(y), color='black', s=z, alpha=0.25, marker='.', label="Glade")
     except:
         pass
@@ -127,9 +145,10 @@ def sassy_cron_mollweide(_log=None, _png='', _show=False, _test=False):
     # plot zfid=1
     try:
         for _i, _v in enumerate(CLASSIFIERS):
+            if _log:
+                _log.info(f"Plotting filter 1 data x={x}, y={y}, z={z}")
             x, y, z = munge_data(_data[1][_v])
             ax.scatter(np.radians(x), np.radians(y), color='green', s=z, alpha=0.25, marker=MARKERS[_i], label=f"{_v}")
-            _total += len(x)
     except:
         pass
 
@@ -137,8 +156,9 @@ def sassy_cron_mollweide(_log=None, _png='', _show=False, _test=False):
     try:
         for _i, _v in enumerate(CLASSIFIERS):
             x, y, z = munge_data(_data[2][_v])
+            if _log:
+                _log.info(f"Plotting filter 2 data x={x}, y={y}, z={z}")
             ax.scatter(np.radians(x), np.radians(y), color='red', s=z, alpha=0.25, marker=MARKERS[_i])
-            _total += len(x)
     except:
         pass
 
@@ -146,8 +166,9 @@ def sassy_cron_mollweide(_log=None, _png='', _show=False, _test=False):
     try:
         for _i, _v in enumerate(CLASSIFIERS):
             x, y, z = munge_data(_data[3][_v])
+            if _log:
+                _log.info(f"Plotting filter 3 data x={x}, y={y}, z={z}")
             ax.scatter(np.radians(x), np.radians(y), color='orange', s=z, alpha=0.25, marker=MARKERS[_i])
-            _total += len(x)
     except:
         pass
 
@@ -159,9 +180,17 @@ def sassy_cron_mollweide(_log=None, _png='', _show=False, _test=False):
     ax.set_xlabel(f'Right Ascension\nMarker symbols apply for all classifiers in all filters')
     ax.set_ylabel(f'Declination')
     ax.grid(True)
-    plt.legend(loc='lower center')
+
+    # create legend(s) manually
+    _agn = mlines.Line2D([], [], color='grey', marker='o', linestyle='None', markersize=6, label='AGN')
+    _sup = mlines.Line2D([], [], color='grey', marker='*', linestyle='None', markersize=6, label='Supernova')
+    _var = mlines.Line2D([], [], color='grey', marker='d', linestyle='None', markersize=6, label='Variable Star')
+    _ast = mlines.Line2D([], [], color='grey', marker='s', linestyle='None', markersize=6, label='Asteroid')
+    _bog = mlines.Line2D([], [], color='grey', marker='+', linestyle='None', markersize=6, label='Bogus')
+    _nun = mlines.Line2D([], [], color='grey', marker='x', linestyle='None', markersize=6, label='Unclassified')
+    plt.legend(handles=[_agn, _sup, _var, _ast, _bog, _nun], loc='lower center')
     plt.title(f"{_total} SassyCron Target(s), {len(_glade)} Glade Galaxies\n"
-              f"(Marker Area {PROPORTIONAL} Classifier Probability, except for 'None')")
+              f"(Marker Area {PROPORTIONAL} Classifier Probability, except for 'Unclassified')")
 
     # output(s)
     if _png.strip() != '':
