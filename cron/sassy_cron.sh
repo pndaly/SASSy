@@ -329,6 +329,7 @@ _add_classifier_and_plot () {
     write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
     write_yellow "DryRun> rm -f ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron.py"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose"
     write_yellow "DryRun> chown www-data:www-data ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
   else
     python3 ${SASSY_SRC}/utils/get_iers.py
@@ -337,6 +338,7 @@ _add_classifier_and_plot () {
     cd ${SASSY_SRC}/static/img
     rm -f ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron.py
+    python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose
     chown www-data:www-data ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1
   fi
 }

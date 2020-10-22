@@ -143,9 +143,6 @@ def sassy_cron(_log=None):
     # disconnect from database
     db_disconnect(_s)
 
-    # plot mollweide
-    sassy_cron_mollweide(_log=_log, _output='sassy_cron_mollweide.png')
-
 
 # +
 # main()
