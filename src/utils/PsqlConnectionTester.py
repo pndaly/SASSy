@@ -291,7 +291,7 @@ def action(iargs=None):
 
     # instantiate class
     try:
-        _t = PsqlConnectionTester(iargs.database, iargs.authorization, iargs.server, iargs.port, iargs.verbose)
+        _t = PsqlConnectionTester(iargs.database, iargs.authorization, iargs.server, int(iargs.port), iargs.verbose)
     except Exception as e:
         raise Exception(f'failed to create class, error={e}')
     else:
