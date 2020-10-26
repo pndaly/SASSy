@@ -146,7 +146,8 @@ def ingest_avro(packet=None):
             )
         try:
             logger.info('Updating object database', extra={'tags': {'candid': alert.alert_candid}})
-            db.session.update(alert)
+            # db.session.update(alert)
+            db.session.add(alert)
             db.session.commit()
             logger.info('Updated object into database', extra={'tags': {'candid': alert.alert_candid}})
         except exc.SQLAlchemyError:
