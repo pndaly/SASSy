@@ -306,9 +306,10 @@
               <th><font color="blue">separation</font></th>
               <th><font color="blue">z</font></th>
               <th><font color="blue">Alerce</font></th>
+              <th><font color="blue">Alerce</font></th>
               <th><font color="blue">Lasair</font></th>
               <th><font color="blue">MMT</font></th>
-              <th><font color="blue">MMT</font></th>
+	      <!-- <th><font color="blue">MMT</font></th> -->
             </tr>
             <tr>
               <th><font color="grey">cutout</font></th>
@@ -337,10 +338,11 @@
               <th><font color="grey">Mpc</font></th>
               <th><font color="grey">&Prime;</font></th>
               <th><font color="grey"> </font></th>
-              <th><font color="grey">link</font></th>
-              <th><font color="grey">link</font></th>
-              <th><font color="grey">Observe</font></th>
-              <th><font color="grey">Observe</font></th>
+              <th><font color="grey">page</font></th>
+              <th><font color="grey">finder</font></th>
+              <th><font color="grey">page</font></th>
+              <th><font color="grey">request</font></th>
+	      <!-- <th><font color="grey">Observe</font></th> -->
             </tr>
           </thead>
           <tbody>
@@ -437,9 +439,10 @@
                  <td>{{ "%.3f"|format(alert.gz) }}</td>
                {% endif %}
                <td><a href="https://alerce.online/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
+	       <td><a href="https://www.findingchart.alerce.online/get_chart?oid={{ alert.zoid }}&candid={{ alert.zcandid }}" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">Finder</a></td>
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
-               <td><a href="{{ url_for('mmt_imaging', zoid=alert.zoid) }}" title="Imaging_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Image</a></td>
+	       <!-- <td><a href="{{ url_for('mmt_imaging', zoid=alert.zoid) }}" title="Imaging_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Image</a></td> -->
               </tr>
             {% endfor %}
           </tbody>
