@@ -54,11 +54,16 @@ def db_disconnect(_session=None):
 # function: get_avro_filename()
 # -
 # noinspection PyBroadException
-def get_avro_filename(_jd=0.0, _candid=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/dataraid0/ztf")):
+def get_avro_filename(_jd=0.0, _candid=0, _dirs=os.getenv("SASSY_ZTF_AVRO", "/opt/ZtfKafka/ztf:/dataraid6/ztf:/dataraid0/ztf"), _log=None):
+    _log = _log if isinstance(_log, logging.Logger) else None
+    if _log:
+        _log.warning(f'_jd={_jd}, _candid={_candid}, _dirs={_dirs}, _log={_log}')
     try:
         _ts = jd_to_isot(_jd).split('T')[0].split('-')
         for _h in _dirs.split(':'):
             _f = os.path.join(f'{_h}', f'{_ts[0]}', f'{_ts[1]}', f'{_ts[2]}', f'{_candid}.avro')
+            if _log:
+                _log.warning(f'_f={_f}, _jd={_jd}, _candid={_candid}, _dirs={_dirs}, _log={_log}')
             if os.path.exists(_f):
                 return f"{_f}"
     except Exception:
@@ -96,7 +101,7 @@ def sassy_cron(_log=None):
             _log.info(f"_altype={_altype}, _alprob={_alprob}")
 
         # get filename and plot cutouts
-        _file = get_avro_filename(_jd=_q.zjd, _candid=_q.zcandid)
+        _file = get_avro_filename(_jd=_q.zjd, _candid=_q.zcandid, _dirs='/opt/ZtfKafka/ztf', _log=_log)
         if _file is not None:
             try:
                 _q.dpng = avro_plot_cutout(_avro_file=_file, _cutout='difference', _oid=_q.zoid, _jd=_q.zjd, _gid=int(_q.gid), _log=_log)
