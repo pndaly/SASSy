@@ -1896,6 +1896,22 @@ def psql_query():
 
 
 # +
+# route(s): /sdss/finder/<img>, /sassy/sdss/finder/<img>
+# -
+@app.route('/sassy/sdss/finder/<img>', methods=['GET'])
+@app.route('/sdss/finder/<img>', methods=['GET'])
+def sdss_finder(img=''):
+    logger.debug(f'route /sassy/sdss/finder/{img} entry')
+
+    # return
+    _finder = f"{app.static_folder}/img/{img}"
+    if os.path.exists(_finder):
+        return render_template('sdss_finder.html', img=img)
+    else:
+        return render_template('sdss_finder.html', img='')
+
+
+# +
 # route(s): /tns/, /sassy/tns/
 # -
 # noinspection PyBroadException
