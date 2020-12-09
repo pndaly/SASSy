@@ -339,6 +339,7 @@ _add_classifier_and_plot () {
     rm -f ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron.py
     python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose
+    python3 ${SASSY_SRC}/utils/sassy_cron_finder.py --folder='/var/www/SASSy/src/static/img' --verbose
     chown www-data:www-data ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1
   fi
 }

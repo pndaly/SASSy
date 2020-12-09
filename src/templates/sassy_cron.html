@@ -275,7 +275,7 @@
           <th colspan="16" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
           <th colspan="4" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
           <th colspan="6" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
-          <th colspan="4" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
+          <th colspan="5" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
         </thead>
           <thead>
             <tr>
@@ -308,6 +308,7 @@
               <th><font color="blue">Alerce</font></th>
               <th><font color="blue">Alerce</font></th>
               <th><font color="blue">Lasair</font></th>
+              <th><font color="blue">MMT</font></th>
               <th><font color="blue">MMT</font></th>
 	      <!-- <th><font color="blue">MMT</font></th> -->
             </tr>
@@ -342,6 +343,7 @@
               <th><font color="grey">finder</font></th>
               <th><font color="grey">page</font></th>
               <th><font color="grey">request</font></th>
+              <th><font color="grey">finder</font></th>
 	      <!-- <th><font color="grey">Observe</font></th> -->
             </tr>
           </thead>
@@ -443,6 +445,7 @@
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
 	       <!-- <td><a href="{{ url_for('mmt_imaging', zoid=alert.zoid) }}" title="Imaging_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Image</a></td> -->
+               <td><img src={{ url_for('static', filename='/img/') }}{{ alert.spng|replace("science", "finder") }} title=/static/img/{{ alert.spng|replace("science", "finder") }} height="50" width="300"></td>
               </tr>
             {% endfor %}
           </tbody>
