@@ -326,6 +326,10 @@ def gwgc_filters(query, request_args):
     if request_args.get('name'):
         query = query.filter(GwgcRecord.name == request_args['name'])
 
+    # return records with objectName = value (API: ?objectName=NGC0684)
+    if request_args.get('objectName'):
+        query = query.filter(GwgcRecord.name == request_args['objectName'])
+
     # return records with a position angle >= value (API: ?pa__gte=1.0)
     if request_args.get('pa__gte'):
         query = query.filter(GwgcRecord.pa >= float(request_args['pa__gte']))
@@ -457,6 +461,8 @@ def gwgc_cli_db(iargs=None):
         request_args['id'] = f'{iargs.id}'
     if iargs.name:
         request_args['name'] = f'{iargs.name}'
+    if iargs.objectName:
+        request_args['objectName'] = f'{iargs.objectName}'
     if iargs.pa__gte:
         request_args['pa__gte'] = f'{iargs.pa__gte}'
     if iargs.pa__lte:
@@ -567,6 +573,7 @@ if __name__ == '__main__':
     _p.add_argument(f'--e_dist__lte', help=f'Error in distance <= <float>')
     _p.add_argument(f'--id', help=f'id <int>')
     _p.add_argument(f'--name', help=f'name <str>')
+    _p.add_argument(f'--objectName', help=f'objectName <str>')
     _p.add_argument(f'--pa__gte', help=f'Position angle >= <float>')
     _p.add_argument(f'--pa__lte', help=f'Position angle <= <float>')
     _p.add_argument(f'--pgc', help=f'pgc <int>')

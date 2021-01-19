@@ -1107,6 +1107,7 @@ def gwgc_records():
         _args['sort_order'] = 'ascending'
     if 'sort_value' not in _args:
         _args['sort_value'] = 'id'
+    logger.debug(f"route /sassy/gwgc/ _args={_args}")
 
     # GET request
     if request.method == 'GET':
@@ -1135,6 +1136,7 @@ def gwgc_records():
 
         # get search criteria
         searches = request.get_json().get('queries')
+        logger.debug(f'route /sassy/gwgc/ searchs={searchs}')
 
         # initialize output(s)
         search_results = []
@@ -1148,6 +1150,7 @@ def gwgc_records():
 
             # query database
             query = db_gwgc.session.query(GwgcRecord)
+            logger.debug(f'route /sassy/gwgc/ search_args={search_args}')
             query = gwgc_filters(query, search_args)
 
             # extract,transform and load (ETL) into result(s)
