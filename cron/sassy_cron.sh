@@ -31,7 +31,7 @@ max_rb=1.0
 max_jd=$(echo "${_jd} + 0.5" | bc -l)
 min_mpc=0.0
 min_rb=0.5
-radius=45.0
+radius=60.0
 srcdir="/var/www/SASSy"
 dry_run=0
 jd_now=0
@@ -327,21 +327,21 @@ _add_classifier_and_plot () {
     write_yellow "DryRun> source ~/.bashrc_conda"
     write_yellow "DryRun> conda activate"
     write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
-    write_yellow "DryRun> rm -f ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
+    write_yellow "DryRun> rm -f ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron.py"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finder.py --folder='/var/www/SASSy/src/static/img' --verbose"
-    write_yellow "DryRun> chown www-data:www-data ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
+    write_yellow "DryRun> chown www-data:www-data ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
   else
     python3 ${SASSY_SRC}/utils/get_iers.py
     source ~/.bashrc_conda
     conda activate
     cd ${SASSY_SRC}/static/img
-    rm -f ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1
+    rm -f ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron.py
     python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose
     python3 ${SASSY_SRC}/utils/sassy_cron_finder.py --folder='/var/www/SASSy/src/static/img' --verbose
-    chown www-data:www-data ZTF20*.png sassy_cron_mollweide.png >> /dev/null 2>&1
+    chown www-data:www-data ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1
   fi
 }
 

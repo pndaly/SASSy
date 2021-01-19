@@ -39,7 +39,8 @@ _log = UtilsLogger('LigoQ3c').logger
 # +
 # default(s)
 # -
-DEFAULT_URL = f'https://wis-tns.weizmann.ac.il/ligo/events'
+#DEFAULT_URL = f'https://wis-tns.weizmann.ac.il/ligo/events'
+DEFAULT_URL = f'https://www.wis-tns.org/ligo/events'
 DEFAULT_CREDENTIALS = f':'
 DEFAULT_SCHEMA = f'json'
 

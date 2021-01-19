@@ -161,16 +161,16 @@ if [[ ${dry_run} -eq 1 ]]; then
       write_yellow "Dry-Run>> rm -f ${this_file} >> /dev/null 2>&1"
     fi
     write_yellow "Dry-Run>> curl ${this_gzip} -o ${this_file}"
-    write_yellow "Dry-Run>> chown :users ${this_file}"
+    write_yellow "Dry-Run>> chown ${def_owner} ${this_file}"
   else
     write_yellow "Dry-Run>> rm -f ${this_dir}/MD5SUMS >> /dev/null 2>&1"
     write_yellow "Dry-Run>> curl ${def_server}/MD5SUMS -o ${this_dir}/MD5SUMS"
-    write_yellow "Dry-Run>> chown :users ${this_dir}/MD5SUMS"
+    write_yellow "Dry-Run>> chown ${def_owner} ${this_dir}/MD5SUMS"
     if [[ ${over_ride} -eq 1 ]]; then
       write_yellow "Dry-Run>> rm -f ${this_file} >> /dev/null 2>&1"
     fi
     write_yellow "Dry-Run>> curl ${this_gzip} -o ${this_file}"
-    write_yellow "Dry-Run>> chown :users ${this_file}"
+    write_yellow "Dry-Run>> chown ${def_owner} ${this_file}"
     write_yellow "Dry-Run>> rem_chk=\`grep -i $(basename ${this_file}) ${this_dir}/MD5SUMS | cut -d' ' -f1\`"
     write_yellow "Dry-Run>> loc_chk=\`md5sum ${this_file} | cut -d' ' -f1\`"
     write_yellow "Dry-Run>> if [ -z \${rem_chk} ]; then write_red \"<WARNING> ${this_file} has no known checksum\"; else if [ \${rem_chk} == \${loc_chk} ]; then echo \"${this_file} is valid\"; else write_red \"<ERROR> ${this_file} is invalid\"; fi; fi"
@@ -190,23 +190,23 @@ else
     fi
     write_green "Executing>> curl ${this_gzip} -o ${this_file}"
     curl ${this_gzip} -o ${this_file}
-    write_green "Executing>> chown :users ${this_file}"
-    chown :users ${this_file}
+    write_green "Executing>> chown ${def_owner} ${this_file}"
+    chown ${def_owner} ${this_file}
   else
     write_green "Executing>> rm -f ${this_dir}/MD5SUMS >> /dev/null 2>&1"
     rm -f ${this_dir}/MD5SUMS >> /dev/null 2>&1
     write_green "Executing>> curl ${def_server}/MD5SUMS -o ${this_dir}/MD5SUMS"
     curl ${def_server}/MD5SUMS -o ${this_dir}/MD5SUMS
-    write_green "Executing>> chown :users ${this_dir}/MD5SUMS"
-    chown :users ${this_dir}/MD5SUMS
+    write_green "Executing>> chown ${def_owner} ${this_dir}/MD5SUMS"
+    chown ${def_owner} ${this_dir}/MD5SUMS
     if [[ ${over_ride} -eq 1 ]]; then
       write_green "Executing>> rm -f ${this_file} >> /dev/null 2>&1"
       rm -f ${this_file} >> /dev/null 2>&1
     fi
     write_green "Executing>> curl ${this_gzip} -o ${this_file}"
     curl ${this_gzip} -o ${this_file}
-    write_green "Executing>> chown :users ${this_file}"
-    chown :users ${this_file}
+    write_green "Executing>> chown ${def_owner} ${this_file}"
+    chown ${def_owner} ${this_file}
 
     write_green "Executing>> rem_chk=\`grep -i $(basename ${this_file}) ${this_dir}/MD5SUMS | cut -d' ' -f1\`"
     rem_chk=`grep -i $(basename ${this_file}) ${this_dir}/MD5SUMS | cut -d' ' -f1`

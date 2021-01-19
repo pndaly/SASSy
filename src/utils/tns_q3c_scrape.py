@@ -112,7 +112,8 @@ def get_unique_hash():
 # +
 # default(s)
 # -
-DEFAULT_BASE_URL = f'https://wis-tns.weizmann.ac.il'
+#DEFAULT_BASE_URL = f'https://wis-tns.weizmann.ac.il'
+DEFAULT_BASE_URL = f'https://www.wis-tns.org'
 DEFAULT_CREDENTIALS = f':'
 DEFAULT_LOGIN_URL = f'{DEFAULT_BASE_URL}/user'
 DEFAULT_NUMBER = 1

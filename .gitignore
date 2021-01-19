@@ -58,6 +58,6 @@ src/static/js9
 # miscellaneous
 # -
 00_TO_DO_00
-src/static/img/ZTF20*.png
-src/static/img/ZTF20*.jpg
+src/static/img/ZTF2*.png
+src/static/img/ZTF2*.jpg
 src/static/img/sassy_cron_mollweide.png
