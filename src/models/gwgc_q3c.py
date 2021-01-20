@@ -392,13 +392,17 @@ def gwgc_q3c_filters(query, request_args):
     if request_args.get('ra__lte'):
         query = query.filter(GwgcQ3cRecord.ra <= float(request_args['ra__lte']))
 
+    # return records with morphological type = value (API: ?tt=1.0)
+    if request_args.get('tt'):
+        query = query.filter(GwgcQ3cRecord.tt == float(request_args['tt']))
+
     # return records with morphological type >= value (API: ?tt__gte=1.0)
     if request_args.get('tt__gte'):
-        query = query.filter(GwgcQ3cRecord.tt >= request_args['tt__gte'])
+        query = query.filter(GwgcQ3cRecord.tt >= float(request_args['tt__gte']))
 
     # return records with morphological type <= value (API: ?tt__lte=1.0)
-    if request_args.get('tt__gte'):
-        query = query.filter(GwgcQ3cRecord.tt <= request_args['tt__lte'])
+    if request_args.get('tt__lte'):
+        query = query.filter(GwgcQ3cRecord.tt <= float(request_args['tt__lte']))
 
     # sort results
     sort_value = request_args.get('sort_value', SORT_VALUE[0]).lower()
@@ -526,6 +530,8 @@ def gwgc_q3c_cli_db(iargs=None):
         request_args['ra__gte'] = f'{iargs.ra__gte}'
     if iargs.ra__lte:
         request_args['ra__lte'] = f'{iargs.ra__lte}'
+    if iargs.tt:
+        request_args['tt'] = f'{iargs.tt}'
     if iargs.tt__gte:
         request_args['tt__gte'] = f'{iargs.tt__gte}'
     if iargs.tt__lte:
@@ -632,8 +638,9 @@ if __name__ == '__main__':
     _p.add_argument(f'--pgc', help=f'pgc <int>')
     _p.add_argument(f'--ra__gte', help=f'RA >= <float>')
     _p.add_argument(f'--ra__lte', help=f'RA <= <float>')
-    _p.add_argument(f'--tt__gte', help=f'Morphological type <float>')
-    _p.add_argument(f'--tt__lte', help=f'Morphological type <float>')
+    _p.add_argument(f'--tt', help=f'Morphological type = <float>')
+    _p.add_argument(f'--tt__gte', help=f'Morphological type >= <float>')
+    _p.add_argument(f'--tt__lte', help=f'Morphological type <= <float>')
 
     _p.add_argument(f'--catalog', default=False, action='store_true', help=f'if present, dump the catalog')
     _p.add_argument(f'--output', default='', help=f'Output file <str>')
