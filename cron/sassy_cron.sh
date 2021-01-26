@@ -25,6 +25,8 @@ _jd=$(GetJD $(date +%Y | bc -l) $(date +%m | bc -l) $(date +%d | bc -l) | bc -l)
 # default(s)
 # -
 authorization="sassy:db_secret"
+dry_run=0
+jd_now=0
 min_jd=$(echo "${_jd} - 0.5" | bc -l)
 max_mpc=500.0
 max_rb=1.0
@@ -33,8 +35,7 @@ min_mpc=0.0
 min_rb=0.5
 radius=120.0
 srcdir="/var/www/SASSy"
-dry_run=0
-jd_now=0
+ztf_dec_limit=-31.0
 
 
 # +
@@ -221,14 +222,14 @@ _create_sassy_cron_glade () {
   if [[ ${1} -eq 1 ]]; then
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP INDEX IF EXISTS sassy_cron_glade_q3c_ang2ipix_idx;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"DROP TABLE IF EXISTS sassy_cron_glade;\""
-    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_glade (gid, gra, gdec, gz, gdist) AS (SELECT DISTINCT id, ra, dec, z, dist FROM glade_q3c WHERE (dist BETWEEN ${5} AND ${4}));\""
+    write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE TABLE sassy_cron_glade (gid, gra, gdec, gz, gdist) AS (SELECT DISTINCT id, ra, dec, z, dist FROM glade_q3c WHERE (dist BETWEEN ${5} AND ${4}) AND (dec > ${6}));\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CREATE INDEX ON sassy_cron_glade (q3c_ang2ipix(gra, gdec));\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"CLUSTER sassy_cron_glade_q3c_ang2ipix_idx ON sassy_cron_glade;\""
     write_yellow "DryRun> PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c \"SELECT COUNT(*) FROM sassy_cron_glade;\""
   else
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP INDEX IF EXISTS sassy_cron_glade_q3c_ang2ipix_idx;" 2> /dev/null
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "DROP TABLE IF EXISTS sassy_cron_glade;" 2> /dev/null
-    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_glade (gid, gra, gdec, gz, gdist) AS (SELECT DISTINCT id, ra, dec, z, dist FROM glade_q3c WHERE (dist BETWEEN ${5} AND ${4}));"
+    PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE TABLE sassy_cron_glade (gid, gra, gdec, gz, gdist) AS (SELECT DISTINCT id, ra, dec, z, dist FROM glade_q3c WHERE (dist BETWEEN ${5} AND ${4}) AND (dec > ${6}));"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CREATE INDEX ON sassy_cron_glade (q3c_ang2ipix(gra, gdec));"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "CLUSTER sassy_cron_glade_q3c_ang2ipix_idx ON sassy_cron_glade;"
     PGPASSWORD=${3} psql -h localhost -p 5432 -U ${2} -d ${2} -e -c "SELECT COUNT(*) FROM sassy_cron_glade;"
@@ -351,7 +352,7 @@ _add_classifier_and_plot () {
 # execute
 # -
 _create_sassy_cron_ztf   ${dry_run} ${_username} ${_password} ${_max_jd} ${_max_rb} ${_min_jd} ${_min_rb}
-_create_sassy_cron_glade ${dry_run} ${_username} ${_password} ${_max_mpc} ${_min_mpc}
+_create_sassy_cron_glade ${dry_run} ${_username} ${_password} ${_max_mpc} ${_min_mpc} ${ztf_dec_limit}
 _create_sassy_cron_q3c   ${dry_run} ${_username} ${_password} ${_radius_degree}
 _create_sassy_cron       ${dry_run} ${_username} ${_password} ${_radius_degree}
 _drop_interim            ${dry_run} ${_username} ${_password}
