@@ -18,7 +18,8 @@ import requests
 # -
 SDSS_HEIGHT = 400
 SDSS_SCALE = 0.79224/2.0
-SDSS_SCALES = (1.0*SDSS_SCALE, 2.0*SDSS_SCALE, 3.0*SDSS_SCALE, 4.0*SDSS_SCALE)
+#SDSS_SCALES = (1.0*SDSS_SCALE, 2.0*SDSS_SCALE, 3.0*SDSS_SCALE, 4.0*SDSS_SCALE)
+SDSS_SCALES = (0.5*SDSS_SCALE, 1.0*SDSS_SCALE, 1.5*SDSS_SCALE, 2.0*SDSS_SCALE, 2.5*SDSS_SCALE, 3.0*SDSS_SCALE, 3.5*SDSS_SCALE, 4.0*SDSS_SCALE)
 SDSS_WIDTH = 400
 SDSS_URL = 'http://skyserver.sdss.org/dr16/SkyServerWS/ImgCutout/getjpeg'
 
@@ -45,7 +46,7 @@ def get_sdss_image(**kw):
     _ra_str = _ra.replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
     _dec_str = _dec.replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
     _scale = kw['scale'] if \
-        ('scale' in kw and isinstance(kw['scale'], float) and kw['scale'] in SDSS_SCALES) else SDSS_SCALES[0]
+        ('scale' in kw and isinstance(kw['scale'], float) and kw['scale'] in SDSS_SCALES) else SDSS_SCALES[1]
     _width = kw['width'] if \
         ('width' in kw and isinstance(kw['width'], int) and kw['width'] > 0) else SDSS_WIDTH
     _height = kw['height'] if \

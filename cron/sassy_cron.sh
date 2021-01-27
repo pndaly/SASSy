@@ -331,7 +331,7 @@ _add_classifier_and_plot () {
     write_yellow "DryRun> rm -f ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron.py"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finder.py --folder='/var/www/SASSy/src/static/img' --verbose"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finder_2.py --folder='/var/www/SASSy/src/static/img' --verbose"
     write_yellow "DryRun> chown www-data:www-data ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
   else
     python3 ${SASSY_SRC}/utils/get_iers.py
@@ -341,7 +341,7 @@ _add_classifier_and_plot () {
     rm -f ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron.py
     python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose
-    python3 ${SASSY_SRC}/utils/sassy_cron_finder.py --folder='/var/www/SASSy/src/static/img' --verbose
+    python3 ${SASSY_SRC}/utils/sassy_cron_finder_2.py --folder='/var/www/SASSy/src/static/img' --verbose
     chown www-data:www-data ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1
   fi
 }
