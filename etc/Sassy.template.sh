@@ -48,6 +48,7 @@ export SASSY_CRON=${SASSY_HOME}/cron
 export SASSY_ETC=${SASSY_HOME}/etc
 export SASSY_LOGS=${SASSY_HOME}/logs
 export SASSY_SRC=${SASSY_HOME}/src
+export SASSY_TTF=${SASSY_HOME}/ttf
 
 
 # +

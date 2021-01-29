@@ -7,6 +7,7 @@
 # -
 from src import *
 from PIL import Image
+from src.utils.utils import *
 
 import argparse
 import os
@@ -38,14 +39,14 @@ def get_sdss_image(**kw):
         raise Exception('No RA/Dec input(s), error={_v}')
 
     # message
-    if _log is not None:
-        _log.debug(f'_ra={_ra}, _dec={_dec}')
+    if _log:
+        _log.debug(f'entry ... kw={kw}')
 
     # set default(s) [NB: plate scale default is 2x the SDSS value]
     _ra_str = _ra.replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
     _dec_str = _dec.replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
     _scale = kw['scale'] if \
-        ('scale' in kw and isinstance(kw['scale'], float) and kw['scale'] in SDSS_SCALES) else SDSS_SCALES[1]
+        ('scale' in kw and isinstance(kw['scale'], float) and kw['scale'] in SDSS_SCALES) else SDSS_SCALES[0]
     _width = kw['width'] if \
         ('width' in kw and isinstance(kw['width'], int) and kw['width'] > 0) else SDSS_WIDTH
     _height = kw['height'] if \
@@ -71,10 +72,13 @@ def get_sdss_image(**kw):
         try:
             with open(_jpg, 'wb') as _f:
                 _f.write(_req.content)
+            if _log:
+                _log.debug(f"exit ...  {os.path.abspath(os.path.expanduser(_jpg))}")
             return os.path.abspath(os.path.expanduser(_jpg))
         except Exception as _w:
             if _log:
                 _log.error(f'failed to create image, error={_w}')
+                _log.debug(f"exit ...  {os.path.abspath(os.path.expanduser(_jpg))}")
             return
 
 
@@ -102,49 +106,35 @@ def jpg_to_png(_jpg=None):
 
 
 # +
-# function: combine_pngs()
-# -
-def combine_pngs(_files=None, _output='', _log=None):
-
-    # check input(s)
-    if _files is None or not isinstance(_files, list) or _files is []:
-        return
-    if not isinstance(_output, str) or _output.strip() == '':
-        return
-
-    # message
-    if _log:
-        _log.debug(f'_files={_files}, _output={_output}')
-
-    # combine PNGs
-    _images = [Image.open(_x) for _x in _files]
-    _widths, _heights = zip(*(i.size for i in _images))
-    _twidth, _theight, _xoff = sum(_widths), max(_heights), 0
-    _finder = Image.new('RGB', (_twidth, _theight))
-    for _im in _images:
-        if _log:
-            _log.debug(f'Adding {_im} to {_output}')
-        _finder.paste(_im, (_xoff, 0))
-        _xoff += _im.size[0]
-
-    # save output
-    try:
-        _finder.save(_output)
-        return _output
-    except Exception as _s:
-        if _log:
-            _log.error(f'Failed to save output, error={_s}')
-
-
-# +
 # main()
 # -
 if __name__ == '__main__':
 
     # noinspection PyTypeChecker
-    _p = argparse.ArgumentParser(description='Combine PNG Files', formatter_class=argparse.RawTextHelpFormatter)
-    _p.add_argument('--files', default='', help="""Files to combine""")
+    _p = argparse.ArgumentParser(description='Get SDSS Image', formatter_class=argparse.RawTextHelpFormatter)
+    _p.add_argument('--ra', default='', help="""Right Ascension (hh:mm:ss.s)""")
+    _p.add_argument('--dec', default='', help="""Declination (+/-dd:mm:ss.s)""")
+    _p.add_argument(f'--png', default=False, action='store_true', help='if present, return PNG image')
+    _p.add_argument(f'--verbose', default=False, action='store_true', help='if present, produce more verbose output')
+    args = _p.parse_args()
+
+    # initialize
+    _l = UtilsLogger('GetSDSSImage').logger if bool(args.verbose) else None
+
+    # convert RA, Dec
+    if ':' in args.ra and ':' in args.dec:
+        _ra = args.ra
+        _dec = args.dec
+    else:
+        _ra = ra_to_hms(args.ra)
+        _dec = dec_to_dms(args.dec)
 
     # execute
-    args = _p.parse_args()
-    combine_pngs(_files=args.files)
+    _l.info("Calling get_sdss_image(**{" + f"'ra': {_ra}, 'dec': {_dec}"+"})")
+    _jpg = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'log': _l})
+    _l.info("Called  get_sdss_image(**{" + f"'ra': {_ra}, 'dec': {_dec}"+"})")
+    _l.info(f"_jpg={_jpg}")
+    if bool(args.png) and _jpg is not None:
+        _png = jpg_to_png(_jpg=_jpg)
+        _l.info(f"_png={_png}")
+
