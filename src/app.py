@@ -1658,50 +1658,13 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
     if _dbrec is None or _form is None or _obstype.strip().lower() not in ['imaging', 'longslit']:
         return
 
-    # get base name and remove existing file(s)
-    _jpg, _png, _images = None, None, []
-    _base = f"{_dbrec.spng.split('.')[0].replace('_science', '')}"
-    _sdss = f"{app.static_folder}/img/{_base}_sdss.jpg"
-    if os.path.exists(_sdss):
-        os.remove(_sdss)
-    _finder = f"{app.static_folder}/img/{_base}_finder.png"
-    if os.path.exists(_finder):
-        os.remove(_finder)
-
     # get RA, Dec
     _ra = f"{_form.ra_hms.data.strip()}"
     _dec = f"{_form.dec_dms.data.strip()}".replace("+", "")
 
-    # create jpg
-    try:
-        _jpg = get_sdss_image(
-            **{'ra': _ra, 'dec': _dec, 'jpg': f'{_sdss}', 'log': logger})
-    except Exception as _j:
-        if logger:
-            logger.error(f'Failed to create image, error={_j}')
-
-    # convert to png
-    try:
-        if _jpg is not None:
-            _png = jpg_to_png(_jpg=_jpg)
-    except Exception as _p:
-        if logger:
-            logger.error(f'Failed to convert image, error={_p}')
-
-    # combine all pngs
-    if os.path.exists(f"{app.static_folder}/img/{_base}_science.png"):
-        _images.append(f"{app.static_folder}/img/{_base}_science.png")
-    if os.path.exists(f"{app.static_folder}/img/{_base}_difference.png"):
-        _images.append(f"{app.static_folder}/img/{_base}_difference.png")
-    if os.path.exists(f"{app.static_folder}/img/{_base}_template.png"):
-        _images.append(f"{app.static_folder}/img/{_base}_template.png")
-    if _png is not None and os.path.exists(f"{app.static_folder}/img/{_base}_sdss.png"):
-        _images.append(f"{app.static_folder}/img/{_base}_sdss.png")
-    try:
-        _output = combine_pngs(_files=_images, _output=_finder, _log=logger)
-    except Exception as _c:
-        if logger:
-            logger.error(f'Failed to combine image(s), error={_c}')
+    # get base name(s)
+    _base = f"{_dbrec.spng.split('.')[0].replace('_science', '')}"
+    _finder = f"{app.static_folder}/img/{_base}_finder.png"
 
     # return payload
     if _obstype.strip().lower() == 'imaging':
@@ -1899,19 +1862,19 @@ def psql_query():
 
 
 # +
-# route(s): /sdss/finder/<img>, /sassy/sdss/finder/<img>
+# route(s): /finder/<img>, /sassy/finder/<img>
 # -
-@app.route('/sassy/sdss/finder/<img>', methods=['GET'])
-@app.route('/sdss/finder/<img>', methods=['GET'])
-def sdss_finder(img=''):
-    logger.debug(f'route /sassy/sdss/finder/{img} entry')
+@app.route('/sassy/finder/<img>', methods=['GET'])
+@app.route('/finder/<img>', methods=['GET'])
+def finder(img=''):
+    logger.debug(f'route /sassy/finder/{img} entry')
 
     # return
     _finder = f"{app.static_folder}/img/{img}"
     if os.path.exists(_finder):
-        return render_template('sdss_finder.html', img=img)
+        return render_template('finder.html', img=img)
     else:
-        return render_template('sdss_finder.html', img='')
+        return render_template('finder.html', img='')
 
 
 # +

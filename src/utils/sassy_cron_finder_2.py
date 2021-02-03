@@ -16,14 +16,6 @@ from src.utils.utils import UtilsLogger
 import argparse
 import os
 
-# try:
-#     import matplotlib as mpl
-#     mpl.use('Agg')
-# except Exception:
-#     pass
-# import matplotlib.pyplot as plt
-# import matplotlib.lines as mlines
-
 
 # +
 # constant(s)
@@ -62,10 +54,10 @@ def db_disconnect(_session=None):
 
 
 # +
-# function: sassy_cron_sdss()
+# function: sassy_cron_finder()
 # -
 # noinspection PyBroadException,PyUnresolvedReferences
-def sassy_cron_sdss(_log=None, _folder=''):
+def sassy_cron_finder(_log=None, _folder=''):
 
     # get record(s)
     _s = db_connect()
@@ -82,13 +74,13 @@ def sassy_cron_sdss(_log=None, _folder=''):
         _ra = ra_to_hms(_zra)
         _dec = dec_to_dms(_zdec)
         _dec = f"{_dec}".replace("+", "")
-        _output = _diff.replace('difference', 'output')
+        _finder = _diff.replace('difference', 'finder')
         _j1 = _diff.replace('difference', 'jpg_1').replace('png', 'jpg')
         _j2 = _diff.replace('difference', 'jpg_2').replace('png', 'jpg')
         _p1 = _diff.replace('difference', 'png_1')
         _p2 = _diff.replace('difference', 'png_2')
         if _log:
-            _log.info(f"_ra={_ra}, _dec={_dec}, output={_output}")
+            _log.info(f"_ra={_ra}, _dec={_dec}, _finder={_finder}")
             _log.info(f"_j1={_j1}, _p1={_p1}")
             _log.info(f"_j2={_j2}, _p2={_p2}")
 
@@ -152,81 +144,30 @@ def sassy_cron_sdss(_log=None, _folder=''):
             _images.append(f"{_p2}")
         if _p1 is not None and os.path.exists(f"{_p1}") and 'KeepCalm' not in _p1:
             _images.append(f"{_p1}")
-        if _log:
-            _log.info(f"_images={_images}")
-        if len(_images) < 2:
-            _output = f"{_folder}/KeepCalm.png"
-        else:
-            try:
-                _output = combine_pngs(_files=_images, _output=_output, _log=_log)
-                if _output is not None and os.path.exists(f"{_output}"):
-                    _output = os.rename(_output, f"{_folder}/{os.path.basename(_output)}")
-                else:
-                    _output = os.rename(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_output)}")
-            except Exception as _eo1:
-                _output = f"{_folder}/KeepCalm.png"
-                if _log:
-                    _log.error(f'Failed to combine image(s), error={_eo1}')
-        if _log:
-            _log.info(f"exit ...  _output={_output}")
-    db_disconnect(_s)
-
-
-# +
-# function: sassy_cron_finder()
-# -
-# noinspection PyBroadException,PyUnresolvedReferences
-def sassy_cron_finder(_log=None, _folder=''):
-
-    # get record(s)
-    _s = db_connect()
-    _query = _s.query(SassyCron)
-    for _q in _query.all():
-
-        # get data
-        _zoid, _zra, _zdec = _q.zoid, _q.zra, _q.zdec
-        _diff, _sci, _tmp = f"{_folder}/{_q.dpng}", f"{_folder}/{_q.spng}", f"{_folder}/{_q.tpng}"
-        if _log:
-            _log.info(f"_zoid={_zoid}, _zra={_zra}, _zdec={_zdec}, _diff={_diff}, _sci={_sci}, _tmp={_tmp}")
-
-        # convert
-        _ra = ra_to_hms(_zra)
-        _dec = dec_to_dms(_zdec)
-        _dec = f"{_dec}".replace("+", "")
-        _finder = _diff.replace('difference', 'finder')
-        _output = _diff.replace('difference', 'output')
-        if _log:
-            _log.info(f"_finder={_finder}, _output={_output}")
-
-        # combine all pngs
-        _images = []
-        if _output is not None and os.path.exists(f"{_output}") and 'KeepCalm' not in _output:
-            _images.append(f"{_output}")
         if _sci is not None and os.path.exists(f"{_sci}"):
             _images.append(f"{_sci}")
         if _tmp is not None and os.path.exists(f"{_tmp}"):
             _images.append(f"{_tmp}")
         if _diff is not None and os.path.exists(f"{_diff}"):
             _images.append(f"{_diff}")
-        try:
-            _finder = combine_pngs(_files=_images, _output=_finder, _log=_log)
-            if _finder is not None and os.path.exists(f"{_finder}"):
-                _finder = os.rename(_finder, f"{_folder}/{os.path.basename(_finder)}")
-        except Exception as _e1:
-            if _log:
-                _log.error(f'Failed to combine image(s), error={_e1}')
         if _log:
-           _log.info(f"_finder={_finder}")
+            _log.info(f"_images={_images}")
+        if len(_images) < 2:
+            _finder = f"{_folder}/KeepCalm.png"
+        else:
+            try:
+                _finder = combine_pngs(_files=_images, _output=_finder, _log=_log)
+                if _finder is not None and os.path.exists(f"{_finder}"):
+                    _finder = os.rename(_finder, f"{_folder}/{os.path.basename(_finder)}")
+                else:
+                    _finder = os.rename(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_finder)}")
+            except Exception as _eo1:
+                _finder = f"{_folder}/KeepCalm.png"
+                if _log:
+                    _log.error(f'Failed to combine image(s), error={_eo1}')
+        if _log:
+            _log.info(f"exit ...  _finder={_finder}")
     db_disconnect(_s)
-
-
-# +
-# function: sassy_cron_images()
-# -
-# noinspection PyBroadException,PyUnresolvedReferences
-def sassy_cron_images(_log=None, _folder=''):
-    sassy_cron_sdss(_log=_log, _folder=_folder)
-    sassy_cron_finder(_log=_log, _folder=_folder)
 
 
 # +
@@ -242,4 +183,4 @@ if __name__ == '__main__':
     # execute
     args = _p.parse_args()
     _log = UtilsLogger('SassyCronFinder').logger if bool(args.verbose) else None
-    sassy_cron_images(_log=_log, _folder=args.folder)
+    sassy_cron_finder(_log=_log, _folder=args.folder)

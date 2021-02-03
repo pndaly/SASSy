@@ -3,7 +3,7 @@
 
 <div class="row">
  <div class="col-md-12">
-  <h1>SDSS Finder Chart</h1>
+  <h1>Finder Chart</h1>
   {% if img %}
    <h3>{{ img }}</h3>
    <img src={{ url_for('static', filename='/img/') }}{{ img|replace("science", "finder") }} title=/static/img/{{ img|replace("science", "finder") }}>

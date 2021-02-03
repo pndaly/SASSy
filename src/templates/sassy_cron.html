@@ -455,7 +455,7 @@
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
 	       <td><a href="{{ url_for('mmt_imaging', zoid=alert.zoid) }}" title="Imaging_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Image</a></td>
-	       <td><a href="{{ url_for('sdss_finder', img=alert.spng|replace('science', 'sdss')) }}" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
+	       <td><a href="{{ url_for('finder', img=alert.spng|replace('science', 'finder')) }}" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
               </tr>
             {% endfor %}
           </tbody>
