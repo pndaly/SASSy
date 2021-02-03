@@ -40,17 +40,17 @@ SASSY_TTF = os.getenv('SASSY_TTF')
 # function: get_panstarrs_url()
 # -
 # noinspection PyBroadException
-def get_panstarrs_url(ra=math.nan, dec=math.nan, size=PANSTARRS_SIZE, output_size=PANSTARRS_SIZE, 
-                      filters=PANSTARRS_FILTERS, format=PANSTARRS_FORMAT, color=True, _log=None):
+def get_panstarrs_url(_ra=math.nan, _dec=math.nan, _size=PANSTARRS_SIZE, _output_size=PANSTARRS_SIZE, 
+                      _filters=PANSTARRS_FILTERS, _format=PANSTARRS_FORMAT, _color=True, _log=None):
 
     # entry
     if _log:
-        _log.debug(f"entry ... ra={ra}, dec={dec}, size={size}, output_size={output_size}, filters={filters}, format={format}, color={color}")
+        _log.debug(f"entry ... _ra={_ra:.4f}, _dec={_dec:.4f}, _size={_size}, _output_size={_output_size}, _filters={_filters}, _format={_format}, _color={_color}")
 
     # get table(s)
     _table, _url = None, None
     try:
-        _table = Table.read(f"{PANSTARRS_URL}?ra={ra}&dec={dec}&size={size}&format=fits&filters={filters}", format='ascii')
+        _table = Table.read(f"{PANSTARRS_URL}?ra={_ra:.4f}&dec={_dec:.4f}&size={_size}&format=fits&filters={_filters}", format='ascii')
     except:
         _table = None
     if _log:
@@ -59,7 +59,7 @@ def get_panstarrs_url(ra=math.nan, dec=math.nan, size=PANSTARRS_SIZE, output_siz
         return
 
     # sort by filter
-    _url = f"{PANSTARRS_FURL}?ra={ra}&dec={dec}&size={size}&format={format}&output_size={output_size}"
+    _url = f"{PANSTARRS_FURL}?ra={_ra:.4f}&dec={_dec:.4f}&size={_size}&format={_format}&output_size={_output_size}"
     _flist = [PANSTARRS_FILTERS[::-1].find(_x) for _x in _table['filter']]
     if _log:
         _log.debug(f"_url={_url}, _flist={_flist}")
@@ -68,7 +68,14 @@ def get_panstarrs_url(ra=math.nan, dec=math.nan, size=PANSTARRS_SIZE, output_siz
 
     # calculate url
     _table = _table[numpy.argsort(_flist)]
-    if color:
+    if _log:
+        _log.debug(f"_table={_table}")
+    if not _color:
+        _urlbase = _url + "&red="
+        _url = []
+        for _fn in _table['filename']:
+            _url.append(_urlbase + _fn)
+    else:
         if len(_table) > 3:
             _f1 = list(PANSTARRS_FILTER)
             _f1s = random.choice(_f1)
@@ -86,12 +93,12 @@ def get_panstarrs_url(ra=math.nan, dec=math.nan, size=PANSTARRS_SIZE, output_siz
             if _log:
                 _log.debug(f">>>> _table={_table}")
         for _i, _p in enumerate(['red', 'green', 'blue']):
-            _url = _url + "&{}={}".format(_p, _table['filename'][_i])
-    else:
-        _urlbase = _url + "&red="
-        _url = []
-        for _fn in _table['filename']:
-            _url.append(_urlbase + _fn)
+            if _log:
+                _log.debug(f">>>> _i={_i}, _p={_p}, _table['filename']={_table['filename']}")
+            try:
+                _url = _url + "&{}={}".format(_p, _table['filename'][_i])
+            except:
+                pass
 
     # exit
     if _log:
@@ -143,7 +150,9 @@ def get_panstarrs_image(**kw):
         _log.debug(f'entry ... kw={kw}')
 
     # set default(s)
+    _ra_dec = ra_to_decimal(_ra)
     _ra_str = _ra.replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+    _dec_dec = dec_to_decimal(_dec)
     _dec_str = _dec.replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
     _color = kw['color'] if ('color' in kw and isinstance(kw['color'], bool)) else True
     _filters = kw['filters'] if \
@@ -158,15 +167,15 @@ def get_panstarrs_image(**kw):
         f'panstarrs_{_ra_str}_{_dec_str}.png'
 
     if _log:
-        _log.debug(f"_ra={_ra}, _ra_str={_ra_str}, _dec={_dec}, _dec_str={_dec_str}")
+        _log.debug(f"_ra={_ra}, _ra_dec={_ra_dec:.4f}, _ra_str={_ra_str}, _dec={_dec}, _dec_dec={_dec_dec:.4f}, _dec_str={_dec_str}")
         _log.debug(f"_color={_color}, _filters={_filters}, _format={_format}, _size={_size}")
         _log.debug(f"_output_size={_output_size}, _png={_png}")
 
     # get url
     _req, _url = None, None
     try:
-        _url = get_panstarrs_url(ra=ra_to_decimal(_ra), dec=dec_to_decimal(_dec), size=_size, filters=_filters, 
-                                 output_size=_output_size, format=_format, color=_color, _log=_log)
+        _url = get_panstarrs_url(_ra=_ra_dec, _dec=_dec_dec, _size=_size, _filters=_filters, 
+                                 _output_size=_output_size, _format=_format, _color=_color, _log=_log)
         if _log:
             _log.debug(f"_url={_url}")
     except Exception as _u:
@@ -232,6 +241,7 @@ if __name__ == '__main__':
     _p.add_argument('--dec', default='', help="""Declination (decimal or +/-dd:mm:ss.s)""")
     _p.add_argument('--filters', default=PANSTARRS_FILTERS, help="""Filter '%(default)s'""")
     _p.add_argument('--size', default=PANSTARRS_SIZE, help=f"""Size {PANSTARRS_SIZES}""")
+    _p.add_argument(f'--color', default=False, action='store_true', help='if present, produce color image')
     _p.add_argument(f'--verbose', default=False, action='store_true', help='if present, produce more verbose output')
     args = _p.parse_args()
 
@@ -247,5 +257,5 @@ if __name__ == '__main__':
         _dec = dec_to_dms(args.dec)
 
     # execute
-    _png = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': args.filters, 'size': int(args.size), 'output_size': PANSTARRS_SIZE, 'color': False, 'log': _l})
+    _png = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': args.filters, 'size': int(args.size), 'output_size': PANSTARRS_SIZE, 'color': bool(args.color), 'log': _l})
     _l.info(f"_png={_png}")

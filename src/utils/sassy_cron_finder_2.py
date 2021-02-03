@@ -9,18 +9,20 @@ from src import *
 from src.common import *
 from src.models.sassy_cron import *
 from src.utils.combine_pngs import *
+from src.utils.get_panstarrs_image import *
+from src.utils.get_sdss_image import *
 from src.utils.utils import UtilsLogger
 
 import argparse
 import os
 
-try:
-    import matplotlib as mpl
-    mpl.use('Agg')
-except Exception:
-    pass
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
+# try:
+#     import matplotlib as mpl
+#     mpl.use('Agg')
+# except Exception:
+#     pass
+# import matplotlib.pyplot as plt
+# import matplotlib.lines as mlines
 
 
 # +
@@ -80,74 +82,93 @@ def sassy_cron_sdss(_log=None, _folder=''):
         _ra = ra_to_hms(_zra)
         _dec = dec_to_dms(_zdec)
         _dec = f"{_dec}".replace("+", "")
-        _sdss = _diff.replace('difference', 'sdss')
-        _sdss_j1 = _diff.replace('difference', 'sdss_1').replace('png', 'jpg')
-        _sdss_j2 = _diff.replace('difference', 'sdss_2').replace('png', 'jpg')
-        _sdss_p1 = None
-        _sdss_p2 = None
+        _output = _diff.replace('difference', 'output')
+        _j1 = _diff.replace('difference', 'jpg_1').replace('png', 'jpg')
+        _j2 = _diff.replace('difference', 'jpg_2').replace('png', 'jpg')
+        _p1 = _diff.replace('difference', 'png_1')
+        _p2 = _diff.replace('difference', 'png_2')
         if _log:
-            _log.info(f"_ra={_ra}, _dec={_dec}, _sdss={_sdss}, _sdss_j1={_sdss_j1}, _sdss_j2={_sdss_j2}, _sdss_p1={_sdss_p1}, _sdss_p2={_sdss_p2}")
+            _log.info(f"_ra={_ra}, _dec={_dec}, output={_output}")
+            _log.info(f"_j1={_j1}, _p1={_p1}")
+            _log.info(f"_j2={_j2}, _p2={_p2}")
 
-        # create _sdss_j1 image
+        # create _[jp]1 image
         try:
-            _sdss_j1 = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'jpg': f'{_sdss_j1}', 'scale': SDSS_SCALES[1], 'log': _log})
-        except Exception as _e1:
-            _sdss_j1 = None
+            _j1 = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'jpg': f'{_j1}', 'scale': SDSS_SCALES[1], 'log': _log})
+        except Exception as _es1:
+            _j1 = None
             if _log:
-                _log.error(f'Failed to get_sdss_image(), error={_e1}')
+                _log.error(f'Failed to get_sdss_image(), error={_es1}')
         if _log:
-            _log.info(f"after get_sdss_image(1)> _sdss={_sdss}, _sdss_j1={_sdss_j1}, _sdss_j2={_sdss_j2}, _sdss_p1={_sdss_p1}, _sdss_p2={_sdss_p2}")
+            _log.info(f"_j1={_j1}")
+        if _j1 is None or not os.path.exists(_j1):
+            try:
+                _p1 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 320, 'output_size': 320, 
+                                             'color': True, 'log': _log, 'png': _p1})
+            except Exception as _ep1:
+                _p1 = f"{_folder}/KeepCalm.png"
+                if _log:
+                    _log.error(f'Failed to get_panstarrs_image(), error={_ep1}')
+        else:
+            try:
+                _p1 = jpg_to_png(_jpg=_j1)
+            except Exception as _ef1:
+                _p1 = f"{_folder}/KeepCalm.png"
+                if _log:
+                    _log.error(f'Failed to convert jpg_to_png(), error={_ef1}')
+        if _log:
+            _log.info(f"_p1={_p1}")
 
-        # create _sdss_j2 image
+        # create _[jp]2 image
         try:
-            _sdss_j2 = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'jpg': f'{_sdss_j2}', 'scale': SDSS_SCALES[0], 'log': _log})
-        except Exception as _e2:
-            _sdss_j2 = None
+            _j2 = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'jpg': f'{_j2}', 'scale': SDSS_SCALES[0], 'log': _log})
+        except Exception as _es2:
+            _j2 = None
             if _log:
-                _log.error(f'Failed to get_sdss_image(), error={_e2}')
+                _log.error(f'Failed to get_sdss_image(), error={_es2}')
         if _log:
-            _log.info(f"after get_sdss_image(2)> _sdss={_sdss}, _sdss_j1={_sdss_j1}, _sdss_j2={_sdss_j2}, _sdss_p1={_sdss_p1}, _sdss_p2={_sdss_p2}")
-
-        # create _sdss_p1 image
-        try:
-            if _sdss_j1 is not None and os.path.exists(_sdss_j1):
-                _sdss_p1 = jpg_to_png(_jpg=_sdss_j1)
-        except Exception as _e3:
-            _sdss_p1 = f"{_folder}/KeepCalm.png"
-            if _log:
-                _log.error(f'Failed to jpg_to_png(), error={_e3}')
+            _log.info(f"_j1={_j1}")
+        if _j2 is None or not os.path.exists(_j2):
+            try:
+                _p2 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 320, 'output_size': 320, 
+                                             'color': True, 'log': _log, 'png': _p2})
+            except Exception as _ep2:
+                _p2 = f"{_folder}/KeepCalm.png"
+                if _log:
+                    _log.error(f'Failed to get_panstarrs_image(), error={_ep2}')
+        else:
+            try:
+                _p2 = jpg_to_png(_jpg=_j2)
+            except Exception as _ef2:
+                _p2 = f"{_folder}/KeepCalm.png"
+                if _log:
+                    _log.error(f'Failed to convert jpg_to_png(), error={_ef2}')
         if _log:
-            _log.info(f"after jpg_to_png(1)> _sdss={_sdss}, _sdss_j1={_sdss_j1}, _sdss_j2={_sdss_j2}, _sdss_p1={_sdss_p1}, _sdss_p2={_sdss_p2}")
+            _log.info(f"_p1={_p1}")
 
-        # create _sdss_p2 image
-        try:
-            if _sdss_j2 is not None and os.path.exists(_sdss_j2):
-                _sdss_p2 = jpg_to_png(_jpg=_sdss_j2)
-        except Exception as _e4:
-            _sdss_p1 = f"{_folder}/KeepCalm.png"
-            if _log:
-                _log.error(f'Failed to jpg_to_png(), error={_e4}')
-        if _log:
-            _log.info(f"after jpg_to_png(2)> _sdss={_sdss}, _sdss_j1={_sdss_j1}, _sdss_j2={_sdss_j2}, _sdss_p1={_sdss_p1}, _sdss_p2={_sdss_p2}")
-
-        # combine sdss pngs
+        # combine pngs
         _images = []
-        if _sdss_p2 is not None and os.path.exists(f"{_sdss_p2}"):
-            _images.append(f"{_sdss_p2}")
-        if _sdss_p1 is not None and os.path.exists(f"{_sdss_p1}"):
-            _images.append(f"{_sdss_p1}")
-        try:
-            _sdss = combine_pngs(_files=_images, _output=_sdss, _log=_log)
-            if _sdss is not None and os.path.exists(f"{_sdss}"):
-                _sdss = os.rename(_sdss, f"{_folder}/{os.path.basename(_sdss)}")
-            else:
-                _sdss = f"{_folder}/KeepCalm.png"
-        except Exception as _e5:
-            _sdss = f"{_folder}/KeepCalm.png"
-            if _log:
-                _log.error(f'Failed to combine image(s), error={_e5}')
+        if _p2 is not None and os.path.exists(f"{_p2}") and 'KeepCalm' not in _p2:
+            _images.append(f"{_p2}")
+        if _p1 is not None and os.path.exists(f"{_p1}") and 'KeepCalm' not in _p1:
+            _images.append(f"{_p1}")
         if _log:
-            _log.info(f"after combine_pngs()> _sdss={_sdss}, _sdss_j1={_sdss_j1}, _sdss_p1={_sdss_p1}, _sdss_j2={_sdss_j2}, _sdss_p2={_sdss_p2}")
+            _log.info(f"_images={_images}")
+        if len(_images) < 2:
+            _output = f"{_folder}/KeepCalm.png"
+        else:
+            try:
+                _output = combine_pngs(_files=_images, _output=_output, _log=_log)
+                if _output is not None and os.path.exists(f"{_output}"):
+                    _output = os.rename(_output, f"{_folder}/{os.path.basename(_output)}")
+                else:
+                    _output = os.rename(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_output)}")
+            except Exception as _eo1:
+                _output = f"{_folder}/KeepCalm.png"
+                if _log:
+                    _log.error(f'Failed to combine image(s), error={_eo1}')
+        if _log:
+            _log.info(f"exit ...  _output={_output}")
     db_disconnect(_s)
 
 
@@ -173,14 +194,14 @@ def sassy_cron_finder(_log=None, _folder=''):
         _dec = dec_to_dms(_zdec)
         _dec = f"{_dec}".replace("+", "")
         _finder = _diff.replace('difference', 'finder')
-        _sdss = _diff.replace('difference', 'sdss')
+        _output = _diff.replace('difference', 'output')
         if _log:
-            _log.info(f"_ra={_ra}, _dec={_dec}, _finder={_finder}, _sdss={_sdss}")
+            _log.info(f"_finder={_finder}, _output={_output}")
 
         # combine all pngs
         _images = []
-        if _sdss is not None and os.path.exists(f"{_sdss}"):
-            _images.append(f"{_sdss}")
+        if _output is not None and os.path.exists(f"{_output}") and 'KeepCalm' not in _output:
+            _images.append(f"{_output}")
         if _sci is not None and os.path.exists(f"{_sci}"):
             _images.append(f"{_sci}")
         if _tmp is not None and os.path.exists(f"{_tmp}"):
@@ -194,9 +215,8 @@ def sassy_cron_finder(_log=None, _folder=''):
         except Exception as _e1:
             if _log:
                 _log.error(f'Failed to combine image(s), error={_e1}')
-        else:
-            if _log:
-                _log.info(f"after combine_pngs()> _finder={_finder}, _sdss={_sdss}")
+        if _log:
+           _log.info(f"_finder={_finder}")
     db_disconnect(_s)
 
 
