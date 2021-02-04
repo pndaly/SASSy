@@ -1639,8 +1639,8 @@ def _mmt_get(_dbrec=None, _form=None, _obstype='imaging'):
         _form.numexposures.data = 5
         _form.zoid.data = f"i{_dbrec.zoid}"
     else:
-        _form.exposuretime.data = 200.0
-        _form.numexposures.data = 10
+        _form.exposuretime.data = 900.0
+        _form.numexposures.data = 2
         _form.central_lambda.data = 6500.0
         _form.grating.data = 270
         _form.zoid.data = f"s{_dbrec.zoid}"

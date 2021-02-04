@@ -282,18 +282,18 @@
 
         <table class="table table-striped table-sm">
         <thead>
-          <th colspan="16" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
-          <th colspan="4" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
+          <th colspan="15" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
           <th colspan="6" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
-          <th colspan="6" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
+          <th colspan="6" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
+          <th colspan="3" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
         </thead>
           <thead>
             <tr>
+	      <!-- ZTF -->
               <th><font color="blue">Science</font></th>
               <th><font color="blue">Difference</font></th>
               <th><font color="blue">Template</font></th>
               <th><font color="blue">ObjectId</font></th>
-              <th><font color="blue">Candid</font></th>
               <th><font color="blue">ID</font></th>
               <th><font color="blue">Filter</font></th>
               <th><font color="blue">&lambda;<sub>mean</sub></font></th>
@@ -305,28 +305,30 @@
               <th><font color="blue">Dec</font></th>
               <th><font color="blue">drb</font></th>
               <th><font color="blue">rb</font></th>
-              <th><font color="blue">Early</font></th>
-              <th><font color="blue">P(Early)</font></th>
-              <th><font color="blue">Late</font></th>
-              <th><font color="blue">P(Late)</font></th>
+	      <!-- Glade -->
               <th><font color="blue">ID</font></th>
               <th><font color="blue">RA</font></th>
               <th><font color="blue">Dec</font></th>
               <th><font color="blue">distance</font></th>
               <th><font color="blue">separation</font></th>
               <th><font color="blue">z</font></th>
+	      <!-- Alerce -->
+              <th><font color="blue">Early</font></th>
+              <th><font color="blue">P(Early)</font></th>
+              <th><font color="blue">Late</font></th>
+              <th><font color="blue">P(Late)</font></th>
               <th><font color="blue">Alerce</font></th>
               <th><font color="blue">Alerce</font></th>
+	      <!-- Other -->
               <th><font color="blue">Lasair</font></th>
               <th><font color="blue">MMT</font></th>
-	      <th><font color="blue">MMT</font></th>
-	      <th><font color="blue">SDSS</font></th>
+	      <th><font color="blue">Observability</font></th>
             </tr>
             <tr>
+	      <!-- ZTF -->
               <th><font color="grey">cutout</font></th>
               <th><font color="grey">cutout</font></th>
               <th><font color="grey">cutout</font></th>
-              <th><font color="grey">ZTF</font></th>
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">sid</font></th>
               <th><font color="grey">{g,r,i}</font></th>
@@ -339,32 +341,34 @@
               <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">0-1</font></th>
               <th><font color="grey">0-1</font></th>
-              <th><font color="grey">Type</font></th>
-              <th><font color="grey">%</font></th>
-              <th><font color="grey">Type</font></th>
-              <th><font color="grey">%</font></th>
+	      <!-- Glade -->
               <th><font color="grey">gid</font></th>
               <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">Mpc</font></th>
               <th><font color="grey">&Prime;</font></th>
               <th><font color="grey"> </font></th>
+	      <!-- Alerce -->
+              <th><font color="grey">Type</font></th>
+              <th><font color="grey">%</font></th>
+              <th><font color="grey">Type</font></th>
+              <th><font color="grey">%</font></th>
               <th><font color="grey">page</font></th>
               <th><font color="grey">finder</font></th>
+	      <!-- Other -->
               <th><font color="grey">page</font></th>
               <th><font color="grey">request</font></th>
-	      <th><font color="grey">request</font></th>
 	      <th><font color="grey">finder</font></th>
             </tr>
           </thead>
           <tbody>
             {% for alert in context.results %}
               <tr>
+	       <!-- ZTF -->
                <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.spng }}" title="/static/img/{{ alert.spng }}" height="75" width="75"></td>
                <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75"></td>
                <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.tpng }}" title="/static/img/{{ alert.dpng }}" height="75" width="75"></td>
                <td>{{ alert.zoid }}</td>
-               <td>{{ alert.zcandid }}</td>
                <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
                <td>{{ alert.zfilter }}</td>
                {% if alert.zlambda|float("NaN") == "NaN" %}
@@ -387,7 +391,7 @@
                {% else %}
                  <td>{{ "%.3f"|format(alert.zmagpsf) }}</td>
                {% endif %}
-                {% if alert.zmagdiff|float("NaN") == "NaN" %}
+               {% if alert.zmagdiff|float("NaN") == "NaN" %}
                  <td>{{ alert.zmagdiff }}</td>
                {% else %}
                  <td>{{ "%.3f"|format(alert.zmagdiff) }}</td>
@@ -412,18 +416,7 @@
                {% else %}
                  <td>{{ "%.3f"|format(alert.zrb) }}</td>
                {% endif %}
-               <td>{{ alert.aetype }}</td>
-               {% if alert.aeprob|float("NaN") == "NaN" %}
-                 <td>{{ alert.aeprob*100.0 }}</td>
-               {% else %}
-                 <td>{{ "%.1f"|format(alert.aeprob*100.0) }}</td>
-               {% endif %}
-               <td>{{ alert.altype }}</td>
-               {% if alert.alprob|float("NaN") == "NaN" %}
-                 <td>{{ alert.alprob*100.0 }}</td>
-               {% else %}
-                 <td>{{ "%.1f"|format(alert.alprob*100.0) }}</td>
-               {% endif %}
+	       <!-- Glade -->
                <td><a href="/sassy/glade_q3c/{{ alert.gid }}/" title="{{ alert.gid }}">{{ alert.gid }}</a></td>
                {% if alert.gra|float("NaN") == "NaN" %}
                  <td>{{ alert.gra }}</td>
@@ -450,11 +443,24 @@
                {% else %}
                  <td>{{ "%.3f"|format(alert.gz) }}</td>
                {% endif %}
-               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
+	       <!-- Alerce -->
+               <td>{{ alert.aetype }}</td>
+               {% if alert.aeprob|float("NaN") == "NaN" %}
+                 <td>{{ alert.aeprob*100.0 }}</td>
+               {% else %}
+                 <td>{{ "%.1f"|format(alert.aeprob*100.0) }}</td>
+               {% endif %}
+               <td>{{ alert.altype }}</td>
+               {% if alert.alprob|float("NaN") == "NaN" %}
+                 <td>{{ alert.alprob*100.0 }}</td>
+               {% else %}
+                 <td>{{ "%.1f"|format(alert.alprob*100.0) }}</td>
+               {% endif %}
+               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
 	       <td><a href="https://www.findingchart.alerce.online/get_chart?oid={{ alert.zoid }}&candid={{ alert.zcandid }}" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">Finder</a></td>
-               <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
+	       <!-- Other -->
+               <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
-	       <td><a href="{{ url_for('mmt_imaging', zoid=alert.zoid) }}" title="Imaging_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Image</a></td>
 	       <td><a href="{{ url_for('finder', img=alert.spng|replace('science', 'finder')) }}" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
               </tr>
             {% endfor %}
