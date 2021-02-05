@@ -15,6 +15,7 @@ from src.utils.utils import UtilsLogger
 
 import argparse
 import os
+import shutil
 
 
 # +
@@ -74,17 +75,12 @@ def sassy_cron_finder(_log=None, _folder=''):
         _ra = ra_to_hms(_zra)
         _dec = dec_to_dms(_zdec)
         _dec = f"{_dec}".replace("+", "")
-        _finder = _diff.replace('difference', 'finder')
-        _j1 = _diff.replace('difference', 'jpg_1').replace('png', 'jpg')
-        _j2 = _diff.replace('difference', 'jpg_2').replace('png', 'jpg')
-        _p1 = _diff.replace('difference', 'png_1')
-        _p2 = _diff.replace('difference', 'png_2')
         if _log:
-            _log.info(f"_ra={_ra}, _dec={_dec}, _finder={_finder}")
-            _log.info(f"_j1={_j1}, _p1={_p1}")
-            _log.info(f"_j2={_j2}, _p2={_p2}")
+            _log.info(f"_ra={_ra}, _dec={_dec}")
 
         # create _[jp]1 image
+        _j1 = _diff.replace('difference', 'jpg_1').replace('png', 'jpg')
+        _p1 = _diff.replace('difference', 'png_1')
         try:
             _j1 = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'jpg': f'{_j1}', 'scale': SDSS_SCALES[1], 'log': _log})
         except Exception as _es1:
@@ -93,7 +89,15 @@ def sassy_cron_finder(_log=None, _folder=''):
                 _log.error(f'Failed to get_sdss_image(), error={_es1}')
         if _log:
             _log.info(f"_j1={_j1}")
-        if _j1 is None or not os.path.exists(_j1):
+        if _j1 is not None and os.path.exists(_j1):
+            try:
+                _p1 = jpg_to_png(_jpg=_j1)
+            except Exception as _ef1:
+                _p1 = None
+                if _log:
+                    _log.error(f'Failed to convert jpg_to_png(), error={_ef1}')
+        if _p1 is None or not os.path.exists(_p1):
+            _p1 = _diff.replace('difference', 'png_1')
             try:
                 _p1 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 320, 'output_size': 320, 
                                              'color': True, 'log': _log, 'png': _p1})
@@ -101,17 +105,12 @@ def sassy_cron_finder(_log=None, _folder=''):
                 _p1 = f"{_folder}/KeepCalm.png"
                 if _log:
                     _log.error(f'Failed to get_panstarrs_image(), error={_ep1}')
-        else:
-            try:
-                _p1 = jpg_to_png(_jpg=_j1)
-            except Exception as _ef1:
-                _p1 = f"{_folder}/KeepCalm.png"
-                if _log:
-                    _log.error(f'Failed to convert jpg_to_png(), error={_ef1}')
         if _log:
             _log.info(f"_p1={_p1}")
 
         # create _[jp]2 image
+        _j2 = _diff.replace('difference', 'jpg_2').replace('png', 'jpg')
+        _p2 = _diff.replace('difference', 'png_2')
         try:
             _j2 = get_sdss_image(**{'ra': _ra, 'dec': _dec, 'jpg': f'{_j2}', 'scale': SDSS_SCALES[0], 'log': _log})
         except Exception as _es2:
@@ -119,31 +118,35 @@ def sassy_cron_finder(_log=None, _folder=''):
             if _log:
                 _log.error(f'Failed to get_sdss_image(), error={_es2}')
         if _log:
-            _log.info(f"_j1={_j1}")
-        if _j2 is None or not os.path.exists(_j2):
+            _log.info(f"_j2={_j2}")
+        if _j2 is not None and os.path.exists(_j2):
             try:
-                _p2 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 320, 'output_size': 320, 
+                _p2 = jpg_to_png(_jpg=_j2)
+            except Exception as _ef2:
+                _p2 = None
+                if _log:
+                    _log.error(f'Failed to convert jpg_to_png(), error={_ef2}')
+        if _p2 is None or not os.path.exists(_p2):
+            _p2 = _diff.replace('difference', 'png_2')
+            try:
+                _p2 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 640, 'output_size': 320, 
                                              'color': True, 'log': _log, 'png': _p2})
             except Exception as _ep2:
                 _p2 = f"{_folder}/KeepCalm.png"
                 if _log:
                     _log.error(f'Failed to get_panstarrs_image(), error={_ep2}')
-        else:
-            try:
-                _p2 = jpg_to_png(_jpg=_j2)
-            except Exception as _ef2:
-                _p2 = f"{_folder}/KeepCalm.png"
-                if _log:
-                    _log.error(f'Failed to convert jpg_to_png(), error={_ef2}')
         if _log:
-            _log.info(f"_p1={_p1}")
+            _log.info(f"_p2={_p2}")
 
         # combine pngs
         _images = []
-        if _p2 is not None and os.path.exists(f"{_p2}") and 'KeepCalm' not in _p2:
-            _images.append(f"{_p2}")
-        if _p1 is not None and os.path.exists(f"{_p1}") and 'KeepCalm' not in _p1:
+        if 'KeepCalm' in _p1 or 'KeepCalm' in _p2:
             _images.append(f"{_p1}")
+        else:
+            if _p2 is not None and os.path.exists(f"{_p2}"):
+                _images.append(f"{_p2}")
+            if _p1 is not None and os.path.exists(f"{_p1}"):
+                _images.append(f"{_p1}")
         if _sci is not None and os.path.exists(f"{_sci}"):
             _images.append(f"{_sci}")
         if _tmp is not None and os.path.exists(f"{_tmp}"):
@@ -152,17 +155,20 @@ def sassy_cron_finder(_log=None, _folder=''):
             _images.append(f"{_diff}")
         if _log:
             _log.info(f"_images={_images}")
+        _finder = _diff.replace('difference', 'finder')
         if len(_images) < 2:
-            _finder = f"{_folder}/KeepCalm.png"
+            _finder = shutil.copy(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_finder)}")
         else:
             try:
                 _finder = combine_pngs(_files=_images, _output=_finder, _log=_log)
                 if _finder is not None and os.path.exists(f"{_finder}"):
-                    _finder = os.rename(_finder, f"{_folder}/{os.path.basename(_finder)}")
+                    _finder = shutil.copy(_finder, f"{_folder}/{os.path.basename(_finder)}")
                 else:
-                    _finder = os.rename(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_finder)}")
+                    _finder = _diff.replace('difference', 'finder')
+                    _finder = shutil.copy(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_finder)}")
             except Exception as _eo1:
-                _finder = f"{_folder}/KeepCalm.png"
+                _finder = _diff.replace('difference', 'finder')
+                _finder = shutil.copy(f"{_folder}/KeepCalm.png", f"{_folder}/{os.path.basename(_finder)}")
                 if _log:
                     _log.error(f'Failed to combine image(s), error={_eo1}')
         if _log:

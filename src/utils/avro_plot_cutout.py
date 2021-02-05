@@ -9,17 +9,21 @@ from astropy.io import fits
 from src import *
 from src.utils.utils import UtilsLogger
 
+from scipy import ndimage
+
 import argparse
 import fastavro
 import gzip
 import io
 import os
+import random
 
 
 # +
 # initialize
 # -
 # noinspection PyBroadException
+random.seed(os.getpid())
 try:
     import matplotlib as mpl
     mpl.use('Agg')
@@ -32,7 +36,7 @@ import matplotlib.pyplot as plt
 # +
 # constant(s)
 # -
-COLOUR_MAPS = [_map for _map in cm.datad]
+COLOR_MAPS = [_map for _map in cm.datad]
 CUTOUTS = ['difference', 'science', 'template']
 
 
@@ -52,7 +56,7 @@ def _get_fits_data(_s=None):
 # function: avro_plot_cutout()
 # -
 # noinspection PyBroadException,PyUnresolvedReferences
-def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=None):
+def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _color='random', _rotation=0.0, _log=None):
 
     # check input(s)
     if not isinstance(_avro_file, str) or _avro_file.strip() == '':
@@ -65,6 +69,10 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
         raise Exception(f'invalid input, _jd={_jd}')
     if not isinstance(_gid, int) or _gid < 0:
         raise Exception(f'invalid input, _gid={_gid}')
+    if not isinstance(_color, str) and not ('random' in _color.strip().lower() or _color.strip().lower() in COLOR_MAPS):
+        raise Exception(f'invalid input, _color={_color}')
+    if not isinstance(_rotation, float):
+        raise Exception(f'invalid input, _rotation={_rotation}')
 
     _file = os.path.abspath(os.path.expanduser(_avro_file.strip()))
     if not os.path.exists(_file):
@@ -93,29 +101,38 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _log=N
     for _i in range(len(_packets)):
 
         # get data
-        _cmap, _data, _output = 'gray', None, ''
+        _cmap = random.choice(COLOR_MAPS) if 'random' in _color.strip().lower() else _color.strip()
+        _data, _output = None, ''
+        # _cmap, _data, _output = 'PuBu_r', None, ''
         if _dif:
-            # _cmap = 'gray' if 'gray' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            # _cmap = 'gray' if 'gray' in COLOR_MAPS else random.choice(COLOR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutDifference']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'
-            _title = f'Difference ({_cmap})'
+            _title = f'Difference ({_cmap}, 1"/pixel, SymLogNorm() Scaling)'
         elif _sci:
-            # _cmap = 'gray' if 'gray' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            # _cmap = 'gray' if 'gray' in COLOR_MAPS else random.choice(COLOR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutScience']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'
-            _title = f'Science ({_cmap})'
+            _title = f'Science ({_cmap}, 1"/pixel, SymLogNorm() Scaling)'
         elif _tmp:
-            # _cmap = 'gray' if 'gray' in COLOUR_MAPS else random.choice(COLOUR_MAPS)
+            # _cmap = 'gray' if 'gray' in COLOR_MAPS else random.choice(COLOR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutTemplate']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'
-            _title = f'Template ({_cmap})'
+            _title = f'Template ({_cmap}, 1"/pixel, SymLogNorm() Scaling)'
         _png_files.append(_output)
+
+        # rotate it
+        _rotation %= 360.0
+        _data_rot = _data if _rotation == 0.0 else ndimage.rotate(_data, _rotation)
 
         # plot it
         try:
             _fig = plt.figure()
             _fig.add_subplot(1, 1, 1)
-            plt.imshow(_data, cmap=_cmap, origin='lower')
+            if _dif:
+                plt.imshow(_data, cmap=_cmap, origin='lower')
+            else:
+                plt.imshow(_data_rot, norm=mpl.colors.SymLogNorm(linthresh=_data.min(), vmin=_data.min(), vmax=_data.max()), cmap=_cmap, origin='lower')
             plt.title(_title)
             _buf = io.BytesIO()
             plt.savefig(_output)
@@ -140,13 +157,17 @@ if __name__ == '__main__':
 
     # noinspection PyTypeChecker
     _p = argparse.ArgumentParser(description='Plot AVRO file FITS data', formatter_class=argparse.RawTextHelpFormatter)
-    _p.add_argument('--file', default='', help="""AVRO input file""")
     _p.add_argument('--cutout', default=CUTOUTS[1], help=f"""AVRO cutout, default '%(default)s', choice of {CUTOUTS}""")
-    _p.add_argument('--oid', default=f"ZTF20{get_hash()[:8]}", help="""ZTF Object Id""")
-    _p.add_argument('--jd', default=0.0, help="""ZTF Julian Day""")
+    _p.add_argument('--color', default='gray', help=f"""Plot color, default '%(default)s'""")
+    _p.add_argument('--file', default='', help="""AVRO input file""")
     _p.add_argument('--gid', default=0, help="""Glade Id""")
+    _p.add_argument('--jd', default=0.0, help="""ZTF Julian Day""")
+    _p.add_argument('--oid', default=f"ZTF20{get_hash()[:8]}", help="""ZTF Object Id""")
+    _p.add_argument('--rotation', default='0.0', help=f"""Plot rotation, default %(default)s""")
 
     # execute
     args = _p.parse_args()
     avro_plot_cutout(_avro_file=args.file, _cutout=args.cutout, _oid=args.oid,
-                     _jd=float(args.jd), _gid=int(args.gid), _log=UtilsLogger('AvroPlot2').logger)
+                     _jd=float(args.jd), _gid=int(args.gid),
+                     _color=args.color, _rotation=float(args.rotation),
+                     _log=UtilsLogger('AvroPlotCutout').logger)
