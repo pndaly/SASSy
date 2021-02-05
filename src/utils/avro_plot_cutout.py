@@ -108,17 +108,17 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _color
             # _cmap = 'gray' if 'gray' in COLOR_MAPS else random.choice(COLOR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutDifference']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_difference.png'
-            _title = f'Difference ({_cmap}, 1"/pixel, SymLogNorm() Scaling)'
+            _title = f'Difference ({_cmap}, 1"/pixel, Linear scaling)'
         elif _sci:
             # _cmap = 'gray' if 'gray' in COLOR_MAPS else random.choice(COLOR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutScience']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_science.png'
-            _title = f'Science ({_cmap}, 1"/pixel, SymLogNorm() Scaling)'
+            _title = f'Science ({_cmap}, 1"/pixel, SymLogNorm scaling)'
         elif _tmp:
             # _cmap = 'gray' if 'gray' in COLOR_MAPS else random.choice(COLOR_MAPS)
             _data = _get_fits_data(_packets[_i][f'cutoutTemplate']['stampData'])
             _output = f'{_oid.strip()}_{_sjd}_{_gid}_{_i}_template.png'
-            _title = f'Template ({_cmap}, 1"/pixel, SymLogNorm() Scaling)'
+            _title = f'Template ({_cmap}, 1"/pixel, SymLogNorm scaling)'
         _png_files.append(_output)
 
         # rotate it
