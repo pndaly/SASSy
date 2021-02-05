@@ -8,7 +8,7 @@
 from src.common import *
 from src.models.sassy_cron import *
 from src.utils.Alerce import Alerce
-from src.utils.utils import UtilsLogger
+from src.utils.utils import *
 
 import argparse
 import numpy as np

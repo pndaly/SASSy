@@ -53,8 +53,6 @@ def get_panstarrs_url(_ra=math.nan, _dec=math.nan, _size=PANSTARRS_SIZE, _output
         _table = Table.read(f"{PANSTARRS_URL}?ra={_ra:.4f}&dec={_dec:.4f}&size={_size}&format=fits&filters={_filters}", format='ascii')
     except:
         _table = None
-    if _log:
-        _log.debug(f"_table={_table}")
     if _table is None:
         return
 
@@ -90,11 +88,7 @@ def get_panstarrs_url(_ra=math.nan, _dec=math.nan, _size=PANSTARRS_SIZE, _output
             if _log:
                 _log.debug(f"Random filters: {_f1s} ({_f1i}), {_f2s} ({_f2i}), {_f3s} ({_f3i})")
             _table = _table[[_f1i, _f2i, _f3i]]
-            if _log:
-                _log.debug(f">>>> _table={_table}")
         for _i, _p in enumerate(['red', 'green', 'blue']):
-            if _log:
-                _log.debug(f">>>> _i={_i}, _p={_p}, _table['filename']={_table['filename']}")
             try:
                 _url = _url + "&{}={}".format(_p, _table['filename'][_i])
             except:

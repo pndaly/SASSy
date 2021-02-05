@@ -328,21 +328,27 @@ _add_classifier_and_plot () {
     write_yellow "DryRun> source ~/.bashrc_conda"
     write_yellow "DryRun> conda activate"
     write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
-    write_yellow "DryRun> rm -f ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron.py"
+    write_yellow "DryRun> rm -f ZTF2*.png ZTF2*.jpg sassy_cron_mollweide.png >> /dev/null 2>&1"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_thumbnails.py"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_alerce.py"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finder_2.py --folder='/var/www/SASSy/src/static/img' --verbose"
-    write_yellow "DryRun> chown www-data:www-data ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=f'${SASSY_SRC}/static/img' --verbose"
+    write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.png"
+    write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.jpg"
+    write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/sassy_cron_mollweide.png"
   else
     python3 ${SASSY_SRC}/utils/get_iers.py
     source ~/.bashrc_conda
     conda activate
     cd ${SASSY_SRC}/static/img
-    rm -f ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1
-    python3 ${SASSY_SRC}/utils/sassy_cron.py
+    rm -f ZTF2*.png ZTF2*.jpg sassy_cron_mollweide.png >> /dev/null 2>&1
+    python3 ${SASSY_SRC}/utils/sassy_cron_thumbnails.py
+    python3 ${SASSY_SRC}/utils/sassy_cron_alerce.py
     python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose
-    python3 ${SASSY_SRC}/utils/sassy_cron_finder_2.py --folder='/var/www/SASSy/src/static/img' --verbose
-    chown www-data:www-data ZTF2*.png sassy_cron_mollweide.png >> /dev/null 2>&1
+    python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=f'${SASSY_SRC}/static/img' --verbose
+    chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.png
+    chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.jpg
+    chown www-data:www-data ${SASSY_SRC}/static/img/sassy_cron_mollweide.png
   fi
 }
 

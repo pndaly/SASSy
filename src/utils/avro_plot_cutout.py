@@ -78,7 +78,8 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _color
     if not os.path.exists(_file):
         return
     if _log is not None:
-        _log.debug(f"avro_plot_cutout(_avro_file='{_avro_file}', _cutout='{_cutout}', _oid='{_oid}', _jd={_jd}, _gid={_gid}, _log={_log}) ... entry")
+        _log.debug(f"entry ... avro_plot_cutout(_avro_file='{_avro_file}', _cutout='{_cutout}', _oid='{_oid}', _jd={_jd}, _gid={_gid}, _color={_color}, _rotation={_rotation})")
+
 
     # set default(s)
     _sjd = str(_jd).strip().replace('.', '')
@@ -146,7 +147,7 @@ def avro_plot_cutout(_avro_file='', _cutout='', _oid='', _jd=0.0, _gid=0, _color
     # return filename
     _of = _png_files[0] if len(_png_files) > 0 else ''
     if _log is not None:
-        _log.debug(f"avro_plot_cutout() ... exit ... _png_file={_png_files}, _of={_of}")
+        _log.debug(f"exit ... avro_plot_cutout(_avro_file='{_avro_file}', _cutout='{_cutout}', _oid='{_oid}', _jd={_jd}, _gid={_gid}, _color={_color}, _rotation={_rotation}), _of={_of}")
     return _of
 
 
