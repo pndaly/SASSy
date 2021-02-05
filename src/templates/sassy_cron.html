@@ -365,12 +365,21 @@
             {% for alert in context.results %}
               <tr>
 	       <!-- ZTF -->
-               <td><a href="{{ url_for('show_image', img=alert.spng) }}" target="_blank" title="{{ alert.spng }}">
-                    <img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75">
-		   </a></td>
-	       <!-- <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.spng }}" title="/static/img/{{ alert.spng }}" height="75" width="75"></td> -->
-               <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75"></td>
-               <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.tpng }}" title="/static/img/{{ alert.dpng }}" height="75" width="75"></td>
+               <td>
+                <a href="{{ url_for('show_image', img=alert.spng) }}" target="_blank" title="{{ alert.spng }}">
+                 <img src="{{ url_for('static', filename='/img/') }}{{ alert.spng }}" title="/static/img/{{ alert.spng }}" height="75" width="75">
+		</a>
+	       </td>
+               <td>
+                <a href="{{ url_for('show_image', img=alert.dpng) }}" target="_blank" title="{{ alert.dpng }}">
+                 <img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.dpng }}" height="75" width="75">
+		</a>
+	       </td>
+               <td>
+                <a href="{{ url_for('show_image', img=alert.tpng) }}" target="_blank" title="{{ alert.tpng }}">
+                 <img src="{{ url_for('static', filename='/img/') }}{{ alert.tpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75">
+		</a>
+	       </td>
                <td>{{ alert.zoid }}</td>
                <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
                <td>{{ alert.zfilter }}</td>

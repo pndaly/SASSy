@@ -3,11 +3,9 @@
 
 <div class="row">
  <div class="col-md-12">
-  <!-- <h1>Image</h1> -->
   {% if img %}
    <h3>{{ img }}</h3>
-   <!-- <img src={{ url_for('static', filename='/img/') }}{{ img|replace("science", "finder") }} title=/static/img/{{ img|replace("science", "finder") }}> -->
-   <img src={{ url_for('static', filename='/img/') }} title=/static/img/{{ img }}>
+   <img src={{ url_for('static', filename='/img/') }}{{ img }} title=/static/img/{{ img }}>
   {% else %}
    <h3>No image found</h3>
   {% endif %}
