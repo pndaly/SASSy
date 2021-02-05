@@ -331,8 +331,8 @@ _add_classifier_and_plot () {
     write_yellow "DryRun> rm -f ZTF2*.png ZTF2*.jpg sassy_cron_mollweide.png >> /dev/null 2>&1"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_thumbnails.py"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_alerce.py"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=f'${SASSY_SRC}/static/img' --verbose"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png=sassy_cron_mollweide.png --verbose"
+    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=${SASSY_SRC}/static/img --verbose"
     write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.png >> /dev/null 2>&1"
     write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.jpg >> /dev/null 2>&1"
     write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1"
@@ -344,8 +344,8 @@ _add_classifier_and_plot () {
     rm -f ZTF2*.png ZTF2*.jpg sassy_cron_mollweide.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron_thumbnails.py
     python3 ${SASSY_SRC}/utils/sassy_cron_alerce.py
-    python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png='sassy_cron_mollweide.png' --verbose
-    python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=f'${SASSY_SRC}/static/img' --verbose
+    python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png=sassy_cron_mollweide.png --verbose
+    python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=${SASSY_SRC}/static/img --verbose
     chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.png >> /dev/null 2>&1
     chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.jpg >> /dev/null 2>&1
     chown www-data:www-data ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1

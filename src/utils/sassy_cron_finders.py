@@ -107,13 +107,13 @@ def sassy_cron_finders(_log=None, _folder=''):
                     _log.error(f'Failed to convert jpg_to_png(), error={_ef1}')
         if _p1 is None or not os.path.exists(_p1):
             _p1 = _base.replace(_replace, 'png_1')
-            try:
-                _p1 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 320, 'output_size': 320, 
-                                             'color': True, 'log': _log, 'png': _p1})
-            except Exception as _ep1:
-                _p1 = f"{_folder}/KeepCalm.png"
-                if _log:
-                    _log.error(f'Failed to get_panstarrs_image(), error={_ep1}')
+            #try:
+            _p1 = get_panstarrs_image(**{'ra': _ra, 'dec': _dec, 'filters': 'grizy', 'size': 320, 'output_size': 320, 
+                                         'color': True, 'log': _log, 'png': _p1})
+            #except Exception as _ep1:
+            #    _p1 = f"{_folder}/KeepCalm.png"
+            #    if _log:
+            #        _log.error(f'Failed to get_panstarrs_image(), error={_ep1}')
         if _p1 is None or not os.path.exists(_p1):
             _p1 = f"{_folder}/KeepCalm.png"
         if _log:
