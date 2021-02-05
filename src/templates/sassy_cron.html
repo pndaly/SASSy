@@ -365,7 +365,10 @@
             {% for alert in context.results %}
               <tr>
 	       <!-- ZTF -->
-               <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.spng }}" title="/static/img/{{ alert.spng }}" height="75" width="75"></td>
+               <td><a href="{{ url_for('show_image', img=alert.spng) }}" target="_blank" title="{{ alert.spng }}">
+                    <img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75">
+		   </a></td>
+	       <!-- <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.spng }}" title="/static/img/{{ alert.spng }}" height="75" width="75"></td> -->
                <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.dpng }}" title="/static/img/{{ alert.tpng }}" height="75" width="75"></td>
                <td><img src="{{ url_for('static', filename='/img/') }}{{ alert.tpng }}" title="/static/img/{{ alert.dpng }}" height="75" width="75"></td>
                <td>{{ alert.zoid }}</td>
@@ -461,7 +464,7 @@
 	       <!-- Other -->
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
-	       <td><a href="{{ url_for('finder', img=alert.spng|replace('science', 'finder')) }}" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
+	       <td><a href="{{ url_for('show_image', img=alert.spng|replace('science', 'finder')) }}" target="_blank" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
               </tr>
             {% endfor %}
           </tbody>

@@ -1862,19 +1862,19 @@ def psql_query():
 
 
 # +
-# route(s): /finder/<img>, /sassy/finder/<img>
+# route(s): /image/<img>, /sassy/image/<img>
 # -
-@app.route('/sassy/finder/<img>', methods=['GET'])
-@app.route('/finder/<img>', methods=['GET'])
-def finder(img=''):
+@app.route('/sassy/image/<img>', methods=['GET'])
+@app.route('/image/<img>', methods=['GET'])
+def show_image(img=''):
     logger.debug(f'route /sassy/finder/{img} entry')
 
     # return
     _finder = f"{app.static_folder}/img/{img}"
     if os.path.exists(_finder):
-        return render_template('finder.html', img=img)
+        return render_template('show_image.html', img=img)
     else:
-        return render_template('finder.html', img='')
+        return render_template('show_image.html', img='')
 
 
 # +
