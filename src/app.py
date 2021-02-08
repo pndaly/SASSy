@@ -1753,11 +1753,17 @@ def mmt_longslit(zoid=''):
 
     # form
     form = MMTLongslitForm()
+    _dif = f"{_cronrec.dpng.split('.')[0]}"
+    _sci = f"{_cronrec.spng.split('.')[0]}"
+    _tmp = f"{_cronrec.tpng.split('.')[0]}"
+    _base = f"{_cronrec.spng.split('.')[0].replace('_science', '')}"
+    _fnd = f"{app.static_folder}/img/{_base}_finder.png"
+    _air = f"{app.static_folder}/img/{_base}_airmass.png"
 
     # GET method
     if request.method == 'GET':
         _form = _mmt_get(_dbrec=_cronrec, _form=form, _obstype='longslit')
-        return render_template('mmt_longslit.html', form=_form, record=_cronrec)
+        return render_template('mmt_longslit.html', form=_form, record=_cronrec, dif=_dif, sci=_sci, tmp=_tmp, fnd=_fnd, air=_air)
 
     # validate form (POST request)
     if form.validate_on_submit():

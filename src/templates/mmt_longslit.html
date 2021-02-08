@@ -123,6 +123,25 @@
    </div>
    <br>
 
+   <div class="row">
+    <div class="col-md-2">
+      <img src="{{ url_for('static', filename='/img/') }}{{ dif }}" title="/static/img/{{ dif }}" height="250" width="250">
+    </div>
+    <div class="col-md-2">
+      <img src="{{ url_for('static', filename='/img/') }}{{ sci }}" title="/static/img/{{ sci }}" height="250" width="250">
+    </div>
+    <div class="col-md-2">
+      <img src="{{ url_for('static', filename='/img/') }}{{ tmp }}" title="/static/img/{{ tmp }}" height="250" width="250">
+    </div>
+    <div class="col-md-2">
+      <img src="{{ url_for('static', filename='/img/') }}{{ fnd }}" title="/static/img/{{ fnd }}" height="250" width="250">
+    </div>
+    <div class="col-md-2">
+      <img src="{{ url_for('static', filename='/img/') }}{{ air }}" title="/static/img/{{ air }}" height="250" width="250">
+    </div>
+   </div>
+   <br>
+
    <div class="d-flex justify-content-between">
     <div class="row">
      {{ form.submit(class_="btn btn-md btn-primary") }}
