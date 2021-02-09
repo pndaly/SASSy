@@ -57,7 +57,7 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 random.seed(os.getpid())
 try:
     import matplotlib as mpl
-    mpl.use('Agg')
+    # mpl.use('Agg')
 except Exception:
     pass
 import matplotlib.pyplot as plt

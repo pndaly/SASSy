@@ -1663,8 +1663,41 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
     _dec = f"{_form.dec_dms.data.strip()}".replace("+", "")
 
     # get base name(s)
-    _base = f"{_dbrec.spng.split('.')[0].replace('_science', '')}"
-    _finder = f"{app.static_folder}/img/{_base}_finder.png"
+    _dif = f"{_dbrec.dpng}"
+    _sci = f"{_dbrec.spng}"
+    _tmp = f"{_dbrec.tpng}"
+    _fnd = f"{_dbrec.spng.split('.')[0].replace('_science', '_finder')}.png"
+    _air = f"{_dbrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
+    _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
+
+    # combine image(s) into 1 finding chart
+    _dif_loc = f"{app.static_folder}/img/{_dif}"
+    _sci_loc = f"{app.static_folder}/img/{_sci}"
+    _tmp_loc = f"{app.static_folder}/img/{_tmp}"
+    _fnd_loc = f"{app.static_folder}/img/{_fnd}"
+    _air_loc = f"{app.static_folder}/img/{_air}"
+    _mmt_loc = f"{app.static_folder}/img/{_air}"
+
+    _images = []
+    if _dif_loc is not None and os.path.exists(f"{_dif_loc}"):
+        _images.append(f"{_dif_loc}")
+    if _sci_loc is not None and os.path.exists(f"{_sci_loc}"):
+        _images.append(f"{_sci_loc}")
+    if _tmp_loc is not None and os.path.exists(f"{_tmp_loc}"):
+        _images.append(f"{_tmp_loc}")
+    if _air_loc is not None and os.path.exists(f"{_air_loc}"):
+        _images.append(f"{_air_loc}")
+    if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
+        _images.append(f"{_fnd_loc}")
+    logger.info(f"_images={_images}, _output={_output}")
+    if len(_images) < 2:
+        _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+    else:
+        try:
+            _mmt = combine_pngs(_files=_images, _output=_mmt, _log=_log)
+        except Exception as _eo1:
+            logger.error(f'Failed to combine image(s), error={_eo1}')
+            _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
 
     # return payload
     if _obstype.strip().lower() == 'imaging':
@@ -1673,7 +1706,7 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
             "epoch": float(_form.epoch.data), 
             "exposuretime": float(_form.exposuretime.data), 
             "filter": f"{_form.filter_name.data.strip()}", 
-            "findingchartfilename": os.path.basename(_finder) if _finder is not None else "",
+            "findingchartfilename": os.path.basename(_mmt) if _mmt is not None else "",
             "instrumentid": 16,
             "magnitude": float(_form.magnitude.data), 
             "maskid": 110, 
@@ -1694,7 +1727,7 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
             "epoch": float(_form.epoch.data),
             "exposuretime": float(_form.exposuretime.data), 
             "filter": f"{_form.filter_name.data.strip()}",
-            "findingchartfilename": os.path.basename(_finder) if _finder is not None else "",
+            "findingchartfilename": os.path.basename(_mmt) if _mmt is not None else "",
             "grating": f"{_form.grating.data.strip()}", 
             "instrumentid": 16,
             "magnitude": float(_form.magnitude.data), 
