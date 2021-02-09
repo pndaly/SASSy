@@ -270,3 +270,18 @@ def dc_mag(fid=-1, magpsf=math.nan, sigmapsf=math.nan, magnr=math.nan,
 
     # return result
     return {'dc_mag': _dc_mag, 'dc_sigmag': _dc_sigmag}
+
+
+# +
+# function: abs_mag()
+# -
+def abs_mag(_dist=math.nan, _mapp=math.nan):
+    """ caclculate absolute magnitude """
+    # check input(s)
+    if not isinstance(_dist, float) or _dist is math.nan:
+        return math.nan
+    if not isinstance(_mapp, float) or _mapp is math.nan:
+        return math.nan
+    # usual formula (assumes _dist is in parsecs!)
+    return _mapp - 2.5*math.log10((_dist/10.0)**2)
+
