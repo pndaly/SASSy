@@ -15,7 +15,7 @@ from astropy.coordinates import EarthLocation
 from astropy.coordinates import SkyCoord
 from astroplan import FixedTarget
 from astroplan import Observer
-from astroplan.plots import plot_airmass
+# from astroplan.plots import plot_airmass
 from matplotlib import dates as mdates
 
 import argparse
@@ -57,10 +57,11 @@ SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 random.seed(os.getpid())
 try:
     import matplotlib as mpl
-    # mpl.use('Agg')
+    mpl.use('Agg')
 except Exception:
     pass
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 
 
 # +
