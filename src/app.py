@@ -1691,16 +1691,16 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
     logger.debug(f'_mmt_loc={_mmt_loc}')
 
     _images = []
+    if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
+        _images.append(f"{_fnd_loc}")
+    if _air_loc is not None and os.path.exists(f"{_air_loc}"):
+        _images.append(f"{_air_loc}")
     if _dif_loc is not None and os.path.exists(f"{_dif_loc}"):
         _images.append(f"{_dif_loc}")
     if _sci_loc is not None and os.path.exists(f"{_sci_loc}"):
         _images.append(f"{_sci_loc}")
     if _tmp_loc is not None and os.path.exists(f"{_tmp_loc}"):
         _images.append(f"{_tmp_loc}")
-    if _air_loc is not None and os.path.exists(f"{_air_loc}"):
-        _images.append(f"{_air_loc}")
-    if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
-        _images.append(f"{_fnd_loc}")
     logger.info(f"_images={_images}, _mmt={_mmt}")
     if len(_images) < 2:
         _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
