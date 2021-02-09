@@ -1664,19 +1664,31 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
 
     # get base name(s)
     _dif = f"{_dbrec.dpng}"
+    logger.debug(f'_dif={_dif}')
     _sci = f"{_dbrec.spng}"
+    logger.debug(f'_sci={_sci}')
     _tmp = f"{_dbrec.tpng}"
+    logger.debug(f'_tmp={_tmp}')
     _fnd = f"{_dbrec.spng.split('.')[0].replace('_science', '_finder')}.png"
+    logger.debug(f'_fnd={_fnd}')
     _air = f"{_dbrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
+    logger.debug(f'_air={_air}')
     _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
+    logger.debug(f'_mmt={_mmt}')
 
     # combine image(s) into 1 finding chart
     _dif_loc = f"{app.static_folder}/img/{_dif}"
+    logger.debug(f'_dif_loc={_dif_loc}')
     _sci_loc = f"{app.static_folder}/img/{_sci}"
+    logger.debug(f'_sci_loc={_sci_loc}')
     _tmp_loc = f"{app.static_folder}/img/{_tmp}"
+    logger.debug(f'_tmp_loc={_tmp_loc}')
     _fnd_loc = f"{app.static_folder}/img/{_fnd}"
+    logger.debug(f'_fnd_loc={_fnd_loc}')
     _air_loc = f"{app.static_folder}/img/{_air}"
-    _mmt_loc = f"{app.static_folder}/img/{_air}"
+    logger.debug(f'_air_loc={_air_loc}')
+    _mmt_loc = f"{app.static_folder}/img/{_mmt}"
+    logger.debug(f'_mmt_loc={_mmt_loc}')
 
     _images = []
     if _dif_loc is not None and os.path.exists(f"{_dif_loc}"):
@@ -1689,15 +1701,15 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
         _images.append(f"{_air_loc}")
     if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
         _images.append(f"{_fnd_loc}")
-    logger.info(f"_images={_images}, _output={_output}")
+    logger.info(f"_images={_images}, _mmt={_mmt}")
     if len(_images) < 2:
         _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
     else:
         try:
-            _mmt = combine_pngs(_files=_images, _output=_mmt, _log=_log)
+            _mmt_loc = combine_pngs(_files=_images, _output=_mmt_loc, _log=logger)
         except Exception as _eo1:
             logger.error(f'Failed to combine image(s), error={_eo1}')
-            _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+            _mmt_loc = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
 
     # return payload
     if _obstype.strip().lower() == 'imaging':
@@ -1706,7 +1718,7 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
             "epoch": float(_form.epoch.data), 
             "exposuretime": float(_form.exposuretime.data), 
             "filter": f"{_form.filter_name.data.strip()}", 
-            "findingchartfilename": os.path.basename(_mmt) if _mmt is not None else "",
+            "findingchartfilename": os.path.basename(_mmt_loc) if _mmt_loc is not None else "",
             "instrumentid": 16,
             "magnitude": float(_form.magnitude.data), 
             "maskid": 110, 
@@ -1727,7 +1739,7 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
             "epoch": float(_form.epoch.data),
             "exposuretime": float(_form.exposuretime.data), 
             "filter": f"{_form.filter_name.data.strip()}",
-            "findingchartfilename": os.path.basename(_mmt) if _mmt is not None else "",
+            "findingchartfilename": os.path.basename(_mmt_loc) if _mmt_loc is not None else "",
             "grating": f"{_form.grating.data.strip()}", 
             "instrumentid": 16,
             "magnitude": float(_form.magnitude.data), 
@@ -1787,10 +1799,17 @@ def mmt_longslit(zoid=''):
     # form
     form = MMTLongslitForm()
     _dif = f"{_cronrec.dpng}"
+    logger.debug(f'_dif={_dif}')
     _sci = f"{_cronrec.spng}"
+    logger.debug(f'_sci={_sci}')
     _tmp = f"{_cronrec.tpng}"
+    logger.debug(f'_tmp={_tmp}')
     _fnd = f"{_cronrec.spng.split('.')[0].replace('_science', '_finder')}.png"
+    logger.debug(f'_fnd={_fnd}')
     _air = f"{_cronrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
+    logger.debug(f'_air={_air}')
+    _mmt = f"{_cronrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
+    logger.debug(f'_mmt={_mmt}')
 
     # GET method
     if request.method == 'GET':
@@ -1799,7 +1818,7 @@ def mmt_longslit(zoid=''):
 
     # validate form (POST request)
     if form.validate_on_submit():
-        return render_template('mmt_request.html', url={'url': ''},
+        return render_template('mmt_request.html', url={'url': ''}, img=_mmt,
                                payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='longslit'))
 
     # return for GET

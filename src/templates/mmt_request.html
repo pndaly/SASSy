@@ -13,18 +13,20 @@
   </div>
  </div>
  <br>
- <div class="row">
-  <h4><font color="grey">Finding Chart:</font></h4>
-  <div class="col-md-12">
-   <img src="{{ url_for('static', filename='img') }}/{{ payload.findingchartfilename }}" height="200" width="800" title="{{ payload.findingchartfilename }}">
+  <div class="row">
+   {% if img %}
+    <h4><font color="grey">Chart:</font></h4>
+    <div class="col-md-12">
+     <img src="{{ url_for('static', filename='/img/') }}{{ img }}" height="200" width="800" title="{{ img }}">
+    </div>
+   {% endif %}
   </div>
- </div>
- <br>
+  <br>
  <div class="row">
   <div class="col-md-12">
    <div class="d-flex justify-content-between">
     <div class="row">
-	    <a href="{{ url_for('mmt_request') }}?payload={{ payload }}" class="btn btn-md btn-primary">Confirm</a>
+     <a href="{{ url_for('mmt_request') }}?payload={{ payload }}" class="btn btn-md btn-primary">Confirm</a>
     </div>
     <div>
      <a href="{{ url_for('cron_records') }}" class="btn btn-md btn-danger">Cancel</a>
