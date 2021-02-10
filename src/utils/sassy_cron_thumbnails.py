@@ -93,17 +93,17 @@ def sassy_cron_thumbnails(_log=None):
         _file = get_avro_filename(_jd=_q.zjd, _candid=_q.zcandid, _dirs='/dataraid6/ztf', _log=_log)
         if _file is not None:
             try:
-                _q.dpng = avro_plot_cutout(_avro_file=_file, _cutout='difference', _gid=int(_q.gid), _jd=float(_q.zjd), _oid=_q.zoid, _log=_log)
+                _q.dpng = avro_plot_cutout(_avro_file=_file, _color='gray', _cutout='difference', _gid=int(_q.gid), _jd=float(_q.zjd), _oid=_q.zoid, _log=_log)
             except:
                 _q.dpng = ''
 
             try:
-                _q.spng = avro_plot_cutout(_avro_file=_file, _cutout='science', _gid=int(_q.gid), _jd=float(_q.zjd), _oid=_q.zoid, _log=_log)
+                _q.spng = avro_plot_cutout(_avro_file=_file, _color='gray', _cutout='science', _gid=int(_q.gid), _jd=float(_q.zjd), _oid=_q.zoid, _log=_log)
             except:
                 _q.spng = ''
 
             try:
-                _q.tpng = avro_plot_cutout(_avro_file=_file, _cutout='template', _gid=int(_q.gid), _jd=float(_q.zjd), _oid=_q.zoid, _log=_log)
+                _q.tpng = avro_plot_cutout(_avro_file=_file, _color='gray', _cutout='template', _gid=int(_q.gid), _jd=float(_q.zjd), _oid=_q.zoid, _log=_log)
             except:
                 _q.tpng = ''
 

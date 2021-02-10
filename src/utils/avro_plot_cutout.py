@@ -57,7 +57,7 @@ def _get_fits_data(_s=None):
 # function: avro_plot_cutout()
 # -
 # noinspection PyBroadException,PyUnresolvedReferences
-def avro_plot_cutout(_avro_file='', _color='random', _cutout='', _gid=0, _jd=0.0, _log=None, _oid='', _origin='upper', _rotation=0.0):
+def avro_plot_cutout(_avro_file='', _color='gray', _cutout='', _gid=0, _jd=0.0, _log=None, _oid='', _origin='upper', _rotation=0.0):
 
     # check input(s)
     if not isinstance(_avro_file, str) or _avro_file.strip() == '':
