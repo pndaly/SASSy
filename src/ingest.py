@@ -144,15 +144,26 @@ def ingest_avro(packet=None):
             gal_b=galactic.b.value,
             **packet['candidate']
             )
+
+        # is it alread in the database?
+        _rec = None
         try:
-            logger.info('Updating object database', extra={'tags': {'candid': alert.alert_candid}})
-            # db.session.update(alert)
-            db.session.add(alert)
-            db.session.commit()
-            logger.info('Updated object into database', extra={'tags': {'candid': alert.alert_candid}})
-        except exc.SQLAlchemyError:
-            db.session.rollback()
-            logger.warn('Failed to update object into database', extra={'tags': {'candid': alert.alert_candid}})
+            _rec = db.session.query(ZtfAlert).first()
+        except Exception:
+            _rec = None
+
+        if _rec is not None:
+            logger.warn('object already exists in database', extra={'tags': {'candid': alert.alert_candid}})
+        else:
+            try:
+                logger.info('Updating object database', extra={'tags': {'candid': alert.alert_candid}})
+                # db.session.update(alert)
+                db.session.add(alert)
+                db.session.commit()
+                logger.info('Updated object into database', extra={'tags': {'candid': alert.alert_candid}})
+            except exc.SQLAlchemyError:
+                db.session.rollback()
+                logger.warn('Failed to update object into database', extra={'tags': {'candid': alert.alert_candid}})
 
 
 # +

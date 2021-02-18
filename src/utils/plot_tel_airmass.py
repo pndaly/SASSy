@@ -65,7 +65,7 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
         return
 
     if _log:
-        _log.info(f"plot_tel_airmass(_ra={_ra:.3f}, _dec={_dec:.3f}, _tel={_oid}, _tel={_oid}, _img={_img}")
+        _log.info(f"plot_tel_airmass(_ra={_ra:.3f}, _dec={_dec:.3f}, _oid={_oid}, _tel={_tel}, _img={_img}")
 
     # get sun, moon etc
     _now_isot = get_isot(0)
@@ -85,10 +85,12 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
     _sun_az = _sun.az
 
     # convert
+    _oid_s = str(_oid).replace("'", "")
     _ra_hms = ra_to_hms(_ra)
     _dec_dms = dec_to_dms(_dec)
     _dec_dms = f"{_dec}".replace("+", "")
-    _title = f"{_oid} Airmass @ MMT\nRA={_ra_hms} ({_ra:.3f}), Dec={_dec_dms} ({_dec:.3f})"
+    _sup_title = f"{_oid} Airmass @ MMT"
+    _sub_title = f"RA={_ra_hms} ({_ra:.3f}), Dec={_dec_dms} ({_dec:.3f})"
 
     # get target
     _coords = SkyCoord(ra=_ra*u.deg, dec=_dec*u.deg)
@@ -100,6 +102,7 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
     # plot data
     _time = str(_target_time[0]).split()[0]
     fig, ax = plt.subplots()
+    fig.suptitle(_sup_title.replace("'", "").replace("{", "").replace("}", ""))
     _ax_scatter = ax.plot(_moon_time.datetime, _moon_alt.degree, 'g--', label='Moon')
     _ax_scatter = ax.plot(_sun_time.datetime, _sun_alt.degree, 'r--', label='Sun')
     _ax_scatter = ax.scatter(_target_time.datetime, _target_alt.degree,
@@ -111,7 +114,7 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
     plt.colorbar(_ax_scatter, ax=ax).set_label(f'Azimuth ({OBS_DEGREE})')
     ax.set_ylim([ASTRONOMICAL_DAWN, 90.0])
     ax.set_xlim([_target_time.datetime[0], _target_time.datetime[-1]])
-    ax.set_title(f'{_title}')
+    ax.set_title(_sub_title)
     ax.set_ylabel(f'Altitude ({OBS_DEGREE})')
     ax.set_xlabel(f'{_time} (UTC)')
     plt.legend(loc='upper left')

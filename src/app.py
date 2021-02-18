@@ -16,6 +16,8 @@ from src import *
 from src.common import *
 from src.utils.combine_pngs import *
 from src.utils.utils import *
+from src.utils.plot_tel_airmass import *
+from src.utils.plot_tel_finder import *
 
 # noinspection PyBroadException
 try:
@@ -139,6 +141,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = \
     f'postgresql+psycopg2://{SASSY_DB_USER}:{SASSY_DB_PASS}@{SASSY_DB_HOST}:{SASSY_DB_PORT}/{SASSY_DB_NAME}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'Steward Alerts For Science System!'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
 # +
@@ -1874,6 +1877,48 @@ def mmt_request():
 
 
 # +
+# route(s): /plot_airmass/<img>, /sassy/plot_airmass/<img>
+# -
+@app.route('/sassy/plot_airmass/<img>', methods=['GET'])
+@app.route('/plot_airmass/<img>', methods=['GET'])
+def plot_airmass(img=''):
+    logger.debug(f'route /sassy/plot_airmass/{img} entry')
+
+    # get data
+    _ra = request.args.get('ra', math.nan)
+    _dec = request.args.get('dec', math.nan)
+    _oid = request.args.get('oid', '')
+    _tel = request.args.get('tel', 'mmt')
+    _airmass = f"{os.getenv('SASSY_AIRMASS')}/{img}"
+    logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _tel={_tel}, _airmass={_airmass}')
+
+    # return
+    if not os.path.exists(_airmass):
+        plot_tel_airmass(_ra=float(_ra), _dec=float(_dec), _oid={_oid}, _tel=_tel, _img=_airmass, _log=logger)
+    return send_from_directory(f"{os.getenv('SASSY_AIRMASS')}", img, as_attachment=False)
+
+# +
+# route(s): /plot_finder/<img>, /sassy/plot_finder/<img>
+# -
+@app.route('/sassy/plot_finder/<img>', methods=['GET'])
+@app.route('/plot_finder/<img>', methods=['GET'])
+def plot_finder(img=''):
+    logger.debug(f'route /sassy/plot_finder/{img} entry')
+
+    # get data
+    _ra = request.args.get('ra', math.nan)
+    _dec = request.args.get('dec', math.nan)
+    _oid = request.args.get('oid', '')
+    _finder = f"{os.getenv('SASSY_FINDERS')}/{img}"
+    logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _finder={_finder}')
+
+    # return
+    if not os.path.exists(_finder):
+        plot_tel_finder(_ra=float(_ra), _dec=float(_dec), _oid={_oid}, _img=_finder, _log=logger)
+    return send_from_directory(f"{os.getenv('SASSY_FINDERS')}", img, as_attachment=False)
+
+
+# +
 # route(s): /psql/, /sassy/psql/
 # -
 @app.route('/sassy/psql/', methods=['GET', 'POST'])
@@ -1924,7 +1969,7 @@ def psql_query():
 @app.route('/sassy/image/<img>', methods=['GET'])
 @app.route('/image/<img>', methods=['GET'])
 def show_image(img=''):
-    logger.debug(f'route /sassy/finder/{img} entry')
+    logger.debug(f'route /sassy/image/{img} entry')
 
     # return
     _finder = f"{app.static_folder}/img/{img}"
@@ -1932,6 +1977,16 @@ def show_image(img=''):
         return render_template('show_image.html', img=img)
     else:
         return render_template('show_image.html', img='')
+
+
+# +
+# route(s): /sassy_cron/<oid>, /sassy/sassy_cron/<oid>
+# -
+@app.route('/sassy_cron/<oid>', methods=['GET'])
+@app.route('/sassy_cron/<oid>', methods=['GET'])
+def sassy_cron_page(oid=''):
+    logger.debug(f'route /sassy_cron/{oid} entry')
+    return render_template('sassy_cron_page.html', oid=oid)
 
 
 # +
@@ -2635,6 +2690,17 @@ def ztf_text():
 def ztf_q3c():
     logger.debug(f'route /sassy/ztf_q3c/ entry')
     return render_template('ztf_q3c.html')
+
+
+#@app.after_request
+#def add_header(response):
+#    """
+#    Add headers to both force latest IE rendering engine or Chrome Frame,
+#    and also to cache the rendered page for 10 minutes.
+#    """
+#    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+#    response.headers['Cache-Control'] = 'public, max-age=0'
+#    return response
 
 
 # +

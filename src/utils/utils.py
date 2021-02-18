@@ -40,7 +40,7 @@ class UtilsLogger(object):
 
         # define some variables and initialize them
         self.__msg = None
-        self.__logconsole = f'/tmp/console-{self.__name}.log'
+        # self.__logconsole = f'/tmp/console-{self.__name}.log'
         self.__logdir = os.getenv("SASSY_LOGS", f"{LOG_WWW_DIR}")
         if not os.path.exists(self.__logdir) or not os.access(self.__logdir, os.W_OK):
             self.__logdir = os.getcwd()
@@ -97,20 +97,20 @@ class UtilsLogger(object):
                     'level': self.__level,
                     'maxBytes': MAX_BYTES
                 },
-                'utils': {
-                    'backupCount': 10,
-                    'class': 'logging.handlers.RotatingFileHandler',
-                    'formatter': 'UtilsFileFormatter',
-                    'filename': self.__logconsole,
-                    'level': self.__level,
-                    'maxBytes': MAX_BYTES
-                }
+                #'utils': {
+                    #'backupCount': 10,
+                    #'class': 'logging.handlers.RotatingFileHandler',
+                    #'formatter': 'UtilsFileFormatter',
+                    #'filename': self.__logconsole,
+                    #'level': self.__level,
+                    #'maxBytes': MAX_BYTES
+                #}
             },
 
             # make this logger use file and console handlers
             'loggers': {
                 self.__name: {
-                    'handlers': ['colored', 'file', 'utils'],
+                    'handlers': ['colored', 'file'],
                     'level': self.__level,
                     'propagate': True
                 }

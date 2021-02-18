@@ -325,34 +325,32 @@ _add_classifier_and_plot () {
   write_magenta "_add_classifier_and_plot(dry_run=${1})"
   if [[ ${1} -eq 1 ]]; then
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/get_iers.py"
+    write_yellow "DryRun> rm -f ${SASSY_SRC}/static/img/ZTF2*.png ${SASSY_SRC}/static/img/ZTF2*.jpg >> /dev/null 2>&1"
+    write_yellow "DryRun> rm -f ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1"
+    write_yellow "DryRun> rm -f ${SASSY_AIRMASS}/*.png ${SASSY_AIRMASS}/*.jpg"
+    write_yellow "DryRun> rm -f ${SASSY_FINDERS}/*.png ${SASSY_FINDERS}/*.jpg"
     write_yellow "DryRun> source ~/.bashrc_conda"
     write_yellow "DryRun> conda activate"
     write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
-    write_yellow "DryRun> rm -f ZTF2*.png ZTF2*.jpg sassy_cron_mollweide.png >> /dev/null 2>&1"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_thumbnails.py"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_alerce.py"
     write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png=sassy_cron_mollweide.png --verbose"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=${SASSY_SRC}/static/img --verbose"
-    write_yellow "DryRun> conda deactivate"
-    write_yellow "DryRun> python3 ${SASSY_SRC}/utils/sassy_cron_airmass.py --folder=${SASSY_SRC}/static/img --verbose"
-    write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.png >> /dev/null 2>&1"
-    write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.jpg >> /dev/null 2>&1"
     write_yellow "DryRun> chown www-data:www-data ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1"
+    write_yellow "DryRun> chown -R www-data:www-data ${SASSY_AIRMASS} ${SASSY_FINDERS} >> /dev/null 2>&1"
   else
     python3 ${SASSY_SRC}/utils/get_iers.py
+    rm -f ${SASSY_SRC}/static/img/ZTF2*.png ${SASSY_SRC}/static/img/ZTF2*.jpg >> /dev/null 2>&1
+    rm -f ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1
+    rm -f ${SASSY_AIRMASS}/*.png ${SASSY_AIRMASS}/*.jpg
+    rm -f ${SASSY_FINDERS}/*.png ${SASSY_FINDERS}/*.jpg
     source ~/.bashrc_conda
     conda activate
     cd ${SASSY_SRC}/static/img
-    rm -f ZTF2*.png ZTF2*.jpg sassy_cron_mollweide.png >> /dev/null 2>&1
     python3 ${SASSY_SRC}/utils/sassy_cron_thumbnails.py
     python3 ${SASSY_SRC}/utils/sassy_cron_alerce.py
     python3 ${SASSY_SRC}/utils/sassy_cron_mollweide.py --png=sassy_cron_mollweide.png --verbose
-    python3 ${SASSY_SRC}/utils/sassy_cron_finders.py --folder=${SASSY_SRC}/static/img --verbose
-    conda deactivate
-    python3 ${SASSY_SRC}/utils/sassy_cron_airmass.py --folder=${SASSY_SRC}/static/img --verbose
-    chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.png >> /dev/null 2>&1
-    chown www-data:www-data ${SASSY_SRC}/static/img/ZTF2*.jpg >> /dev/null 2>&1
     chown www-data:www-data ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1
+    chown -R www-data:www-data ${SASSY_AIRMASS} ${SASSY_FINDERS} >> /dev/null 2>&1
   fi
 }
 

@@ -10,16 +10,6 @@
   <div class="row">
     <div class="col-md-12">
       <h2>SassyCron</h2>
-      <!--
-      <br><h5><font color="grey">This cron job runs every hour and answers the question: How many alerts within the
-      past 24 hours (from now), with a real/bogus score &gt; 0.5, have a host in the GLADE catalog within the
-      circumscribed circle of the ZTF cutout FoV (45&Prime;) at a distance of &lt; 500 Mpc that are <i>not</i> in the TNS
-      database and are <i>not</i> known solar system objects? For each such candidate, we then query the
-      <a href="https://alerce.online">Alerce</a> database to obtain a classifier and produce images of the cutouts.
-      The table is explorable using the standard SASSy controls on the left.<br><br>
-      The data below includes the period {{ iso_min }} through {{ iso_max }}.</font></h5>
-      <br><br>
-      -->
       <br><h5><font color="grey">This cron job runs every odd hour and answers the question: How many alerts within the
       past 24 hours (from now), with a real/bogus score &gt; 0.5, have a host in the GLADE catalog within 120&Prime;
       at a distance of &lt; 250 Mpc that are <i>not</i> in the TNS
@@ -282,10 +272,10 @@
 
         <table class="table table-striped table-sm">
         <thead>
-          <th colspan="15" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
-          <th colspan="6" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
-          <th colspan="6" style="border: 1px solid black; background-color: #ffebcc;"><center>Alerce Classifier</center></th>
-          <th colspan="4" style="border: 1px solid black; background-color: #cfe3e6;"><center>Other</center></th>
+          <th colspan="10" style="border: 1px solid black; background-color: #e6ffe6;"><center>ZTF Candidate(s)</center></th>
+          <th colspan="4" style="border: 1px solid black; background-color: #f2e6ff;"><center>GLADE Catalog</center></th>
+          <th colspan="4" style="border: 1px solid black; background-color: #ffebcc;"><center>Classifier(s)</center></th>
+          <th colspan="6" style="border: 1px solid black; background-color: #cfe3e6;"><center>Link(s)</center></th>
         </thead>
           <thead>
             <tr>
@@ -296,19 +286,12 @@
               <th><font color="blue">ObjectId</font></th>
               <th><font color="blue">ID</font></th>
               <th><font color="blue">Filter</font></th>
-              <th><font color="blue">&lambda;<sub>mean</sub></font></th>
-              <th><font color="blue">JD</font></th>
               <th><font color="blue">mag<sub>ap</sub></font></th>
               <th><font color="blue">mag<sub>psf</sub></font></th>
-              <th><font color="blue">&delta;mag<sub>ref</sub></font></th>
               <th><font color="blue">RA</font></th>
               <th><font color="blue">Dec</font></th>
-              <th><font color="blue">drb</font></th>
-              <th><font color="blue">rb</font></th>
 	      <!-- Glade -->
               <th><font color="blue">ID</font></th>
-              <th><font color="blue">RA</font></th>
-              <th><font color="blue">Dec</font></th>
               <th><font color="blue">distance</font></th>
               <th><font color="blue">separation</font></th>
               <th><font color="blue">z</font></th>
@@ -317,10 +300,10 @@
               <th><font color="blue">P(Early)</font></th>
               <th><font color="blue">Late</font></th>
               <th><font color="blue">P(Late)</font></th>
+	      <!-- Links -->
               <th><font color="blue">Alerce</font></th>
-              <th><font color="blue">Alerce</font></th>
-	      <!-- Other -->
               <th><font color="blue">Lasair</font></th>
+              <th><font color="blue">SASSy</font></th>
               <th><font color="blue">MMT</font></th>
 	      <th><font color="blue">Finder</font></th>
 	      <th><font color="blue">Airmass</font></th>
@@ -333,19 +316,12 @@
               <th><font color="grey">ZTF</font></th>
               <th><font color="grey">sid</font></th>
               <th><font color="grey">{g,r,i}</font></th>
-              <th><font color="grey">&#8491;</font></th>
-              <th><font color="grey"> </font></th>
               <th><font color="grey">m</font></th>
               <th><font color="grey">m</font></th>
-              <th><font color="grey">&delta;m</font></th>
               <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">J2k&deg;</font></th>
-              <th><font color="grey">0-1</font></th>
-              <th><font color="grey">0-1</font></th>
 	      <!-- Glade -->
               <th><font color="grey">gid</font></th>
-              <th><font color="grey">J2k&deg;</font></th>
-              <th><font color="grey">J2k&deg;</font></th>
               <th><font color="grey">Mpc</font></th>
               <th><font color="grey">&Prime;</font></th>
               <th><font color="grey"> </font></th>
@@ -354,13 +330,13 @@
               <th><font color="grey">%</font></th>
               <th><font color="grey">Type</font></th>
               <th><font color="grey">%</font></th>
-              <th><font color="grey">page</font></th>
-              <th><font color="grey">finder</font></th>
 	      <!-- Other -->
               <th><font color="grey">page</font></th>
+              <th><font color="grey">page</font></th>
+              <th><font color="grey">page</font></th>
               <th><font color="grey">request</font></th>
-	      <th><font color="grey">chart</font></th>
-	      <th><font color="grey">chart</font></th>
+	      <th><font color="grey">plot</font></th>
+	      <th><font color="grey">plot</font></th>
             </tr>
           </thead>
           <tbody>
@@ -385,16 +361,6 @@
                <td>{{ alert.zoid }}</td>
                <td><a href="/sassy/ztf/{{ alert.zsid }}/" title="{{ alert.zsid }}">{{ alert.zsid }}</a></td>
                <td>{{ alert.zfilter }}</td>
-               {% if alert.zlambda|float("NaN") == "NaN" %}
-                 <td>{{ alert.zlambda }}</td>
-               {% else %}
-                 <td>{{ "%.1f"|format(alert.zlambda) }}</td>
-               {% endif %}
-               {% if alert.zjd|float("NaN") == "NaN" %}
-                 <td>{{ alert.zjd }}</td>
-               {% else %}
-                 <td>{{ "%.3f"|format(alert.zjd) }}</td>
-               {% endif %}
                {% if alert.zmagap|float("NaN") == "NaN" %}
                  <td>{{ alert.zmagap }}</td>
                {% else %}
@@ -404,11 +370,6 @@
                  <td>{{ alert.zmagpsf }}</td>
                {% else %}
                  <td>{{ "%.3f"|format(alert.zmagpsf) }}</td>
-               {% endif %}
-               {% if alert.zmagdiff|float("NaN") == "NaN" %}
-                 <td>{{ alert.zmagdiff }}</td>
-               {% else %}
-                 <td>{{ "%.3f"|format(alert.zmagdiff) }}</td>
                {% endif %}
                {% if alert.zra|float("NaN") == "NaN" %}
                  <td>{{ alert.zra }}</td>
@@ -420,28 +381,8 @@
                {% else %}
                  <td>{{ "%.3f"|format(alert.zdec) }}</td>
                {% endif %}
-               {% if alert.zdrb|float("NaN") == "NaN" %}
-                 <td>{{ alert.zdrb }}</td>
-               {% else %}
-                 <td>{{ "%.3f"|format(alert.zdrb) }}</td>
-               {% endif %}
-               {% if alert.zrb|float("NaN") == "NaN" %}
-                 <td>{{ alert.zrb }}</td>
-               {% else %}
-                 <td>{{ "%.3f"|format(alert.zrb) }}</td>
-               {% endif %}
 	       <!-- Glade -->
                <td><a href="/sassy/glade_q3c/{{ alert.gid }}/" title="{{ alert.gid }}">{{ alert.gid }}</a></td>
-               {% if alert.gra|float("NaN") == "NaN" %}
-                 <td>{{ alert.gra }}</td>
-               {% else %}
-                 <td>{{ "%.3f"|format(alert.gra) }}</td>
-               {% endif %}
-               {% if alert.gdec|float("NaN") == "NaN" %}
-                 <td>{{ alert.gdec }}</td>
-               {% else %}
-                 <td>{{ "%.3f"|format(alert.gdec) }}</td>
-               {% endif %}
                {% if alert.gdist|float("NaN") == "NaN" %}
                  <td>{{ alert.gdist }}</td>
                {% else %}
@@ -470,13 +411,13 @@
                {% else %}
                  <td>{{ "%.1f"|format(alert.alprob*100.0) }}</td>
                {% endif %}
-               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
-	       <td><a href="https://www.findingchart.alerce.online/get_chart?oid={{ alert.zoid }}&candid={{ alert.zcandid }}" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">Finder</a></td>
 	       <!-- Other -->
+               <td><a href="https://alerce.online/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
+               <td><a href="{{ url_for('sassy_cron_page', oid=alert.zoid) }}" title="_blank" class="btn btn-outline-info btn-small">SassyCron</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
-	       <td><a href="{{ url_for('show_image', img=alert.spng|replace('science', 'finder')) }}" target="_blank" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
-	       <td><a href="{{ url_for('show_image', img=alert.spng|replace('science', 'airmass')) }}" target="_blank" title="airmass" class="btn btn-outline-info btn-small">Airmass</a></td>
+	       <td><a href="{{ url_for('plot_finder', ra=alert.zra, dec=alert.zdec, oid=alert.zoid, img=alert.spng|replace('science', 'finder')) }}" target="_blank" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
+	       <td><a href="{{ url_for('plot_airmass', tel='mmt', ra=alert.zra, dec=alert.zdec, oid=alert.zoid, img=alert.spng|replace('science', 'airmass')) }}" target="_blank" title="airmass" class="btn btn-outline-info btn-small">Airmass</a></td>
               </tr>
             {% endfor %}
           </tbody>
