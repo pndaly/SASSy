@@ -23,6 +23,9 @@ SASSY_DB_USER = os.getenv("SASSY_DB_USER", "sassy")
 SASSY_HOME = os.getenv("SASSY_HOME", "/var/www/SASSy")
 SASSY_SRC = os.getenv("SASSY_SRC", "/var/www/SASSy/src")
 
+SASSY_AIRMASS = os.getenv("SASSY_AIRMASS", "/var/www/SASSy/img/airmass")
+SASSY_FINDERS = os.getenv("SASSY_FINDERS", "/var/www/SASSy/img/finders")
+
 SASSY_ZTF_ARCHIVE = os.getenv("SASSY_ZTF_ARCHIVE", "/dataraid6/backups:/data/backups")
 SASSY_ZTF_DATA = os.getenv("SASSY_ZTF_DATA", "/dataraid6/ztf:/data/ztf")
 SASSY_ZTF_AVRO = os.getenv("SASSY_ZTF_AVRO", "/dataraid6/ztf:/data/ztf")

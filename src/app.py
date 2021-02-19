@@ -131,6 +131,8 @@ logger.debug('SASSY_ZTF_ARCHIVE = {}'.format(SASSY_ZTF_ARCHIVE))
 logger.debug('SASSY_ZTF_AVRO = {}'.format(SASSY_ZTF_AVRO))
 logger.debug('SASSY_ZTF_DATA = {}'.format(SASSY_ZTF_DATA))
 logger.debug('SASSY_APP_URL = {}'.format(SASSY_APP_URL))
+logger.debug('SASSY_AIRMASS = {}'.format(SASSY_AIRMASS))
+logger.debug('SASSY_FINDERS = {}'.format(SASSY_FINDERS))
 
 
 # +
@@ -1744,9 +1746,9 @@ def _mmt_create_finder(_dbrec=None):
     _tmp_loc = f"{app.static_folder}/img/{_tmp}"
     logger.debug(f'_dif_loc={_dif_loc}, _sci_loc={_sci_loc}, _tmp_loc={_tmp_loc}')
 
-    _fnd_loc = f"{os.getenv('SASSY_FINDERS')}/{_fnd}"
-    _air_loc = f"{os.getenv('SASSY_AIRMASS')}/{_air}"
-    _mmt_loc = f"{os.getenv('SASSY_FINDERS')}/{_mmt}"
+    _fnd_loc = f"{SASSY_FINDERS}/{_fnd}"
+    _air_loc = f"{SASSY_AIRMASS}/{_air}"
+    _mmt_loc = f"{SASSY_FINDERS}/{_mmt}"
     logger.debug(f'_fnd_loc={_fnd_loc}, _air_loc={_air_loc}, _mmt_loc={_mmt_loc}')
 
     # get finder
@@ -1908,13 +1910,13 @@ def plot_airmass(img=''):
     _dec = request.args.get('dec', math.nan)
     _oid = request.args.get('oid', '')
     _tel = request.args.get('tel', 'mmt')
-    _airmass = f"{os.getenv('SASSY_AIRMASS')}/{img}"
+    _airmass = f"{SASSY_AIRMASS}/{img}"
     logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _tel={_tel}, _airmass={_airmass}')
 
     # return
     if not os.path.exists(_airmass):
         plot_tel_airmass(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _tel=_tel, _img=_airmass, _log=logger)
-    return send_from_directory(f"{os.getenv('SASSY_AIRMASS')}", img, as_attachment=False)
+    return send_from_directory(f"{SASSY_AIRMASS}", img, as_attachment=False)
 
 # +
 # route(s): /plot_finder/<img>, /sassy/plot_finder/<img>
@@ -1928,13 +1930,13 @@ def plot_finder(img=''):
     _ra = request.args.get('ra', math.nan)
     _dec = request.args.get('dec', math.nan)
     _oid = request.args.get('oid', '')
-    _finder = f"{os.getenv('SASSY_FINDERS')}/{img}"
+    _finder = f"{SASSY_FINDERS}/{img}"
     logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _finder={_finder}')
 
     # return
     if not os.path.exists(_finder):
         plot_tel_finder(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _img=_finder, _log=logger)
-    return send_from_directory(f"{os.getenv('SASSY_FINDERS')}", img, as_attachment=False)
+    return send_from_directory(f"{SASSY_FINDERS}", img, as_attachment=False)
 
 
 # +
@@ -1989,7 +1991,7 @@ def psql_query():
 @app.route('/finder/<img>', methods=['GET'])
 def show_finder(img=''):
     logger.debug(f'route /sassy/finder/{img} entry')
-    return send_from_directory(f"{os.getenv('SASSY_FINDERS')}", img, as_attachment=False)
+    return send_from_directory(f"{SASSY_FINDERS}", img, as_attachment=False)
 
 
 # +
