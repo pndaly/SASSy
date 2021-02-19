@@ -60,6 +60,7 @@ src/static/js9
 00_TO_DO_00
 src/static/img/ZTF2*.png
 src/static/img/ZTF2*.jpg
+img/
 img/airmass/img/*.png
 img/airmass/img/*.jpg
 img/finders/img/*.png
