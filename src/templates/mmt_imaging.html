@@ -100,6 +100,14 @@
    </div>
    <br>
 
+   <div class="row">
+    {% if img %}
+     <div class="col-md-12">
+      <img src="{{ url_for('static', filename='/img/') }}{{ img }}" height="200" width="800" title="{{ img }}">
+     </div>
+    {% endif %}
+   </div>
+   <br>
    <div class="d-flex justify-content-between">
     <div class="row">
      {{ form.submit(class_="btn btn-md btn-primary") }}

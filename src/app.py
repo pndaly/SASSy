@@ -1665,54 +1665,10 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
     _ra = f"{_form.ra_hms.data.strip()}"
     _dec = f"{_form.dec_dms.data.strip()}".replace("+", "")
 
-    # get base name(s)
-    _dif = f"{_dbrec.dpng}"
-    logger.debug(f'_dif={_dif}')
-    _sci = f"{_dbrec.spng}"
-    logger.debug(f'_sci={_sci}')
-    _tmp = f"{_dbrec.tpng}"
-    logger.debug(f'_tmp={_tmp}')
-    _fnd = f"{_dbrec.spng.split('.')[0].replace('_science', '_finder')}.png"
-    logger.debug(f'_fnd={_fnd}')
-    _air = f"{_dbrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
-    logger.debug(f'_air={_air}')
+    # get full path(s)
     _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
-    logger.debug(f'_mmt={_mmt}')
-
-    # combine image(s) into 1 finding chart
-    _dif_loc = f"{app.static_folder}/img/{_dif}"
-    logger.debug(f'_dif_loc={_dif_loc}')
-    _sci_loc = f"{app.static_folder}/img/{_sci}"
-    logger.debug(f'_sci_loc={_sci_loc}')
-    _tmp_loc = f"{app.static_folder}/img/{_tmp}"
-    logger.debug(f'_tmp_loc={_tmp_loc}')
-    _fnd_loc = f"{app.static_folder}/img/{_fnd}"
-    logger.debug(f'_fnd_loc={_fnd_loc}')
-    _air_loc = f"{app.static_folder}/img/{_air}"
-    logger.debug(f'_air_loc={_air_loc}')
     _mmt_loc = f"{app.static_folder}/img/{_mmt}"
-    logger.debug(f'_mmt_loc={_mmt_loc}')
-
-    _images = []
-    if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
-        _images.append(f"{_fnd_loc}")
-    if _air_loc is not None and os.path.exists(f"{_air_loc}"):
-        _images.append(f"{_air_loc}")
-    if _dif_loc is not None and os.path.exists(f"{_dif_loc}"):
-        _images.append(f"{_dif_loc}")
-    if _sci_loc is not None and os.path.exists(f"{_sci_loc}"):
-        _images.append(f"{_sci_loc}")
-    if _tmp_loc is not None and os.path.exists(f"{_tmp_loc}"):
-        _images.append(f"{_tmp_loc}")
-    logger.info(f"_images={_images}, _mmt={_mmt}")
-    if len(_images) < 2:
-        _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
-    else:
-        try:
-            _mmt_loc = combine_pngs(_files=_images, _output=_mmt_loc, _log=logger)
-        except Exception as _eo1:
-            logger.error(f'Failed to combine image(s), error={_eo1}')
-            _mmt_loc = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+    logger.debug(f'_mmt={_mmt}, _mmt_loc={_mmt_loc}')
 
     # return payload
     if _obstype.strip().lower() == 'imaging':
@@ -1761,6 +1717,73 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
 
 
 # +
+# function: _mmt_create_finder()
+# -
+def _mmt_create_finder(_dbrec=None):
+
+    # check input(s)
+    if _dbrec is None:
+        return
+    logger.debug(f'_ra={_dbrec.zra}, _dec={_dbrec.zdec}, _oid={_dbrec.zoid}')
+
+    # get base name(s)
+    _dif = f"{_dbrec.dpng}"
+    _sci = f"{_dbrec.spng}"
+    _tmp = f"{_dbrec.tpng}"
+    logger.debug(f'_dif={_dif}, _sci={_sci}, _tmp={_tmp}')
+
+    _fnd = f"{_dbrec.spng.split('.')[0].replace('_science', '_finder')}.png"
+    _air = f"{_dbrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
+    _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
+    _oid = f"{_dbrec.zoid}"
+    logger.debug(f'_fnd={_fnd}, _air={_air}, _mmt={_mmt}, _oid={_oid}')
+
+    # get full path(s)
+    _dif_loc = f"{app.static_folder}/img/{_dif}"
+    _sci_loc = f"{app.static_folder}/img/{_sci}"
+    _tmp_loc = f"{app.static_folder}/img/{_tmp}"
+    logger.debug(f'_dif_loc={_dif_loc}, _sci_loc={_sci_loc}, _tmp_loc={_tmp_loc}')
+
+    _fnd_loc = f"{os.getenv('SASSY_FINDERS')}/{_fnd}"
+    _air_loc = f"{os.getenv('SASSY_AIRMASS')}/{_air}"
+    _mmt_loc = f"{os.getenv('SASSY_FINDERS')}/{_mmt}"
+    logger.debug(f'_fnd_loc={_fnd_loc}, _air_loc={_air_loc}, _mmt_loc={_mmt_loc}')
+
+    # get finder
+    if _fnd_loc is not None and not os.path.exists(f"{_fnd_loc}"):
+        plot_tel_finder(_ra=_dbrec.zra, _dec=_dbrec.zdec, _oid=_oid, _img=_fnd_loc, _log=logger)
+
+    # get airmass
+    if _air_loc is not None and not os.path.exists(f"{_air_loc}"):
+        plot_tel_airmass(_ra=_dbrec.zra, _dec=_dbrec.zdec, _oid=_oid, _tel='mmt', _img=_air_loc, _log=logger)
+
+    # combine image(s)
+    _images = []
+    if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
+        _images.append(f"{_fnd_loc}")
+    if _air_loc is not None and os.path.exists(f"{_air_loc}"):
+        _images.append(f"{_air_loc}")
+    if _dif_loc is not None and os.path.exists(f"{_dif_loc}"):
+        _images.append(f"{_dif_loc}")
+    if _sci_loc is not None and os.path.exists(f"{_sci_loc}"):
+        _images.append(f"{_sci_loc}")
+    if _tmp_loc is not None and os.path.exists(f"{_tmp_loc}"):
+        _images.append(f"{_tmp_loc}")
+    logger.info(f"_images={_images}, _mmt={_mmt}")
+    if len(_images) < 2:
+        _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+    else:
+        try:
+            _mmt_loc = combine_pngs(_files=_images, _output=_mmt_loc, _log=logger)
+        except Exception as _eo1:
+            logger.error(f'Failed to combine image(s), error={_eo1}')
+            _mmt_loc = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+
+    # return path
+    return _mmt
+
+
+# +
 # route(s): /mmt/imaging/<zoid>, /sassy/mmt/imaging/<zoid>
 # -
 @app.route('/sassy/mmt/imaging/<zoid>', methods=['GET', 'POST'])
@@ -1771,13 +1794,17 @@ def mmt_imaging(zoid=''):
     # get observation request
     _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
 
+    # get image
+    _mmt = _mmt_create_finder(_dbrec=_cronrec)
+    logger.debug(f'route /sassy/mmt/imaging/{zoid} _mmt={_mmt}')
+
     # form
     form = MMTImagingForm()
 
     # GET method
     if request.method == 'GET':
         _form = _mmt_get(_dbrec=_cronrec, _form=form, _obstype='imaging')
-        return render_template('mmt_imaging.html', form=_form, record=_cronrec)
+        return render_template('mmt_imaging.html', form=_form, record=_cronrec, img=_mmt)
 
     # validate form (POST request)
     if form.validate_on_submit():
@@ -1799,25 +1826,17 @@ def mmt_longslit(zoid=''):
     # get observation request
     _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
 
+    # get image
+    _mmt = _mmt_create_finder(_dbrec=_cronrec)
+    logger.debug(f'route /sassy/mmt/longslit/{zoid} _mmt={_mmt}')
+
     # form
     form = MMTLongslitForm()
-    _dif = f"{_cronrec.dpng}"
-    logger.debug(f'_dif={_dif}')
-    _sci = f"{_cronrec.spng}"
-    logger.debug(f'_sci={_sci}')
-    _tmp = f"{_cronrec.tpng}"
-    logger.debug(f'_tmp={_tmp}')
-    _fnd = f"{_cronrec.spng.split('.')[0].replace('_science', '_finder')}.png"
-    logger.debug(f'_fnd={_fnd}')
-    _air = f"{_cronrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
-    logger.debug(f'_air={_air}')
-    _mmt = f"{_cronrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
-    logger.debug(f'_mmt={_mmt}')
 
     # GET method
     if request.method == 'GET':
         _form = _mmt_get(_dbrec=_cronrec, _form=form, _obstype='longslit')
-        return render_template('mmt_longslit.html', form=_form, record=_cronrec, dif=_dif, sci=_sci, tmp=_tmp, fnd=_fnd, air=_air)
+        return render_template('mmt_longslit.html', form=_form, record=_cronrec, img=_mmt)
 
     # validate form (POST request)
     if form.validate_on_submit():
@@ -1894,7 +1913,7 @@ def plot_airmass(img=''):
 
     # return
     if not os.path.exists(_airmass):
-        plot_tel_airmass(_ra=float(_ra), _dec=float(_dec), _oid={_oid}, _tel=_tel, _img=_airmass, _log=logger)
+        plot_tel_airmass(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _tel=_tel, _img=_airmass, _log=logger)
     return send_from_directory(f"{os.getenv('SASSY_AIRMASS')}", img, as_attachment=False)
 
 # +
@@ -1914,7 +1933,7 @@ def plot_finder(img=''):
 
     # return
     if not os.path.exists(_finder):
-        plot_tel_finder(_ra=float(_ra), _dec=float(_dec), _oid={_oid}, _img=_finder, _log=logger)
+        plot_tel_finder(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _img=_finder, _log=logger)
     return send_from_directory(f"{os.getenv('SASSY_FINDERS')}", img, as_attachment=False)
 
 
@@ -1961,6 +1980,16 @@ def psql_query():
 
     # return for GET
     return render_template('psql_query.html', form=form)
+
+
+# +
+# route(s): /finder/<img>, /sassy/finder/<img>
+# -
+@app.route('/sassy/finder/<img>', methods=['GET'])
+@app.route('/finder/<img>', methods=['GET'])
+def show_finder(img=''):
+    logger.debug(f'route /sassy/finder/{img} entry')
+    return send_from_directory(f"{os.getenv('SASSY_FINDERS')}", img, as_attachment=False)
 
 
 # +
