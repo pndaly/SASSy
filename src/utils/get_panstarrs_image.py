@@ -33,7 +33,7 @@ PANSTARRS_SIZE = 320
 PANSTARRS_URL = "https://ps1images.stsci.edu/cgi-bin/ps1filenames.py"
 PANSTARRS_FURL = f"https://ps1images.stsci.edu/cgi-bin/fitscut.cgi"
 
-SASSY_TTF = os.getenv('SASSY_TTF')
+SASSY_TTF = os.getenv('SASSY_TTF', '/var/www/SASSy/src/ttf')
 
 
 # +
