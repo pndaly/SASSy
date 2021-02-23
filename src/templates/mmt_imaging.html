@@ -67,7 +67,7 @@
     </div>
     <div class="col-md-2">
      {{ form.magnitude.label }}<br>
-     {{ form.magnitude(size=12) }}<br>
+     {{ form.magnitude(size=8) }}<br>
      {% for error in form.magnitude.errors %}
       <span class="error-label"><small>[{{ error }}]</small></span>
      {% endfor %}
@@ -103,7 +103,7 @@
    <div class="row">
     {% if img %}
      <div class="col-md-12">
-      <img src="{{ url_for('static', filename='/img/') }}{{ img }}" height="200" width="800" title="{{ img }}">
+      <img src="{{ url_for('show_finder', img=img) }}" height="200" width="800" title="{{ img }}">
      </div>
     {% endif %}
    </div>

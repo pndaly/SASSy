@@ -17,7 +17,7 @@
    {% if img %}
     <h4><font color="grey">Chart:</font></h4>
     <div class="col-md-12">
-     <img src="{{ url_for('static', filename='/img/') }}{{ img }}" height="200" width="800" title="{{ img }}">
+     <img src="{{ url_for('show_finder', img=img) }}" height="200" width="800" title="{{ img }}">
     </div>
    {% endif %}
   </div>

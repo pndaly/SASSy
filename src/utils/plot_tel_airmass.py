@@ -88,7 +88,7 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
     _oid_s = str(_oid).replace("'", "")
     _ra_hms = ra_to_hms(_ra)
     _dec_dms = dec_to_dms(_dec)
-    _dec_dms = f"{_dec}".replace("+", "")
+    _dec_dms = f"{_dec_dms}".replace("+", "")
     _sup_title = f"{_oid} Airmass @ MMT"
     _sub_title = f"RA={_ra_hms} ({_ra:.3f}), Dec={_dec_dms} ({_dec:.3f})"
 

@@ -18,6 +18,12 @@ import shutil
 
 
 # +
+# constant(s)
+# -
+SASSY_FINDERS = os.getenv('SASSY_FINDERS', '/var/www/SASSy/img/finders')
+
+
+# +
 # function: sassy_cron_finders()
 # -
 # noinspection PyBroadException,PyUnresolvedReferences
@@ -26,9 +32,10 @@ def plot_tel_finder(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _img=''):
     # convert
     _ra_hms = ra_to_hms(_ra)
     _dec_dms = dec_to_dms(_dec)
-    _dec_dms = f"{_dec}".replace("+", "")
+    _dec_dms = f"{_dec_dms}".replace("+", "")
     if _log:
         _log.info(f"_ra={_ra}, _dec={_dec}")
+        _log.info(f"_ra_hms={_ra_hms}, _dec_dms={_dec_dms}")
 
     # create _[jp]1 image
     _j1 = f"{_img.split('.')[0]}_jpg_1.jpg"
@@ -108,7 +115,8 @@ def plot_tel_finder(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _img=''):
     if len(_images) < 2:
         if _log:
             _log.debug(f"too few images, len(_images)={len(_images)}")
-        _finder = shutil.copy(f"KeepCalm.png", f"{os.path.basename(_img)}")
+        # _finder = shutil.copy(f"KeepCalm.png", f"{os.path.basename(_img)}")
+        _finder = f"{SASSY_FINDERS}/KeepCalm.png"
     else:
         try:
             _finder = combine_pngs(_files=_images, _output=_img, _log=_log)

@@ -247,7 +247,8 @@ class MMTImagingForm(FlaskForm):
         DataRequired(), NumberRange(min=0.0, message=f'0.0 < exposure time')])
     filter_name = SelectField('Filter', choices=MMT_IMAGING_FILTERS, default=MMT_IMAGING_FILTERS[0], validators=[
         DataRequired()])
-    magnitude = FloatField('Magnitude', default=0.0, validators=[DataRequired()])
+    magnitude = FloatField('Magnitude', default=-15.0, validators=[
+        DataRequired(), NumberRange(min=-100.0, max=100.0, message=f'100.0 < magnitude < 100.0')])
     notes = StringField('Note(s)', default='', validators=[DataRequired()])
     numexposures = IntegerField('Exposures', default=1, validators=[
         DataRequired(), NumberRange(min=1, message=f'1 < # exposures')])
@@ -281,7 +282,8 @@ class MMTLongslitForm(FlaskForm):
         DataRequired()])
     slitwidth = SelectField('Slit Width', choices=MMT_LONGSLIT_WIDTHS, default=MMT_LONGSLIT_WIDTHS[0], validators=[
         DataRequired()])
-    magnitude = FloatField('Magnitude', default=0.0, validators=[DataRequired()])
+    magnitude = FloatField('Magnitude', default=-15.0, validators=[
+        DataRequired(), NumberRange(min=-100.0, max=100.0, message=f'100.0 < magnitude < 100.0')])
     notes = StringField('Note(s)', default='', validators=[DataRequired()])
     numexposures = IntegerField('Exposures', default=1, validators=[
         DataRequired(), NumberRange(min=1, message=f'1 < # exposures')])
