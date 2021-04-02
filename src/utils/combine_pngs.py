@@ -20,18 +20,37 @@ import requests
 def jpg_to_png(_jpg=None):
 
     # check input(s)
-    if _jpg is None or not isinstance(_jpg, str) or _jpg.strip() == '':
+    if _jpg is None or not isinstance(_jpg, str) or not os.path.exists(os.path.abspath(os.path.expanduser(_jpg))):
         return
     _jpg_file = os.path.abspath(os.path.expanduser(_jpg))
-    if not os.path.exists(_jpg_file):
-        return
+    _png_file = _jpg_file.replace('.jpg', '.png')
 
     # convert
     try:
-        _png_file = _jpg_file.replace('.jpg', '.png')
-        _data = Image.open(_jpg)
+        _data = Image.open(_jpg_file)
         _data.save(_png_file)
         return _png_file
+    except:
+        return
+
+
+# +
+# function: png_to_jpg()
+# -
+# noinspection PyBroadException
+def png_to_jpg(_png=None):
+
+    # check input(s)
+    if _png is None or not isinstance(_png, str) or not os.path.exists(os.path.abspath(os.path.expanduser(_png))):
+        return
+    _png_file = os.path.abspath(os.path.expanduser(_png))
+    _jpg_file = _png_file.replace('.png', '.jpg')
+
+    # convert
+    try:
+        _data = Image.open(_png_file)
+        _data.save(_jpg_file)
+        return _jpg_file
     except:
         return
 
@@ -65,6 +84,8 @@ def combine_pngs(_files=None, _output='', _log=None):
     # save output
     try:
         _finder.save(_output)
+        if _log:
+            _log.info(f'Returning output={_output}')
         return _output
     except Exception as _s:
         if _log:
