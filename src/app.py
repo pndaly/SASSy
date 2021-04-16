@@ -2017,7 +2017,64 @@ def show_image(img=''):
 @app.route('/sassy_cron/<oid>', methods=['GET'])
 def sassy_cron_page(oid=''):
     logger.debug(f'route /sassy_cron/{oid} entry')
-    return render_template('sassy_cron_page.html', oid=oid)
+    logger.debug(f'ahahadsfjk;ahsdfa')
+    _cronrec = SassyCron.query.filter_by(zoid=oid).first_or_404()
+    filter_name = ZTF_FILTERS.get(_cronrec.zfid)[0]
+    ra_hms = ra_to_hms(_cronrec.zra).strip()
+    dec_dms = dec_to_dms(_cronrec.zdec).strip()
+
+    tns_info = {
+            'available':_cronrec.alias is not None,
+            'alias':_cronrec.alias,
+            'discovery_date':_cronrec.discovery_date,
+            'discovery_mag':_cronrec.discovery_mag,
+            'discovery_inst':_cronrec.discovery_instrument,
+            'source_group':_cronrec.source_group,
+            'tns_link':_cronrec.tns_link,
+            'host':_cronrec.host,
+            'host_z':_cronrec.host_z,
+            }
+
+    ztf_info = {
+            'oid':oid,
+            'filter':filter_name,
+            'ra_hms':ra_hms,
+            'dec_dms':dec_dms,
+            'jd':round(_cronrec.zjd,3),
+            'magap':round(_cronrec.zmagap,2),
+            'magpsf':round(_cronrec.zmagpsf,2),
+            'magdiff':round(_cronrec.zmagdiff,2)
+            }
+
+    alerce_info = {
+            'available':_cronrec.aetype is not None,
+            'aetype':_cronrec.aetype,
+            'altype':_cronrec.altype,
+            'aeprob':_cronrec.aeprob,
+            'alprob':_cronrec.alprob,
+            'dpng':_cronrec.dpng,
+            'spng':_cronrec.spng,
+            'tpng':_cronrec.tpng,
+            }
+    
+    glade_info = {
+            'available':_cronrec.gid is not None,
+            'id':_cronrec.gid,
+            'distance': round(_cronrec.gdist, 3),
+            'redshift': round(_cronrec.gz, 3),
+            }
+
+
+    payload = {
+            'ztf':ztf_info,
+            'tns':tns_info,
+            'alerce':alerce_info,
+            'glade':glade_info
+            }
+
+    logger.debug('{}'.format(payload))
+
+    return render_template('sassy_cron_page.html', ztf=ztf_info, tns=tns_info, alerce=alerce_info, glade=glade_info)
 
 
 # +
