@@ -30,12 +30,32 @@ import unicodedata
 ASTRONOMICAL_DAWN = -18.0
 CIVIL_DAWN = -6.0
 LUNAR_STYLE = {'linestyle': '--', 'color': 'r'}
-MMT_LATITUDE = 31.6883
-MMT_LONGITUDE = -110.8850
-MMT_ELEVATION = 8585.0 / 3.28083
 NAUTICAL_DAWN = -12.0
 OBS_DEGREE = unicodedata.lookup('DEGREE SIGN')
 SOLAR_STYLE = {'linestyle': '--', 'color': 'g'}
+
+
+# +
+# telescope(s)
+# -
+BOK_ELEVATION = 6795.0 / 3.28083
+BOK_LATITUDE = 31.9629
+BOK_LONGITUDE = -111.6004
+GREENWICH_ELEVATION = 0.0 / 3.28083
+GREENWICH_LATITUDE = 51.477754
+GREENWICH_LONGITUDE = -0.001138
+KUIPER_ELEVATION = 8235.0 / 3.28083
+KUIPER_LATITUDE = 32.4165
+KUIPER_LONGITUDE = -110.7345
+MMT_ELEVATION = 8585.0 / 3.28083
+MMT_LATITUDE = 31.6883
+MMT_LONGITUDE = -110.8850
+STEWARD_ELEVATION = 0.0 / 3.28083
+STEWARD_LATITUDE = 32.233184
+STEWARD_LONGITUDE = -110.948944
+VATT_ELEVATION = 10469.0 / 3.28083
+VATT_LATITUDE = 32.7016
+VATT_LONGITUDE = -109.8719
 
 
 # +
@@ -58,9 +78,24 @@ import matplotlib.lines as mlines
 def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt', _img=''):
 
     # define observer, observatory, time, frame, sun and moon
-    if _tel.lower() == 'mmt':
+    if _tel.lower().strip() == 'bok':
+        _observatory = EarthLocation(lat=BOK_LATITUDE*u.deg, lon=BOK_LONGITUDE * u.deg, height=BOK_ELEVATION * u.m)
+        _observer = Observer(location=_observatory, name='BOK', timezone='US/Arizona')
+    elif _tel.lower().strip() == 'greenwich':
+        _observatory = EarthLocation(lat=GREENWICH_LATITUDE*u.deg, lon=GREENWICH_LONGITUDE * u.deg, height=GREENWICH_ELEVATION * u.m)
+        _observer = Observer(location=_observatory, name='GREENWICH', timezone='Greenwich')
+    elif _tel.lower().strip() == 'kuiper':
+        _observatory = EarthLocation(lat=KUIPER_LATITUDE*u.deg, lon=KUIPER_LONGITUDE * u.deg, height=KUIPER_ELEVATION * u.m)
+        _observer = Observer(location=_observatory, name='KUIPER', timezone='US/Arizona')
+    elif _tel.lower().strip() == 'mmt':
         _observatory = EarthLocation(lat=MMT_LATITUDE*u.deg, lon=MMT_LONGITUDE * u.deg, height=MMT_ELEVATION * u.m)
         _observer = Observer(location=_observatory, name='MMT', timezone='US/Arizona')
+    elif _tel.lower().strip() == 'steward':
+        _observatory = EarthLocation(lat=STEWARD_LATITUDE*u.deg, lon=STEWARD_LONGITUDE * u.deg, height=STEWARD_ELEVATION * u.m)
+        _observer = Observer(location=_observatory, name='STEWARD', timezone='US/Arizona')
+    elif _tel.lower().strip() == 'vatt':
+        _observatory = EarthLocation(lat=VATT_LATITUDE*u.deg, lon=VATT_LONGITUDE * u.deg, height=VATT_ELEVATION * u.m)
+        _observer = Observer(location=_observatory, name='VATT', timezone='US/Arizona')
     else:
         return
 
@@ -88,8 +123,8 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
     _oid_s = str(_oid).replace("'", "")
     _ra_hms = ra_to_hms(_ra)
     _dec_dms = dec_to_dms(_dec)
-    _dec_dms = f"{_dec}".replace("+", "")
-    _sup_title = f"{_oid} Airmass @ MMT"
+    _dec_dms = f"{_dec_dms}".replace("+", "")
+    _sup_title = f"{_oid} Airmass @ {_tel.upper()}"
     _sub_title = f"RA={_ra_hms} ({_ra:.3f}), Dec={_dec_dms} ({_dec:.3f})"
 
     # get target
@@ -132,10 +167,17 @@ def plot_tel_airmass(_log=None, _ra=math.nan, _dec=math.nan, _oid='', _tel='mmt'
     plt.savefig(_img)
     plt.savefig(_buf, format='png', dpi=100, bbox_inches='tight')
     plt.close()
-    if _log:
-        _log.debug(f"exit ... _img={_img}")
-        _log.debug(f"exit ... {os.path.basename(os.path.abspath(os.path.expanduser(_img)))}")
-    return os.path.basename(os.path.abspath(os.path.expanduser(_img)))
+
+    # return
+    _img = os.path.abspath(os.path.expanduser(_img))
+    if os.path.exists(_img):
+        if _log:
+            _log.debug(f"created {_img}")
+        return _img
+    else:
+        if _log:
+            _log.debug(f"created None")
+        return
 
 
 # +

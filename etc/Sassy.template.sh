@@ -54,8 +54,8 @@ export SASSY_TTF=${SASSY_HOME}/ttf
 # +
 # data path(s)
 # 
-export SASSY_FINDERS=${SASSY_HOME}/img/finders
 export SASSY_AIRMASS=${SASSY_HOME}/img/airmass
+export SASSY_FINDERS=${SASSY_HOME}/img/finders
 export SASSY_ZTF_ARCHIVE=/dataraid6/backups:/data/backups
 export SASSY_ZTF_DATA=/dataraid6/ztf:/data/ztf
 export SASSY_ZTF_AVRO=/dataraid6/ztf:/data/ztf

@@ -220,6 +220,8 @@
     <table class="table table-striped table-sm">
      <thead>
       <tr>
+       <th><font color="blue">MMT</font></th>
+       <th><font color="blue">MMT</font></th>
        <th><font color="blue">ID</font></th>
        <th><font color="blue">TNS ID</font></th>
        <th><font color="blue">TNS Name</font></th>
@@ -238,6 +240,8 @@
        <th><font color="blue">Certificate</font></th>
       </tr>
       <tr>
+       <th><font color="grey">request</font></th>
+       <th><font color="grey">request</font></th>
        <th><font color="grey"></font></th>
        <th><font color="grey"></font></th>
        <th><font color="grey"></font></th>
@@ -259,8 +263,10 @@
      <tbody>
       {% for record in context.results %}
        <tr>
-        <td><a href="/sassy/tns_q3c/{{ record.id }}/" title="{{ record.id }}">{{ record.id }}</a></td>
+	<td><a href="{{ url_for('mmt_imaging', zoid=record.tns_name|replace(" ", "_")) }}" title="Imaging_{{ record.tns_name|replace(" ", "_") }}" class="btn btn-outline-info btn-small">Image</a></td>
+	<td><a href="{{ url_for('mmt_longslit', zoid=record.tns_name|replace(" ", "_")) }}" title="Longslit_{{ record.tns_name|replace(" ", "_") }}" class="btn btn-outline-info btn-small">Spectra</a></td>
 
+        <td><a href="/sassy/tns_q3c/{{ record.id }}/" title="{{ record.id }}">{{ record.id }}</a></td>
         <td>{{ record.tns_id }}</td>
 
 	<td><a href="{{ record.tns_link }}" title="{{ record.tns_name }}">{{ record.tns_name }}</a></td>
@@ -319,7 +325,6 @@
 	{% else %}
          <td><a href="{{ record.certificate }}/" title="{{ record.certificate }}">{{ record.certificate }}</a></td>
 	{% endif %}
-
 
        </tr>
       {% endfor %}

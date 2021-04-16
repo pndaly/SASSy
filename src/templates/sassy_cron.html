@@ -414,7 +414,7 @@
 	       <!-- Other -->
                <td><a href="https://alerce.online/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
                <td><a href="https://lasair.roe.ac.uk/object/{{ alert.zoid }}/" target="_blank" title="{{ alert.zoid }}" class="btn btn-outline-success btn-small">{{ alert.zoid }}</a></td>
-               <td><a href="{{ url_for('sassy_cron_page', oid=alert.zoid) }}" title="_blank" class="btn btn-outline-info btn-small">SassyCron</a></td>
+	       <td><a href="{{ url_for('sassy_cron_page', oid=alert.zoid) }}" title="_blank" class="btn btn-outline-info btn-small">{{ alert.zoid }}</a></td>
                <td><a href="{{ url_for('mmt_longslit', zoid=alert.zoid) }}" title="Longslit_{{ alert.zoid }}" class="btn btn-outline-info btn-small">Spectrum</a></td>
 	       <td><a href="{{ url_for('plot_finder', ra=alert.zra, dec=alert.zdec, oid=alert.zoid, img=alert.spng|replace('science', 'finder')) }}" target="_blank" title="finder" class="btn btn-outline-info btn-small">Finder</a></td>
 	       <td><a href="{{ url_for('plot_airmass', tel='mmt', ra=alert.zra, dec=alert.zdec, oid=alert.zoid, img=alert.spng|replace('science', 'airmass')) }}" target="_blank" title="airmass" class="btn btn-outline-info btn-small">Airmass</a></td>

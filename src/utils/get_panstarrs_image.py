@@ -145,8 +145,8 @@ def get_panstarrs_image(**kw):
 
     # set default(s)
     _ra_dec = ra_to_decimal(_ra)
-    _ra_str = _ra.replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
     _dec_dec = dec_to_decimal(_dec)
+    _ra_str = _ra.replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
     _dec_str = _dec.replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
     _color = kw['color'] if ('color' in kw and isinstance(kw['color'], bool)) else True
     _filters = kw['filters'] if \

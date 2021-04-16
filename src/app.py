@@ -32,6 +32,7 @@ from flask import render_template
 from flask import send_file
 from flask import send_from_directory
 from urllib.parse import urlencode
+from urllib.parse import parse_qsl
 
 # noinspection PyUnresolvedReferences
 from src.forms.Forms import AstronomicalRadialQueryForm
@@ -1630,25 +1631,68 @@ def _mmt_get(_dbrec=None, _form=None, _obstype='imaging'):
     if _dbrec is None or _form is None or _obstype.strip().lower() not in ['imaging', 'longslit']:
         return
 
-    # set default(s)
-    _form.ra_hms.data = ra_to_hms(_dbrec.zra).strip()
-    _form.dec_dms.data = dec_to_dms(_dbrec.zdec).strip()
+    # populate form depending on type
+    if isinstance(_dbrec, SassyCron):
+        _form.ra_hms.data = ra_to_hms(_dbrec.zra).strip()
+        _form.dec_dms.data = dec_to_dms(_dbrec.zdec).strip()
+        _form.filter_name.data = ZTF_FILTERS.get(_dbrec.zfid)[0]
+        _form.magnitude.data = round((_dbrec.zmagap + _dbrec.zmagpsf) / 2.0, 3)
+        _form.notes.data = f"{_dbrec.spng.split('.')[0].replace('_science', '')}: {_dbrec.altype}"
+        if _obstype.strip().lower() == 'imaging':
+            _form.zoid.data = f"i{_dbrec.zoid}"
+        else:
+            _form.zoid.data = f"s{_dbrec.zoid}"
+
+    elif isinstance(_dbrec, TnsQ3cRecord):
+        _ra_str = ra_to_hms(_dbrec.ra).replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+        _dec_str = dec_to_dms(_dbrec.dec).replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
+        _form.ra_hms.data = ra_to_hms(_dbrec.ra).strip()
+        _form.dec_dms.data = dec_to_dms(_dbrec.dec).strip()
+        _form.filter_name.data = _dbrec.filter_name
+        _form.magnitude.data = round(_dbrec.discovery_mag, 3)
+        _form.zoid.data = f"{_dbrec.tns_name.replace(' ', '')}"
+        if _obstype.strip().lower() == 'imaging':
+            _form.notes.data = f"i{_dbrec.tns_name.replace(' ', '_')}_{_ra_str}_{_dec_str}"
+        else:
+            _form.notes.data = f"s{_dbrec.tns_name.replace(' ', '_')}_{_ra_str}_{_dec_str}"
+
+    elif isinstance(_dbrec, dict):
+        if not _dbrec or _dbrec == {}:
+            pass
+        elif all(_k in ['ra', 'dec', 'filter_name', 'magnitude', 'name'] for _k in _dbrec.keys()):
+            _ra_str, _dec_str = '', ''
+            if isinstance(_dbrec['ra'], float):
+                _ra_str = ra_to_hms(_dbrec['ra']).replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+                _form.ra_hms.data = ra_to_hms(_dbrec['ra']).strip()
+            if isinstance(_dbrec['dec'], float):
+                _dec_str = dec_to_dms(_dbrec['dec']).replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
+                _form.dec_dms.data = dec_to_dms(_dbrec['dec']).strip()
+            _form.filter_name.data = _dbrec['filter_name']
+            if isinstance(_dbrec['magnitude'], float):
+                _form.magnitude.data = round(float(_dbrec['magnitude']), 3)
+            else:
+                _form.magnitude.data = -900.0
+            _form.zoid.data = f"{_dbrec['name'].replace(' ', '_')}"
+            if _obstype.strip().lower() == 'imaging':
+                _form.notes.data = f"i{_dbrec['name'].replace(' ', '_')}_{_ra_str}_{_dec_str}"
+            else:
+                _form.notes.data = f"s{_dbrec['name'].replace(' ', '_')}_{_ra_str}_{_dec_str}"
+
+    else:
+        pass
+
+    # common item(s)
     _form.epoch.data = 2000.0
-    _form.filter_name.data = ZTF_FILTERS.get(_dbrec.zfid)[0]
-    _form.magnitude.data = round((_dbrec.zmagap + _dbrec.zmagpsf) / 2.0, 3)
-    _form.notes.data = f"{_dbrec.spng.split('.')[0].replace('_science', '')}: {_dbrec.altype}"
     _form.token.data = ''
     _form.visits.data = 1
     if _obstype.strip().lower() == 'imaging':
         _form.exposuretime.data = 100.0
         _form.numexposures.data = 5
-        _form.zoid.data = f"i{_dbrec.zoid}"
     else:
         _form.exposuretime.data = 900.0
         _form.numexposures.data = 2
         _form.central_lambda.data = 6500.0
         _form.grating.data = 270
-        _form.zoid.data = f"s{_dbrec.zoid}"
 
     # return form
     return _form
@@ -1667,9 +1711,30 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
     _ra = f"{_form.ra_hms.data.strip()}"
     _dec = f"{_form.dec_dms.data.strip()}".replace("+", "")
 
-    # get full path(s)
-    _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
-    _mmt_loc = f"{app.static_folder}/img/{_mmt}"
+    # get path(s)
+    _mmt, _mmt_loc = None, None
+    if isinstance(_dbrec, SassyCron):
+        _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.jpg"
+
+    elif isinstance(_dbrec, TnsQ3cRecord):
+        _ra_str = ra_to_hms(_dbrec.ra).replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+        _dec_str = dec_to_dms(_dbrec.dec).replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
+        _oid = f"{_dbrec.tns_name.replace(' ', '_')}"
+        _mmt = f"{_oid}_{_ra_str}_{_dec_str}_mmt.jpg"
+
+    elif isinstance(_dbrec, dict):
+        if not _dbrec or _dbrec == {}:
+            pass
+        elif all(_k in ['ra', 'dec', 'name'] for _k in _dbrec.keys()):
+            _ra_str = ra_to_hms(_dbrec['ra']).replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+            _dec_str = dec_to_dms(_dbrec['dec']).replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
+            _oid = f"{_dbrec['name']}"
+            _mmt = f"{_oid}_{_ra_str}_{_dec_str}_mmt.jpg"
+
+    else:
+        pass
+
+    _mmt_loc = f"{SASSY_FINDERS}/{_mmt}"
     logger.debug(f'_mmt={_mmt}, _mmt_loc={_mmt_loc}')
 
     # return payload
@@ -1685,12 +1750,12 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
             "maskid": 110, 
             "notes": f"{_form.notes.data.strip()}",
             "numberexposures": int(_form.numexposures.data), 
-            "objectid": f"{_form.zoid.data.strip()}",
+            "objectid": f"{_form.zoid.data.strip()}".replace("_", ""),
             "observationtype": "imaging", 
             "priority": 1, 
             "ra": _ra,
             "token": f"{_form.token.data.strip()}", 
-            "too": 1, 
+            "targetofopportunity": 1, 
             "visits": int(_form.visits.data)
         }
     else:
@@ -1707,13 +1772,13 @@ def _mmt_post(_dbrec=None, _form=None, _obstype='imaging'):
             "maskid": {'Longslit0_75': 113, 'Longslit1': 111, 'Longslit1_25': 131, 'Longslit1_5': 114, 'Longslit5': 112}.get(f"{_form.slitwidth.data.strip()}", 111),
             "notes": f"{_form.notes.data.strip()}",
             "numberexposures": int(_form.numexposures.data), 
-            "objectid": f"{_form.zoid.data.strip()}",
+            "objectid": f"{_form.zoid.data.strip()}".replace("_", ""),
             "observationtype": "longslit", 
             "priority": 1, 
             "ra": _ra,
             "slitwidth": f"{_form.slitwidth.data.strip()}",
             "token": f"{_form.token.data.strip()}", 
-            "too": 1, 
+            "targetofopportunity": 1, 
             "visits": int(_form.visits.data)
         }
 
@@ -1726,41 +1791,85 @@ def _mmt_create_finder(_dbrec=None):
     # check input(s)
     if _dbrec is None:
         return
-    logger.debug(f'_ra={_dbrec.zra}, _dec={_dbrec.zdec}, _oid={_dbrec.zoid}')
 
     # get base name(s)
-    _dif = f"{_dbrec.dpng}"
-    _sci = f"{_dbrec.spng}"
-    _tmp = f"{_dbrec.tpng}"
-    logger.debug(f'_dif={_dif}, _sci={_sci}, _tmp={_tmp}')
+    _dif, _sci, _tmp, _fnd, _air, _mmt_jpg, _mmt_png, _oid = '', '', '', '', '', '', '', ''
+    if isinstance(_dbrec, SassyCron):
+        _dif = f"{_dbrec.dpng}"
+        _sci = f"{_dbrec.spng}"
+        _tmp = f"{_dbrec.tpng}"
+        _fnd = f"{_dbrec.spng.split('.')[0].replace('_science', '_finder')}.png"
+        _air = f"{_dbrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
+        _oid = f"{_dbrec.zoid}"
+        _mmt_jpg = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.jpg"
+        _mmt_png = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
 
-    _fnd = f"{_dbrec.spng.split('.')[0].replace('_science', '_finder')}.png"
-    _air = f"{_dbrec.spng.split('.')[0].replace('_science', '_airmass')}.png"
-    _mmt = f"{_dbrec.spng.split('.')[0].replace('_science', '_mmt')}.png"
-    _oid = f"{_dbrec.zoid}"
-    logger.debug(f'_fnd={_fnd}, _air={_air}, _mmt={_mmt}, _oid={_oid}')
+    elif isinstance(_dbrec, TnsQ3cRecord):
+        _ra_str = ra_to_hms(_dbrec.ra).replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+        _dec_str = dec_to_dms(_dbrec.dec).replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
+        _oid = f"{_dbrec.tns_name.replace(' ', '_')}"
+        _dif = f"{_oid}_{_ra_str}_{_dec_str}_difference.png"
+        _sci = f"{_oid}_{_ra_str}_{_dec_str}_science.png"
+        _tmp = f"{_oid}_{_ra_str}_{_dec_str}_template.png"
+        _fnd = f"{_oid}_{_ra_str}_{_dec_str}_finder.png"
+        _air = f"{_oid}_{_ra_str}_{_dec_str}_airmass.png"
+        _mmt_jpg = f"{_oid}_{_ra_str}_{_dec_str}_mmt.jpg"
+        _mmt_png = f"{_oid}_{_ra_str}_{_dec_str}_mmt.png"
+
+    elif isinstance(_dbrec, dict):
+        _ra_str = ra_to_hms(_dbrec['ra']).replace('.', '').replace(':', '').replace(' ', '').strip()[:6]
+        _dec_str = dec_to_dms(_dbrec['dec']).replace('.', '').replace(':', '').replace(' ', '').replace('-', '').replace('+', '').strip()[:6]
+        _oid = f"{_dbrec['name']}"
+        _dif = f"{_oid}_{_ra_str}_{_dec_str}_difference.png"
+        _sci = f"{_oid}_{_ra_str}_{_dec_str}_science.png"
+        _tmp = f"{_oid}_{_ra_str}_{_dec_str}_template.png"
+        _fnd = f"{_oid}_{_ra_str}_{_dec_str}_finder.png"
+        _air = f"{_oid}_{_ra_str}_{_dec_str}_airmass.png"
+        _mmt_jpg = f"{_oid}_{_ra_str}_{_dec_str}_mmt.jpg"
+        _mmt_png = f"{_oid}_{_ra_str}_{_dec_str}_mmt.png"
+
+    else:
+        pass
+
+    logger.debug(f'_dif={_dif}, _sci={_sci}, _tmp={_tmp}, _oid={_oid}')
+    logger.debug(f'_fnd={_fnd}, _air={_air}, _mmt_png={_mmt_png}, _mmt_jpg={_mmt_jpg}')
 
     # get full path(s)
     _dif_loc = f"{app.static_folder}/img/{_dif}"
     _sci_loc = f"{app.static_folder}/img/{_sci}"
     _tmp_loc = f"{app.static_folder}/img/{_tmp}"
-    logger.debug(f'_dif_loc={_dif_loc}, _sci_loc={_sci_loc}, _tmp_loc={_tmp_loc}')
-
     _fnd_loc = f"{SASSY_FINDERS}/{_fnd}"
     _air_loc = f"{SASSY_AIRMASS}/{_air}"
-    _mmt_loc = f"{SASSY_FINDERS}/{_mmt}"
-    logger.debug(f'_fnd_loc={_fnd_loc}, _air_loc={_air_loc}, _mmt_loc={_mmt_loc}')
+    _mmt_jpg_loc = f"{SASSY_FINDERS}/{_mmt_jpg}"
+    _mmt_png_loc = f"{SASSY_FINDERS}/{_mmt_png}"
 
-    # get finder
-    if _fnd_loc is not None and not os.path.exists(f"{_fnd_loc}"):
-        plot_tel_finder(_ra=_dbrec.zra, _dec=_dbrec.zdec, _oid=_oid, _img=_fnd_loc, _log=logger)
+    logger.debug(f'_dif_loc={_dif_loc}, _sci_loc={_sci_loc}, _tmp_loc={_tmp_loc}')
+    logger.debug(f'_fnd_loc={_fnd_loc}, _air_loc={_air_loc}')
+    logger.debug(f'_mmt_jpg_loc={_mmt_jpg_loc}, _mmt_png_loc={_mmt_png_loc}')
 
     # get airmass
     if _air_loc is not None and not os.path.exists(f"{_air_loc}"):
-        plot_tel_airmass(_ra=_dbrec.zra, _dec=_dbrec.zdec, _oid=_oid, _tel='mmt', _img=_air_loc, _log=logger)
+        if isinstance(_dbrec, SassyCron):
+            _air_loc = plot_tel_airmass(_ra=_dbrec.zra, _dec=_dbrec.zdec, _oid=_oid, _tel='mmt', _img=_air_loc, _log=logger)
+        elif isinstance(_dbrec, TnsQ3cRecord):
+            _air_loc = plot_tel_airmass(_ra=_dbrec.ra, _dec=_dbrec.dec, _oid=_oid, _tel='mmt', _img=_air_loc, _log=logger)
+        elif isinstance(_dbrec, dict):
+            _air_loc = plot_tel_airmass(_ra=ra_to_decimal(_dbrec['ra']), _dec=dec_to_decimal(_dbrec['dec']), _oid=_oid, _tel='mmt', _img=_air_loc, _log=logger)
+    logger.debug(f'_air_loc={_air_loc}')
+
+    # get finder
+    if _fnd_loc is not None and not os.path.exists(f"{_fnd_loc}"):
+        if isinstance(_dbrec, SassyCron):
+            _fnd_loc = plot_tel_finder(_ra=_dbrec.zra, _dec=_dbrec.zdec, _oid=_oid, _img=_fnd_loc, _log=logger)
+        elif isinstance(_dbrec, TnsQ3cRecord):
+            _fnd_loc = plot_tel_finder(_ra=_dbrec.ra, _dec=_dbrec.dec, _oid=_oid, _img=_fnd_loc, _log=logger)
+        elif isinstance(_dbrec, dict):
+            _fnd_loc = plot_tel_finder(_ra=_dbrec['ra'], _dec=_dbrec['dec'], _oid=_oid, _img=_fnd_loc, _log=logger)
+    logger.debug(f'_fnd_loc={_fnd_loc}')
 
     # combine image(s)
     _images = []
+    logger.debug(f'_fnd_loc={_fnd_loc}, _air_loc={_air_loc}, _images={_images}')
     if _fnd_loc is not None and os.path.exists(f"{_fnd_loc}"):
         _images.append(f"{_fnd_loc}")
     if _air_loc is not None and os.path.exists(f"{_air_loc}"):
@@ -1771,18 +1880,39 @@ def _mmt_create_finder(_dbrec=None):
         _images.append(f"{_sci_loc}")
     if _tmp_loc is not None and os.path.exists(f"{_tmp_loc}"):
         _images.append(f"{_tmp_loc}")
-    logger.info(f"_images={_images}, _mmt={_mmt}")
-    if len(_images) < 2:
-        _mmt = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+    logger.info(f"_images={_images}")
+
+    if len(_images) == 0:
+        if _air_loc is not None and os.path.exists(_air_loc):
+            _mmt_png_loc = f"{_air_loc}"
+        elif _fnd_loc is not None and os.path.exists(_fnd_loc):
+            _mmt_png_loc = f"{_fnd_loc}"
+        else:
+            _mmt_png_loc = f"${SASSY_FINDERS}/KeepCalm.png"
+    elif len(_images) == 1:
+        if os.path.exists(_images[0]):
+            _mmt_png_loc = _images[0]
+        else:
+            _mmt_png_loc = f"${SASSY_FINDERS}/KeepCalm.png"
     else:
         try:
-            _mmt_loc = combine_pngs(_files=_images, _output=_mmt_loc, _log=logger)
+            _mmt_png_loc = combine_pngs(_files=_images, _output=_mmt_png_loc, _log=logger)
         except Exception as _eo1:
+            _mmt_png_loc = f"${SASSY_FINDERS}/KeepCalm.png"
             logger.error(f'Failed to combine image(s), error={_eo1}')
-            _mmt_loc = os.path.basename(_fnd_loc) if _fnd_loc is not None else ""
+
+    # convert final image to jpg
+    logger.debug(f'_mmt_jpg_loc={_mmt_jpg_loc}, _mmt_png_loc={_mmt_png_loc}')
+    _mmt_jpg_loc = png_to_jpg(_png=f'{_mmt_png_loc}')
+    logger.debug(f'_mmt_jpg_loc={_mmt_jpg_loc}, _mmt_png_loc={_mmt_png_loc}')
 
     # return path
-    return _mmt
+    if _mmt_jpg_loc is not None and os.path.exists(_mmt_jpg_loc):
+        return _mmt_jpg_loc
+    elif _mmt_png_loc is not None and os.path.exists(_mmt_png_loc):
+        return _mmt_png_loc
+    else:
+        return f"{SASSY_FINDERS}/KeepCalm.jpg"
 
 
 # +
@@ -1794,11 +1924,18 @@ def mmt_imaging(zoid=''):
     logger.debug(f'route /sassy/mmt/imaging/{zoid} entry')
 
     # get observation request
-    _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
-
-    # get image
-    _mmt = _mmt_create_finder(_dbrec=_cronrec)
-    logger.debug(f'route /sassy/mmt/imaging/{zoid} _mmt={_mmt}')
+    _cronrec, _mmt = None, None
+    if zoid.upper().startswith('ZTF'):
+        _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
+        _mmt = _mmt_create_finder(_dbrec=_cronrec)
+    elif zoid.upper().startswith('TNS') or zoid.upper().startswith('AT') or zoid.upper().startswith('SN'):
+        _tns_name = str(zoid).replace("_", " ")
+        _cronrec = TnsQ3cRecord.query.filter_by(tns_name=_tns_name).first_or_404()
+        _mmt = _mmt_create_finder(_dbrec=_cronrec)
+    else:
+        _cronrec = dict(parse_qsl(zoid))
+        _mmt = None
+    logger.debug(f'route /sassy/mmt/imaging/{zoid} _mmt={_mmt}, _cronrec={repr(_cronrec)}')
 
     # form
     form = MMTImagingForm()
@@ -1810,8 +1947,17 @@ def mmt_imaging(zoid=''):
 
     # validate form (POST request)
     if form.validate_on_submit():
-        return render_template('mmt_request.html', url={'url': ''},
-                               payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='imaging'))
+        _payload = _mmt_post(_dbrec=_cronrec, _form=form, _obstype='imaging')
+        logger.info(f'route /sassy/mmt/imaging/{zoid} _payload={_payload}')
+        if zoid.upper().startswith('ZTF'):
+            pass
+        elif zoid.upper().startswith('TNS') or zoid.upper().startswith('AT') or zoid.upper().startswith('SN'):
+            pass
+        else:
+            _mmt = _mmt_create_finder(_dbrec={**_payload, **{'name': _payload['objectid']}})
+            logger.info(f'route /sassy/mmt/imaging/{zoid} _mmt={_mmt}')
+            _payload['findingchartfilename'] = os.path.basename(_mmt) if _mmt is not None else "KeepCalm.png"
+        return render_template('mmt_request.html', url={'url': ''}, img=_mmt, payload=_payload)
 
     # return for GET
     return render_template('mmt_imaging.html', form=form)
@@ -1825,12 +1971,19 @@ def mmt_imaging(zoid=''):
 def mmt_longslit(zoid=''):
     logger.debug(f'route /sassy/mmt/longslit/{zoid} entry')
 
-    # get observation request
-    _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
-
-    # get image
-    _mmt = _mmt_create_finder(_dbrec=_cronrec)
-    logger.debug(f'route /sassy/mmt/longslit/{zoid} _mmt={_mmt}')
+    # get observation request and image
+    _cronrec, _mmt = None, None
+    if zoid.upper().startswith('ZTF'):
+        _cronrec = SassyCron.query.filter_by(zoid=zoid).first_or_404()
+        _mmt = _mmt_create_finder(_dbrec=_cronrec)
+    elif zoid.upper().startswith('TNS') or zoid.upper().startswith('AT') or zoid.upper().startswith('SN'):
+        _tns_name = str(zoid).replace("_", " ")
+        _cronrec = TnsQ3cRecord.query.filter_by(tns_name=_tns_name).first_or_404()
+        _mmt = _mmt_create_finder(_dbrec=_cronrec)
+    else:
+        _cronrec = dict(parse_qsl(zoid))
+        _mmt = None
+    logger.debug(f'route /sassy/mmt/longslit/{zoid} _mmt={_mmt}, _cronrec={repr(_cronrec)}')
 
     # form
     form = MMTLongslitForm()
@@ -1838,12 +1991,21 @@ def mmt_longslit(zoid=''):
     # GET method
     if request.method == 'GET':
         _form = _mmt_get(_dbrec=_cronrec, _form=form, _obstype='longslit')
-        return render_template('mmt_longslit.html', form=_form, record=_cronrec, img=_mmt)
+        return render_template('mmt_longslit.html', form=_form, record=_cronrec, img=os.path.basename(_mmt))
 
     # validate form (POST request)
     if form.validate_on_submit():
-        return render_template('mmt_request.html', url={'url': ''}, img=_mmt,
-                               payload=_mmt_post(_dbrec=_cronrec, _form=form, _obstype='longslit'))
+        _payload = _mmt_post(_dbrec=_cronrec, _form=form, _obstype='longslit')
+        logger.info(f'route /sassy/mmt/longslit/{zoid} _payload={_payload}')
+        if zoid.upper().startswith('ZTF'):
+            pass
+        elif zoid.upper().startswith('TNS') or zoid.upper().startswith('AT') or zoid.upper().startswith('SN'):
+            pass
+        else:
+            _mmt = _mmt_create_finder(_dbrec={**_payload, **{'name': _payload['objectid']}})
+            logger.info(f'route /sassy/mmt/longslit/{zoid} _mmt={_mmt}')
+            _payload['findingchartfilename'] = os.path.basename(_mmt) if _mmt is not None else "KeepCalm.png"
+        return render_template('mmt_request.html', url={'url': ''}, img=os.path.basename(_mmt), payload=_payload)
 
     # return for GET
     return render_template('mmt_longslit.html', form=form)
@@ -1873,28 +2035,81 @@ def mmt_request():
 
     # return error if we cannot parse it
     if _payload is None or not isinstance(_payload, dict):
+        if logger:
+            logger.error(f"_payload={_payload}, type(_payload)={type(_payload)}")
         details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
                     'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_payload}'}]
         return render_template('error.html', details=details)
 
-    # send request
+    # create request
+    _target = None
+    _token = _payload['token']
+    if logger:
+        logger.debug(f"creating MMT target, _target={_target}")
     try:
-        _token = _payload['token']
         _target = mmtapi.Target(token=_token, verbose=True, payload=_payload)
+    except Exception as _ec:
+        if logger:
+            logger.error(f"failed to create MMT target, _target={_target}, error={_ec}")
+        details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
+                    'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_ec}'}]
+        return render_template('error.html', details=details)
+    else:
+        if logger:
+            logger.debug(f"created MMT target, _target={_target}")
+            logger.debug(f"_target.__dict__={_target.__dict__}")
+
+    # post request
+    _json = {}
+    if logger:
+        logger.debug(f"posting MMT target, _target={_target}")
+    try:
         _target.post()
-        _target.upload_finder(finder_path=f"{app.static_folder}/img/{_payload['findingchartfilename']}")
-        _status = _target.__dict__['request'].status_code
+    except Exception as _ep:
+        if logger:
+            logger.error(f"failed to post MMT target, _target={_target}, error={_ep}")
+        details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
+                    'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_ep}'}]
+        return render_template('error.html', details=details)
+    else:
+        if logger:
+            logger.debug(f"posted MMT target, _target={_target}")
+            logger.debug(f"_target.__dict__={_target.__dict__}")
+        _status = int(_target.__dict__['request'].status_code)
         if _status == 200:
             _json = json.loads(_target.__dict__['request'].text)
-            _targetid = _json['id']
-            return render_template('mmt_request_ok.html', targetid=_targetid, obstype=f"{_payload['observationtype']}")
-        else:
-            return render_template('mmt_request_notok.html', status=_status, obstype=f"{_payload['observationtype']}")
+            if logger:
+                logger.debug(f"posted MMT target reponse OK, _status={_status}, _json={_json}")
 
-    except:
+    # upload finder
+    _finder_path = f"{SASSY_FINDERS}/{_payload['findingchartfilename']}"
+    if logger:
+        logger.debug(f"uploading MMT finder, _finder_path={_finder_path}")
+    try:
+        _target.upload_finder(finder_path=f"{_finder_path}")
+    except Exception as _eu:
+        if logger:
+            logger.error(f"failed to upload MMT finder, _finder_path={_finder_path}, error={_eu}")
         details = [{'format': '<dict>', 'line': '', 'name': 'payload', 'route': f'/sassy/mmt/request/?{_payload}',
-                    'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_payload}'}]
+                    'type': 'dict', 'url': f'{SASSY_APP_URL}/mmt/request/?{_payload}/', 'value': f'{_eu}'}]
         return render_template('error.html', details=details)
+    else:
+        if logger:
+            logger.debug(f"uploaded MMT finder, _finder_path={_finder_path}")
+            logger.debug(f"_target.__dict__={_target.__dict__}")
+
+    # check response
+    _status = int(_target.__dict__['request'].status_code)
+    if _status == 200:
+        if logger:
+            logger.debug(f"MMT request reponse OK, _status={_status}")
+        _json = json.loads(_target.__dict__['request'].text)
+        _targetid = _json['id']
+        return render_template('mmt_request_ok.html', targetid=_targetid, obstype=f"{_payload['observationtype']}")
+    else:
+        if logger:
+            logger.error(f"MMT request reponse NOT OK, _status={_status}")
+        return render_template('mmt_request_notok.html', status=_status, obstype=f"{_payload['observationtype']}")
 
 
 # +
@@ -1905,18 +2120,19 @@ def mmt_request():
 def plot_airmass(img=''):
     logger.debug(f'route /sassy/plot_airmass/{img} entry')
 
-    # get data
-    _ra = request.args.get('ra', math.nan)
-    _dec = request.args.get('dec', math.nan)
-    _oid = request.args.get('oid', '')
-    _tel = request.args.get('tel', 'mmt')
-    _airmass = f"{SASSY_AIRMASS}/{img}"
-    logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _tel={_tel}, _airmass={_airmass}')
-
     # return
-    if not os.path.exists(_airmass):
-        plot_tel_airmass(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _tel=_tel, _img=_airmass, _log=logger)
-    return send_from_directory(f"{SASSY_AIRMASS}", img, as_attachment=False)
+    if os.path.exists(f"{SASSY_AIRMASS}/{img}"):
+        return send_from_directory(f"{SASSY_AIRMASS}", img, as_attachment=False)
+    else:
+        _airmass = f"{SASSY_AIRMASS}/{img}"
+        logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _tel={_tel}, _airmass={_airmass}')
+        _ra = request.args.get('ra', math.nan)
+        _dec = request.args.get('dec', math.nan)
+        _oid = request.args.get('oid', get_hash())
+        _tel = request.args.get('tel', 'mmt')
+        _airmass = plot_tel_airmass(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _tel=_tel, _img=_airmass, _log=logger)
+        return send_from_directory(f"{SASSY_AIRMASS}", os.path.basename(_airmass), as_attachment=False)
+
 
 # +
 # route(s): /plot_finder/<img>, /sassy/plot_finder/<img>
@@ -1926,17 +2142,17 @@ def plot_airmass(img=''):
 def plot_finder(img=''):
     logger.debug(f'route /sassy/plot_finder/{img} entry')
 
-    # get data
-    _ra = request.args.get('ra', math.nan)
-    _dec = request.args.get('dec', math.nan)
-    _oid = request.args.get('oid', '')
-    _finder = f"{SASSY_FINDERS}/{img}"
-    logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _finder={_finder}')
-
     # return
-    if not os.path.exists(_finder):
-        plot_tel_finder(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _img=_finder, _log=logger)
-    return send_from_directory(f"{SASSY_FINDERS}", img, as_attachment=False)
+    if os.path.exists(f"{SASSY_FINDERS}/{img}"):
+        return send_from_directory(f"{SASSY_FINDERS}", img, as_attachment=False)
+    else:
+        _finder = f"{SASSY_FINDERS}/{img}"
+        logger.debug(f'img={img}, _ra={_ra}, _dec={_dec}, _oid={_oid}, _tel={_tel}, _finder={_finder}')
+        _ra = request.args.get('ra', math.nan)
+        _dec = request.args.get('dec', math.nan)
+        _oid = request.args.get('oid', get_hash())
+        _finder = plot_tel_finder(_ra=float(_ra), _dec=float(_dec), _oid=_oid, _img=_finder, _log=logger)
+        return send_from_directory(f"{SASSY_FINDERS}", os.path.basename(_finder), as_attachment=False)
 
 
 # +
@@ -1991,6 +2207,7 @@ def psql_query():
 @app.route('/finder/<img>', methods=['GET'])
 def show_finder(img=''):
     logger.debug(f'route /sassy/finder/{img} entry')
+    img = img if '/' not in img else os.path.basename(img)
     return send_from_directory(f"{SASSY_FINDERS}", img, as_attachment=False)
 
 

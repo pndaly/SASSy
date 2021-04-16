@@ -329,6 +329,8 @@ _add_classifier_and_plot () {
     write_yellow "DryRun> rm -f ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1"
     write_yellow "DryRun> rm -f ${SASSY_AIRMASS}/*.png ${SASSY_AIRMASS}/*.jpg"
     write_yellow "DryRun> rm -f ${SASSY_FINDERS}/*.png ${SASSY_FINDERS}/*.jpg"
+    write_yellow "DryRun> cp ${SASSY_SRC}/static/img/KeepCalm.png ${SASSY_AIRMASS} >> /dev/null 2>&1"
+    write_yellow "DryRun> cp ${SASSY_SRC}/static/img/KeepCalm.png ${SASSY_FINDERS} >> /dev/null 2>&1"
     write_yellow "DryRun> source ~/.bashrc_conda"
     write_yellow "DryRun> conda activate"
     write_yellow "DryRun> cd ${SASSY_SRC}/static/img"
@@ -343,6 +345,8 @@ _add_classifier_and_plot () {
     rm -f ${SASSY_SRC}/static/img/sassy_cron_mollweide.png >> /dev/null 2>&1
     rm -f ${SASSY_AIRMASS}/*.png ${SASSY_AIRMASS}/*.jpg
     rm -f ${SASSY_FINDERS}/*.png ${SASSY_FINDERS}/*.jpg
+    cp ${SASSY_SRC}/static/img/KeepCalm.png ${SASSY_AIRMASS} >> /dev/null 2>&1
+    cp ${SASSY_SRC}/static/img/KeepCalm.png ${SASSY_FINDERS} >> /dev/null 2>&1
     source ~/.bashrc_conda
     conda activate
     cd ${SASSY_SRC}/static/img
