@@ -26,14 +26,14 @@
       <p> <b>Early Classifier:</b> {{ alerce['aetype'] }} <b>Prob:</b> {{ alerce['aeprob'] }}</p>
       <p> <b>Late Classifier:</b> {{ alerce['altype'] }} <b>Prob:</b> {{ alerce['alprob'] }}</p>
       <p>
-      	<a href="/" target="_blank" title="">
-	      <img src="/static/img/{{ alerce['spng'] }}" title="{{ alerce['spng'] }}" width="100" height="100">
-      	</a>
-	<a href="/" target="_blank" title="">
-              <img src="/static/img/{{ alerce['dpng'] }}" title="{{ alerce['dpng'] }}" width="100" height="100">
+        <a href="{{ url_for('show_image', img=alerce['spng']) }}" target="_blank" title="{{ alerce['spng'] }}">
+          <img src="{{ url_for('static', filename='/img/') }}{{ alerce['spng'] }}" title="/static/img/{{ alerce['spng'] }}" height="125" width="125">
         </a>
-	<a href="/" target="_blank" title="">
-              <img src="/static/img/{{ alerce['tpng'] }}" title="{{ alerce['tpng'] }}" width="100" height="100">
+        <a href="{{ url_for('show_image', img=alerce['dpng']) }}" target="_blank" title="{{ alerce['dpng'] }}">
+          <img src="{{ url_for('static', filename='/img/') }}{{ alerce['dpng'] }}" title="/static/img/{{ alerce['dpng'] }}" height="125" width="125">
+        </a>
+        <a href="{{ url_for('show_image', img=alerce['tpng']) }}" target="_blank" title="{{ alerce['tpng'] }}">
+          <img src="{{ url_for('static', filename='/img/') }}{{ alerce['tpng'] }}" title="/static/img/{{ alerce['tpng'] }}" height="125" width="125">
         </a>
       </p>
    {% endif %}
