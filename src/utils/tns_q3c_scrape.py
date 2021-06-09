@@ -48,6 +48,8 @@ SASSY_DB_PASS = os.getenv('SASSY_DB_PASS', None)
 SASSY_DB_NAME = os.getenv('SASSY_DB_NAME', None)
 SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 
+TNS_USER_AGENT = 'tns_marker{"tns_id":936,"type":"user","name":"<username>"}'
+
 
 # +
 # function(s)
@@ -112,7 +114,6 @@ def get_unique_hash():
 # +
 # default(s)
 # -
-#DEFAULT_BASE_URL = f'https://wis-tns.weizmann.ac.il'
 DEFAULT_BASE_URL = f'https://www.wis-tns.org'
 DEFAULT_CREDENTIALS = f':'
 DEFAULT_LOGIN_URL = f'{DEFAULT_BASE_URL}/user'
@@ -218,20 +219,37 @@ class TnsQ3cTableParser(object):
 
         # private variable(s)
         self.__ans = None
+        self.__log = None
         self.__response = None
         self.__soup = None
         self.__params = None
         self.__pages = -1
+        self.__session = None
         self.__total = -1
+        self.__user_agent = None
+
+        self.__authorization = {'username': self.__username, 'password': self.__password}
+        self.__user_agent = {'user-agent': TNS_USER_AGENT.replace('<username>', self.__username)}
+
+        # verbose
+        self.__log = UtilsLogger('TnsQ3cScrapeUserAgent').logger if self.__verbose else None
+        if self.__verbose:
+            self.__log.info(f"url='{self.__url}'")
+            self.__log.info(f"credentials='{self.__credentials}'")
+            self.__log.info(f"number={self.__number}")
+            self.__log.info(f"unit='{self.__unit}'")
+            self.__log.info(f"verbose={self.__verbose}") 
+            self.__log.info(f"log={self.__log}") 
+            self.__log.info(f"authorization={self.__authorization}") 
+            self.__log.info(f"user_agent={self.__user_agent}") 
 
         # login
-        self.__session = None
         try:
             self.__session = requests.Session()
-            self.__session.post(self.__url, data=dict(username=self.__username, password=self.__password))
+            self.__session.post(self.__url, data=self.__user_agent)
         except Exception as e:
             self.__session = None
-            _log.debug(f"self.__session={self.__session}, error={e}")
+            self.__log.debug(f"self.__session={self.__session}, error={e}")
 
     # +
     # decorator(s)
@@ -253,6 +271,14 @@ class TnsQ3cTableParser(object):
         self.__credentials = credentials if (isinstance(credentials, str)
                                              and f':' in credentials) else DEFAULT_CREDENTIALS
         self.__username, self.__password = self.__credentials.split(f':')
+
+    @property
+    def log(self):
+        return self.__log
+
+    @log.setter
+    def log(self, log):
+        self.__log = UtilsLogger('TnsQ3cScrapeUserAgent').logger if self.__verbose else None
 
     @property
     def number(self):
@@ -278,6 +304,14 @@ class TnsQ3cTableParser(object):
     def verbose(self, verbose):
         self.__verbose = verbose if isinstance(verbose, bool) else False
 
+    @property
+    def athorization(self):
+        return self.__athorization
+
+    @property
+    def user_agent(self):
+        return self.__user_agent
+
     # +
     # method: dump()
     # -
@@ -302,6 +336,8 @@ class TnsQ3cTableParser(object):
             _res += f'self.__params = {self.__params}, '
             _res += f'self.__soup = {self.__soup}, '
             _res += f'self.__session = {self.__session}, '
+            _res += f'self.__authorization = {self.__authorization}, '
+            _res += f'self.__user_agent = {self.__user_agent}, '
             _res += f'self.__username = {self.__username}, '
             _res += f'self.__password = {self.__password}, '
             _res += f'self.__ans = {self.__ans}, '
@@ -320,18 +356,18 @@ class TnsQ3cTableParser(object):
         # noinspection PyBroadException
         try:
             if self.__session is not None:
-                _requests = self.__session.get(url=self.__url, params=self.__params,)
+                _requests = self.__session.get(url=self.__url, headers=self.__user_agent, params=self.__params,)
             else:
-                _requests = requests.get(url=self.__url, params=self.__params, auth=(self.__username, self.__password),)
+                _requests = requests.get(url=self.__url, headers=self.__user_agent, params=self.__params, auth=(self.__username, self.__password),)
         except Exception as e:
             if self.__verbose:
-                _log.error(f"Failed calling self.get_request(), error={e}")
+                self.__log.error(f"Failed calling self.get_request(), error={e}")
             return None
 
         # return data
         if _requests.status_code != 200 or _requests.text.strip() == '':
             if self.__verbose:
-                _log.error(f"Bad response (code={_requests.status_code}, text='{_requests.text[1:80]}...')")
+                self.__log.error(f"Bad response (code={_requests.status_code}, text='{_requests.text[1:80]}...')")
             return None
         else:
             return _requests
@@ -350,20 +386,20 @@ class TnsQ3cTableParser(object):
         _rope = [_e.find_all('tr', attrs={'class': 'row-odd public even'}) for _e in _table][0]
         _ropo = [_e.find_all('tr', attrs={'class': 'row-odd public odd'}) for _e in _table][0]
         if self.__verbose:
-            _log.info(f"len(_repe)={len(_repe)}")
-            _log.info(f"len(_repo)={len(_repo)}")
-            _log.info(f"len(_rope)={len(_rope)}")
-            _log.info(f"len(_ropo)={len(_ropo)}")
+            self.__log.info(f"len(_repe)={len(_repe)}")
+            self.__log.info(f"len(_repo)={len(_repo)}")
+            self.__log.info(f"len(_rope)={len(_rope)}")
+            self.__log.info(f"len(_ropo)={len(_ropo)}")
 
         _evens = set().union(_repe, _repo)
         _odds = set().union(_rope, _ropo)
         if self.__verbose:
-            _log.info(f"len(_evens)={len(_evens)}")
-            _log.info(f"len(_odds)={len(_odds)}")
+            self.__log.info(f"len(_evens)={len(_evens)}")
+            self.__log.info(f"len(_odds)={len(_odds)}")
 
         _rows = list(set().union(_evens, _odds))
         if self.__verbose:
-            _log.info(f"len(_rows)={len(_rows)}")
+            self.__log.info(f"len(_rows)={len(_rows)}")
 
         # scrape each row which should look like this
         for _e in _rows:
@@ -374,7 +410,7 @@ class TnsQ3cTableParser(object):
 
             # initialize a dictionary
             if self.__verbose:
-                _log.info(f"scraping row {_e}")
+                self.__log.info(f"scraping row {_e}")
             _ans_tmp = {}
 
             try:
@@ -547,7 +583,7 @@ class TnsQ3cTableParser(object):
                 _ans_tmp['bibcode'] = ''
 
             try:
-                # _log.info(f"_ans_tmp['bibcode']={_ans_tmp['bibcode']}")
+                # self.__log.info(f"_ans_tmp['bibcode']={_ans_tmp['bibcode']}")
                 _ans_tmp['catalogs'] = _e.find('td', attrs={'class': 'cell-ext_catalogs'}).text.strip()
             except Exception:
                 _ans_tmp['catalogs'] = ''
@@ -555,11 +591,11 @@ class TnsQ3cTableParser(object):
             # add it to the result(s)
             if _ans_tmp['tns_id'] != '' and _ans_tmp['tns_name'] != '' and _ans_tmp['ra'] != '' and _ans_tmp['decl'] != '':
                 if self.__verbose:
-                    _log.debug(f"scraped row {_ans_tmp}")
+                    self.__log.debug(f"scraped row {_ans_tmp}")
                 self.__ans.append(_ans_tmp)
             else:
                 if self.__verbose:
-                    _log.debug(f"ignoring {_ans_tmp}")
+                    self.__log.debug(f"ignoring {_ans_tmp}")
 
     # +
     # method: get_soup()
@@ -570,12 +606,12 @@ class TnsQ3cTableParser(object):
         # set default(s)
         self.__params['page'] = _page if (isinstance(_page, int) and _page > 0) else 0
         if self.__verbose:
-            _log.debug(f'self.__params={self.__params}')
+            self.__log.debug(f'self.__params={self.__params}')
 
         # get request
         self.__response = self.get_request()
         if self.__verbose:
-            _log.debug(f'self.__response={self.__response}')
+            self.__log.debug(f'self.__response={self.__response}')
 
         # get encoding
         _http_encoding = self.__response.encoding if 'charset' in self.__response.headers.get(
@@ -586,15 +622,15 @@ class TnsQ3cTableParser(object):
         self.__soup = None
         try:
             if self.__verbose:
-                _log.debug(f'Getting soup from self.__response.text')
+                self.__log.debug(f'Getting soup from self.__response.text')
             self.__soup = BeautifulSoup(self.__response.text, features='html5lib', 
                                         from_encoding=(_html_encoding or _http_encoding))
             if self.__verbose:
-                _log.debug(f'Got soup from self.__response.text OK')
+                self.__log.debug(f'Got soup from self.__response.text OK')
         except Exception as e:
             self.__soup = None
             if self.__verbose:
-                _log.error(f'Failed to get soup from self.__response.text, error={e}')
+                self.__log.error(f'Failed to get soup from self.__response.text, error={e}')
 
     # +
     # method: scrape_tns_pages()
@@ -614,7 +650,7 @@ class TnsQ3cTableParser(object):
         # get soup
         self.get_soup()
         if self.__verbose:
-            _log.debug(f'type(self.__soup)={type(self.__soup)}')
+            self.__log.debug(f'type(self.__soup)={type(self.__soup)}')
 
         # get max number of results by scraping
         if self.__soup is not None:
@@ -622,15 +658,15 @@ class TnsQ3cTableParser(object):
             _ems = [_e.find_all('em', attrs={'class': 'placeholder'}) for _e in _div][0]
             self.__total = int(_ems[-1].text)
             if self.__verbose:
-                _log.debug(f'self.__total={self.__total}')
-                _log.debug(f"self.__params['num_page']={self.__params['num_page']}")
+                self.__log.debug(f'self.__total={self.__total}')
+                self.__log.debug(f"self.__params['num_page']={self.__params['num_page']}")
         else:
             return self.__total, self.__ans
 
         # calculate pages
         self.__pages = math.ceil(int(self.__total) / int(self.__params['num_page']))
         if self.__verbose:
-            _log.debug(f'self.__pages={self.__pages}')
+            self.__log.debug(f'self.__pages={self.__pages}')
 
         # get record(s) for page 0
         self.get_records()
@@ -641,13 +677,13 @@ class TnsQ3cTableParser(object):
                 self.get_soup(_i)
                 self.get_records()
                 if self.__verbose:
-                    _log.debug(f'sleeping for 5 seconds ...')
+                    self.__log.debug(f'sleeping for 5 seconds ...')
                 time.sleep(5)
 
         # return result
         if self.__verbose:
-            _log.debug(f'self.__total = {self.__total}')
-            _log.debug(f'len(self.__ans) = {len(self.__ans)}')
+            self.__log.debug(f'self.__total = {self.__total}')
+            self.__log.debug(f'len(self.__ans) = {len(self.__ans)}')
         return self.__total, self.__ans
 
 
@@ -673,6 +709,7 @@ def tns_q3c_scrape(login=DEFAULT_LOGIN_URL, credentials=DEFAULT_CREDENTIALS, num
         _log.info(f"Instantiating TnsQ3cTableParser('{login}', '{credentials}', '{number}', '{unit}', {verbose})")
         _ttp = TnsQ3cTableParser(login, credentials, number, unit, verbose)
         _log.info(f"Instantiated TnsQ3cTableParser('{login}', '{credentials}', '{number}', '{unit}', {verbose}) OK")
+        _log.info(f"TnsQ3cTableParser.log = {_ttp.log}")
     except Exception as e:
         _log.error(f"Failed instantiating TnsQ3cTableParser("
                    f"'{login}', '{credentials}', '{number}', '{unit}',  {verbose}), error={e}")
