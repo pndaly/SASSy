@@ -39,8 +39,9 @@ _log = UtilsLogger('LigoQ3c').logger
 # +
 # default(s)
 # -
-#DEFAULT_URL = f'https://wis-tns.weizmann.ac.il/ligo/events'
-DEFAULT_URL = f'https://www.wis-tns.org/ligo/events'
+DEFAULT_BASE_URL = f'https://www.wis-tns.org'
+DEFAULT_LOGIN_URL = f'{DEFAULT_BASE_URL}/user'
+DEFAULT_SEARCH_URL = f'{DEFAULT_BASE_URL}/ligo/events'
 DEFAULT_CREDENTIALS = f':'
 DEFAULT_SCHEMA = f'json'
 
@@ -54,8 +55,10 @@ SASSY_DB_PASS = os.getenv('SASSY_DB_PASS', None)
 SASSY_DB_PORT = os.getenv('SASSY_DB_PORT', None)
 SASSY_DB_USER = os.getenv('SASSY_DB_USER', None)
 
-TNS_LIGO_Q3C_SUPPORTED_EVENTS = re.compile(r'GW\d{8}_\d{6}')
-TNS_LIGO_Q3C_SUPPORTED_SCHEMAS = [f'json', f'tsv']
+TNS_LIGO_SUPPORTED_EVENTS = re.compile(r'GW\d{8}_\d{6}')
+TNS_LIGO_SUPPORTED_SCHEMAS = [f'json', f'tsv']
+
+TNS_USER_AGENT = 'tns_marker{"tns_id":936,"type":"user","name":"<username>"}'
 
 
 # +
@@ -69,6 +72,15 @@ __doc__ = """
 
 
 # +
+# function: list_has_index()
+# -
+def list_has_index(_list=None, _index=0):
+    if isinstance(_list, list):
+        return (_index < len(_list))
+    return False
+
+
+# +
 # class: LigoQ3cTableParser()
 # -
 class LigoQ3cTableParser(object):
@@ -76,7 +88,7 @@ class LigoQ3cTableParser(object):
     # +
     # method: __init__()
     # -
-    def __init__(self, url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS, schema=DEFAULT_SCHEMA, verbose=False):
+    def __init__(self, url=DEFAULT_BASE_URL, credentials=DEFAULT_CREDENTIALS, schema=DEFAULT_SCHEMA, verbose=False):
 
         # get input(s)
         self.url = url
@@ -87,6 +99,7 @@ class LigoQ3cTableParser(object):
         # private variable(s)
         self.__response = None
         self.__soup = None
+        self.__username, self.__password = self.__credentials.split(f':')
 
         self.__after = []
         self.__aka = []
@@ -98,6 +111,28 @@ class LigoQ3cTableParser(object):
         self.__columns = 0
         self.__headers = []
         self.__rows = 0
+
+        self.__authorization = {'username': self.__username, 'password': self.__password}
+        self.__user_agent = {'user-agent': TNS_USER_AGENT.replace('<username>', self.__username)}
+
+        # verbose
+        self.__log = UtilsLogger('LigoQ3cScrapeUserAgent').logger if self.__verbose else None
+        if self.__verbose:
+            self.__log.info(f"url='{self.__url}'")
+            self.__log.info(f"credentials='{self.__credentials}'")
+            self.__log.info(f"schema={self.__schema}")
+            self.__log.info(f"verbose={self.__verbose}")
+            self.__log.info(f"log={self.__log}")
+            self.__log.info(f"authorization={self.__authorization}")
+            self.__log.info(f"user_agent={self.__user_agent}")
+
+        # login
+        try:
+            self.__session = requests.Session()
+            self.__session.post(f'{self.__url}/user', data=self.__user_agent)
+        except Exception as e:
+            self.__session = None
+            self.__log.debug(f"self.__session={self.__session}, error={e}")
 
     # +
     # decorator(s)
@@ -123,12 +158,20 @@ class LigoQ3cTableParser(object):
         self.__username, self.__password = self.__credentials.split(f':')
 
     @property
+    def log(self):
+        return self.__log
+
+    @log.setter
+    def log(self, log):
+        self.__log = UtilsLogger('LigoQ3cScrapeUserAgent').logger if self.__verbose else None
+
+    @property
     def schema(self):
         return self.__schema
 
     @schema.setter
     def schema(self, schema):
-        self.__schema = schema.lower() if schema in TNS_LIGO_Q3C_SUPPORTED_SCHEMAS else DEFAULT_SCHEMA
+        self.__schema = schema.lower() if schema in TNS_LIGO_SUPPORTED_SCHEMAS else DEFAULT_SCHEMA
 
     @property
     def verbose(self):
@@ -137,6 +180,14 @@ class LigoQ3cTableParser(object):
     @verbose.setter
     def verbose(self, verbose):
         self.__verbose = verbose if isinstance(verbose, bool) else False
+
+    @property
+    def authorization(self):
+        return self.__authorization
+
+    @property
+    def user_agent(self):
+        return self.__user_agent
 
     # +
     # method: dump()
@@ -203,7 +254,7 @@ class LigoQ3cTableParser(object):
                 if _a['href'].lower().startswith(f'/ligo/event'):
 
                     # check for search pattern
-                    m = TNS_LIGO_Q3C_SUPPORTED_EVENTS.search(_a['href'])
+                    m = TNS_LIGO_SUPPORTED_EVENTS.search(_a['href'])
                     if m and f'{m.group().strip()}' not in self.__aka:
                         self.__aka.append(f'{m.group()}')
 
@@ -232,9 +283,9 @@ class LigoQ3cTableParser(object):
                 self.__rows += 1
 
         if self.__verbose:
-            _log.debug(f"self.__columns={self.__columns}")
-            _log.debug(f"self.__headers={self.__headers}")
-            _log.debug(f"self.__rows={self.__rows}")
+            self.__log.debug(f"self.__columns={self.__columns}")
+            self.__log.debug(f"self.__headers={self.__headers}")
+            self.__log.debug(f"self.__rows={self.__rows}")
 
     # +
     # method: get_before()
@@ -297,20 +348,20 @@ class LigoQ3cTableParser(object):
 
         # message(s)
         if self.__verbose:
-            _log.debug(f"self.__after={self.dump(self.__after, ' ')}, len={len(self.__after)}")
-            _log.debug(f"self.__aka={self.dump(self.__aka, ' ')}, len={len(self.__aka)}")
-            _log.debug(f"self.__before={self.dump(self.__before, ' ')}, len={len(self.__before)}")
-            _log.debug(f"self.__dates={self.dump(self.__dates, ' ')}, len={len(self.__dates)}")
-            _log.debug(f"self.__names={self.dump(self.__names, ' ')}, len={len(self.__names)}")
+            self.__log.debug(f"self.__after={self.dump(self.__after, ' ')}, len={len(self.__after)}")
+            self.__log.debug(f"self.__aka={self.dump(self.__aka, ' ')}, len={len(self.__aka)}")
+            self.__log.debug(f"self.__before={self.dump(self.__before, ' ')}, len={len(self.__before)}")
+            self.__log.debug(f"self.__dates={self.dump(self.__dates, ' ')}, len={len(self.__dates)}")
+            self.__log.debug(f"self.__names={self.dump(self.__names, ' ')}, len={len(self.__names)}")
 
         # return - this is horrible, it really needs splitting up somehow
         _ans = {}
         for _i in range(self.__rows):
             if self.__verbose:
-                _log.debug(f"scraping row {_i}")
+                self.__log.debug(f"scraping row {_i}")
 
             # get before data from json
-            if self.__schema == 'json':
+            if self.__schema == 'json' and list_has_index(self.__before, _i):
                 _before = self.scrape_json(self.__before[_i])
                 if _before is not None:
                     for _bk, _bv in _before.items():
@@ -319,7 +370,7 @@ class LigoQ3cTableParser(object):
                         if f'{_name}' in _ans:
                             _name = f'{_name}-{_suffix}'
                         if self.__verbose:
-                            _log.debug(f"Creating new dictionary element, _ans['{_name}']")
+                            self.__log.debug(f"Creating new dictionary element, _ans['{_name}']")
                         _ans[f'{_name}'] = {
                             'name': f'{_name}',
                             'name_prefix': _bv['name_prefix'] if 'name_prefix' in _bv else '',
@@ -340,7 +391,7 @@ class LigoQ3cTableParser(object):
                         }
 
             # get before data from tsv
-            elif self.__schema == 'tsv':
+            elif self.__schema == 'tsv' and list_has_index(self.__before, _i):
                 _before = self.scrape_tsv(self.__before[_i])
                 if _before is not None:
                     _before = _before.split('\n')
@@ -354,7 +405,7 @@ class LigoQ3cTableParser(object):
                         if f'{_name}' in _ans:
                             _name = f'{_name}-{_suffix}'
                         if self.__verbose:
-                            _log.debug(f"Creating new dictionary element, _ans['{_name}']")
+                            self.__log.debug(f"Creating new dictionary element, _ans['{_name}']")
                         _ans[f'{_name}'] = {
                             'name': f'{_name}',
                             'name_prefix': _before_entry['name_prefix'] if 'name_prefix' in _before_entry else '',
@@ -378,7 +429,7 @@ class LigoQ3cTableParser(object):
                         }
    
             # get after data from json
-            if self.__schema == 'json':
+            if self.__schema == 'json' and list_has_index(self.__after, _i):
                 _after = self.scrape_json(self.__after[_i])
                 if _after is not None:
                     for _ak, _av in _after.items():
@@ -387,7 +438,7 @@ class LigoQ3cTableParser(object):
                         if f'{_name}' in _ans:
                             _name = f'{_name}-{_suffix}'
                         if self.__verbose:
-                            _log.debug(f"Creating new dictionary element, _ans['{_name}']")
+                            self.__log.debug(f"Creating new dictionary element, _ans['{_name}']")
                         _ans[f'{_name}'] = {
                             'name': f'{_name}',
                             'name_prefix': _av['name_prefix'] if 'name_prefix' in _av else '',
@@ -406,11 +457,9 @@ class LigoQ3cTableParser(object):
                             'gw_date': self.__dates[_i],
                             'before': False
                         }
-                        # if self.__verbose:
-                        #     _log.debug(f"_ans['{_name}']={_ans[_name]}")
 
             # get after data from tsv
-            elif self.__schema == 'tsv':
+            elif self.__schema == 'tsv' and list_has_index(self.__after, _i):
                 _after = self.scrape_tsv(self.__after[_i])
                 if _after is not None:
                     _after = _after.split('\n')
@@ -424,7 +473,7 @@ class LigoQ3cTableParser(object):
                         if f'{_name}' in _ans:
                             _name = f'{_name}-{_suffix}'
                         if self.__verbose:
-                            _log.debug(f"Creating new dictionary element, _ans['{_name}']")
+                            self.__log.debug(f"Creating new dictionary element, _ans['{_name}']")
                         _ans[f'{_name}'] = {
                             'name': f'{_name}',
                             'name_prefix': _after_entry['name_prefix'] if 'name_prefix' in _after_entry else '',
@@ -445,8 +494,6 @@ class LigoQ3cTableParser(object):
                             'gw_date': self.__dates[_i],
                             'before': False
                         }
-                        # if self.__verbose:
-                        #     _log.debug(f"_ans['{_name}']={_ans[_name]}")
 
         # return
         return _ans
@@ -469,7 +516,6 @@ class LigoQ3cTableParser(object):
             for _a in _td.find_all('a', href=True):
 
                 # check names are in correct format
-                # if _a['href'].lower().startswith(f'/ligo/event') and f'{_a.text.strip()}' not in self.__names:
                 if _a['href'].lower().startswith(f'/ligo/event'):
                     self.__names.append(f'{_a.text.strip()}')
 
@@ -482,23 +528,23 @@ class LigoQ3cTableParser(object):
         # noinspection PyBroadException
         try:
             if self.__verbose:
-                _log.debug(f"Calling requests.get('{self.__url}', auth='{self.__username, self.__password}')")
-            _requests = requests.get(self.__url, auth=(self.__username, self.__password))
+                self.__log.debug(f"Calling requests.get('{self.__url}', auth='{self.__username, self.__password}')")
+            _requests = requests.get(f'{self.__url}/ligo/events', headers=self.__user_agent, auth=(self.__username, self.__password))
             if self.__verbose:
-                _log.debug(f"Called requests.get('{self.__url}', "
+                self.__log.debug(f"Called requests.get('{self.__url}', "
                            f"auth='{self.__username, self.__password}'), _requests={_requests}")
 
             if _requests.status_code == 200:
                 return _requests
             else:
                 if self.__verbose:
-                    _log.error(f"Bad status code ({_requests.status_code})  calling requests.get('{self.__url}', "
+                    self.__log.error(f"Bad status code ({_requests.status_code})  calling requests.get('{self.__url}', "
                                f"auth='{self.__username, self.__password}')")
                 return None
 
         except Exception as e:
             if self.__verbose:
-                _log.error(f"Failed calling requests.get('{self.__url}', "
+                self.__log.error(f"Failed calling requests.get('{self.__url}', "
                            f"auth='{self.__username, self.__password}'), error={e}")
             return None
 
@@ -541,11 +587,11 @@ class LigoQ3cTableParser(object):
         # get data
         self.__response = self.get_request()
         if self.__verbose:
-            _log.debug(f'self.__response={self.__response}')
+            self.__log.debug(f'self.__response={self.__response}')
 
         # check response
         if self.__response is None:
-            return []
+            return [], 0
 
         # set up encoding
         _http_encoding = self.__response.encoding if 'charset' in self.__response.headers.get(
@@ -556,11 +602,21 @@ class LigoQ3cTableParser(object):
         try:
             self.__soup = BeautifulSoup(self.__response.text, features='html5lib', 
                                         from_encoding=(_html_encoding or _http_encoding))
-            return [self.get_events(_t) for _t in self.__soup.find_all('table', attrs={'class': 'ligo-alerts-table'})]
         except Exception as e:
             if self.__verbose:
-                _log.error(f'Failed to get soup from self.__response, error={e}')
-            return []
+                self.__log.error(f'Failed to get soup from self.__response, error={e}')
+            return [], 0
+
+        if self.__verbose:
+            self.__log.info(self.__soup.find_all('table', attrs={'class': 'ligo-alerts-table'}))
+
+        try:
+            _ret = [self.get_events(_t) for _t in self.__soup.find_all('table', attrs={'class': 'ligo-alerts-table'})]
+            return _ret, len(_ret)
+        except Exception as e:
+            if self.__verbose:
+                self.__log.error(f'Failed to get events from self.__response, error={e}')
+            return [], 0
 
 
 # +
@@ -575,7 +631,7 @@ def get_unique_hash():
 # function: ligo_q3c_scrape()
 # -
 # noinspection PyBroadException
-def ligo_q3c_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS,
+def ligo_q3c_scrape(url=DEFAULT_BASE_URL, credentials=DEFAULT_CREDENTIALS,
                     schema=DEFAULT_SCHEMA, verbose=False, force=False, dry_run=False):
 
     # check input(s)
@@ -592,14 +648,16 @@ def ligo_q3c_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS,
             _log.critical(f'Invalid input, credentials={credentials}')
         return
     if (not isinstance(schema, str)) or (schema.strip() == '') \
-            or (args.schema.strip().lower() not in TNS_LIGO_Q3C_SUPPORTED_SCHEMAS):
+            or (args.schema.strip().lower() not in TNS_LIGO_SUPPORTED_SCHEMAS):
         if verbose:
             _log.critical(f'Invalid input, schema={schema}')
         return
 
     # instantiate the class
     try:
+        _log.info(f"Instantiating LigoQ3cTableParser('{url}', '{credentials}', '{schema}', {verbose})")
         _ltp = LigoQ3cTableParser(url, credentials, schema, verbose)
+        _log.info(f"Instantiated LigoQ3cTableParser('{url}', '{credentials}', '{schema}', {verbose})")
     except Exception as e:
         _log.error(
             f"Failed instantiating LigoQ3cTableParser('{url}', '{credentials}', '{schema}', {verbose}), error={e}")
@@ -607,11 +665,17 @@ def ligo_q3c_scrape(url=DEFAULT_URL, credentials=DEFAULT_CREDENTIALS,
 
     # scrape the web site
     try:
-        _data = _ltp.scrape_ligo_q3c_events()
+        _log.info(f'Scraping pages')
+        _data, _total = _ltp.scrape_ligo_q3c_events()
+        _log.info(f'Scraped pages OK')
     except Exception as e:
         if verbose:
             _log.error(f'Failed scraping {url}, error={e}')
         return
+
+    if verbose:
+        _log.info(f'_total={_total}')
+        _log.info(f'len(_data)={len(_data)}')
 
     # connect to database
     try:
@@ -735,7 +799,7 @@ if __name__ == '__main__':
     # noinspection PyTypeChecker
     _parser = argparse.ArgumentParser(description=f'Ingest LIGO_Q3C events from TNS',
                                       formatter_class=argparse.RawTextHelpFormatter)
-    _parser.add_argument(f'-u', f'--url', default=f'{DEFAULT_URL}',
+    _parser.add_argument(f'-u', f'--url', default=f'{DEFAULT_BASE_URL}',
                          help=f"""server url=<str>, defaults to %(default)s""")
     _parser.add_argument(f'-c', f'--credentials', default=f'{DEFAULT_CREDENTIALS}',
                          help=f"""server credentials=<str>:<str>, defaults to '%(default)s'""")
